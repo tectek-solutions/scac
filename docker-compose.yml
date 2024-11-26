@@ -1,0 +1,26 @@
+services:
+  action-reaction-service:
+    build:
+      context: services/action-reaction-service
+      dockerfile: Dockerfile
+
+  service-integration-service:
+    build:
+      context: services/service-integration-service
+      dockerfile: Dockerfile
+
+  trigger-service:
+    build:
+      context: services/trigger-service
+      dockerfile: Dockerfile
+
+  user-management-service:
+    build:
+      context: services/user-management-service
+      dockerfile: Dockerfile
+
+  workflow-service:
+    build:
+      context: services/workflow-service
+      dockerfile: Dockerfile
+

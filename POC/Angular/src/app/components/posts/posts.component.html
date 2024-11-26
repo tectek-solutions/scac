@@ -1,0 +1,8 @@
+<button (click)="addPost()">Add Post</button>
+
+@for (post of posts; track post) {
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.body }}</p>
+    <button (click)="deletePost(post.id)">Delete</button>
+    <button (click)="editPost(post.id)">Update</button>
+}

@@ -1,0 +1,22 @@
+<div>
+  <h1>{{ title }}</h1>
+  @for (comp of components; track comp) {
+    <button (click)="loadComponent(comp.component)">{{ comp.name }}</button>
+  }
+  @if (selectedComponent) {
+    @switch (selectedComponent.name) {
+      @case ('_PostsComponent') {
+        <app-posts></app-posts>
+      }
+      @case ('_AlbumsComponent') {
+        <app-albums></app-albums>
+      }
+      @case ('_TodosComponent') {
+        <app-todos></app-todos>
+      }
+      @case ('_UsersComponent') {
+        <app-users></app-users>
+      }
+    }
+  }
+</div>

@@ -1,0 +1,99 @@
+.App-logo {
+  height: 5vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #282c34;
+  height: 60px;
+  text-align: center;
+  color: white;
+}
+
+.nav-start {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.nav-middle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.nav-middle ul {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-middle li {
+  margin: 10px;
+}
+
+.nav-middle a {
+  text-decoration: none;
+  color: white;
+}
+
+.nav-end {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 20px;
+}
+
+.container-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  margin: 20px;
+}
+
+.result {
+  overflow-y: auto;
+  height: 50vh;
+}
+
+.nav-start, .nav-middle, .nav-end {
+  text-align: center;
+}
+
+.nav-middle a:hover {
+  color: #61dafb;
+}
+
+.active {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
