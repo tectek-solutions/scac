@@ -35,8 +35,8 @@ Also the schema can be found in the [SCHEMA.md](SCHEMA.md) file.
 
 - **Relational**: PostgreSQL  
   - Selected for its robust ACID compliance and extensive support for complex queries.  
-- **Non-relational**: MongoDB  
-  - Ideal for unstructured or semi-structured data such as user interactions.
+- **Non-relational**: PostgreSQL JSONB  
+  - Offers the flexibility of NoSQL with the reliability of SQL, ideal for dynamic data structures.
 
 ---
 
