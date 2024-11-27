@@ -1,4 +1,4 @@
-name: Build Multiple Dockerfiles
+name: Docker
 
 on:
   push:
@@ -13,30 +13,8 @@ env:
   DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
 jobs:
-  build:
+  build_action_reaction_service:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service:
-          [
-            action-reaction-service,
-            service-integration-service,
-            trigger-service,
-            user-management-service,
-            workflow-service,
-            client,
-            api-gateway
-          ]
-        directory:
-          [
-            ./services,    # action-reaction-service
-            ./services,    # service-integration-service
-            ./services,    # trigger-service
-            ./services,    # user-management-service
-            ./services,    # workflow-service
-            ./,            # client
-            ./              # api-gateway
-          ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
@@ -44,12 +22,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.7.1
 
-      - name: Build Docker image
+      - name: Build Docker image for action-reaction-service
         run: |
           docker buildx build \
-            --file ./${{ matrix.directory }}/${{ matrix.service }}/Dockerfile \
-            --tag ${{ matrix.service }}:latest \
-            ./${{ matrix.directory }}/${{ matrix.service }}
+            --file ./services/action-reaction-service/Dockerfile \
+            --tag action-reaction-service:latest \
+            ./services/action-reaction-service
 
       - name: If not the branch main, exit
         run: |
@@ -61,5 +39,179 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
-      - name: Push Docker image
-        run: docker push ${{ matrix.service }}:latest
+      - name: Push Docker image for action-reaction-service
+        run: docker push action-reaction-service:latest
+
+  build_service_integration_service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.7.1
+
+      - name: Build Docker image for service-integration-service
+        run: |
+          docker buildx build \
+            --file ./services/service-integration-service/Dockerfile \
+            --tag service-integration-service:latest \
+            ./services/service-integration-service
+
+      - name: If not the branch main, exit
+        run: |
+          if [ ${{ github.ref }} != 'refs/heads/main' ]; then
+            echo "Not on the main branch, exiting..."
+            exit 0
+          fi
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Push Docker image for service-integration-service
+        run: docker push service-integration-service:latest
+
+  build_trigger_service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.7.1
+
+      - name: Build Docker image for trigger-service
+        run: |
+          docker buildx build \
+            --file ./services/trigger-service/Dockerfile \
+            --tag trigger-service:latest \
+            ./services/trigger-service
+
+      - name: If not the branch main, exit
+        run: |
+          if [ ${{ github.ref }} != 'refs/heads/main' ]; then
+            echo "Not on the main branch, exiting..."
+            exit 0
+          fi
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Push Docker image for trigger-service
+        run: docker push trigger-service:latest
+
+  build_user_management_service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.7.1
+
+      - name: Build Docker image for user-management-service
+        run: |
+          docker buildx build \
+            --file ./services/user-management-service/Dockerfile \
+            --tag user-management-service:latest \
+            ./services/user-management-service
+
+      - name: If not the branch main, exit
+        run: |
+          if [ ${{ github.ref }} != 'refs/heads/main' ]; then
+            echo "Not on the main branch, exiting..."
+            exit 0
+          fi
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Push Docker image for user-management-service
+        run: docker push user-management-service:latest
+
+  build_workflow_service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.7.1
+
+      - name: Build Docker image for workflow-service
+        run: |
+          docker buildx build \
+            --file ./services/workflow-service/Dockerfile \
+            --tag workflow-service:latest \
+            ./services/workflow-service
+
+      - name: If not the branch main, exit
+        run: |
+          if [ ${{ github.ref }} != 'refs/heads/main' ]; then
+            echo "Not on the main branch, exiting..."
+            exit 0
+          fi
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Push Docker image for workflow-service
+        run: docker push workflow-service:latest
+
+  build_client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.7.1
+
+      - name: Build Docker image for client
+        run: |
+          docker buildx build \
+            --file ./Dockerfile \
+            --tag client:latest \
+            .
+
+      - name: If not the branch main, exit
+        run: |
+          if [ ${{ github.ref }} != 'refs/heads/main' ]; then
+            echo "Not on the main branch, exiting..."
+            exit 0
+          fi
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Push Docker image for client
+        run: docker push client:latest
+
+  build_api_gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.7.1
+
+      - name: Build Docker image for api-gateway
+        run: |
+          docker buildx build \
+            --file ./Dockerfile \
+            --tag api-gateway:latest \
+            .
+
+      - name: If not the branch main, exit
+        run: |
+          if [ ${{ github.ref }} != 'refs/heads/main' ]; then
+            echo "Not on the main branch, exiting..."
+            exit 0
+          fi
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Push Docker image for api-gateway
+        run: docker push api-gateway:latest
