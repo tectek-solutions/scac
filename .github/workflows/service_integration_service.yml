@@ -1,4 +1,4 @@
-name: Build Multiple Dockerfiles
+name: Build and Push service-integration-service Docker Image
 
 on:
   push:
@@ -13,18 +13,8 @@ env:
   DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
 jobs:
-  build:
+  build_and_push:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service:
-          [
-            action-reaction-service,
-            service-integration-service,
-            trigger-service,
-            user-management-service,
-            workflow-service,
-          ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
@@ -35,12 +25,18 @@ jobs:
       - name: Build Docker image
         run: |
           docker buildx build \
-            --file ./services/${{ matrix.service }}/Dockerfile \
-            --tag ${{ matrix.service }}:latest \
-            ./services/${{ matrix.service }}
+            --file ./services/service-integration-service/Dockerfile \
+            --tag service-integration-service:latest \
+            .
+
+      - name: If not the branch main, exit
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: echo "Not on the main branch, skipping push."
 
       - name: Login to Docker Hub
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
 
       - name: Push Docker image
-        run: docker push ${{ matrix.service }}:latest
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: docker push service-integration-service:latest
