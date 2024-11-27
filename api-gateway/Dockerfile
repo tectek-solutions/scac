@@ -19,7 +19,7 @@ COPY src ./src
 RUN cargo build --release
 
 # Stage 2: Final Image
-FROM alpine:${ALPINE_VERSION}
+FROM alpine:${ALPINE_VERSION} as runtime
 
 # Install runtime dependencies if required
 RUN apk add --no-cache libgcc

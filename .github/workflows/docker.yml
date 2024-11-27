@@ -24,6 +24,18 @@ jobs:
             trigger-service,
             user-management-service,
             workflow-service,
+            client
+            api-gateway,
+          ]
+        directory:
+          [
+            ./services,
+            ./services,
+            ./services,
+            ./services,
+            ./services,
+            ./,
+            ./,
           ]
     steps:
       - name: Checkout code
@@ -35,9 +47,9 @@ jobs:
       - name: Build Docker image
         run: |
           docker buildx build \
-            --file ./services/${{ matrix.service }}/Dockerfile \
+            --file ./${{ matrix.directory }}/${{ matrix.service }}/Dockerfile \
             --tag ${{ matrix.service }}:latest \
-            ./services/${{ matrix.service }}
+            ./${{ matrix.directory }}/${{ matrix.service }}
 
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
