@@ -24,8 +24,8 @@ jobs:
             trigger-service,
             user-management-service,
             workflow-service,
-            client
-            api-gateway,
+            client,
+            api-gateway
           ]
         directory:
           [
@@ -35,7 +35,7 @@ jobs:
             ./services,
             ./services,
             ./,
-            ./,
+            ./
           ]
     steps:
       - name: Checkout code
