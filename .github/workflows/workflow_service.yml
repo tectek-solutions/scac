@@ -40,3 +40,11 @@ jobs:
       - name: Push Docker image
         if: ${{ github.ref == 'refs/heads/main' }}
         run: docker push workflow-service:latest
+
+      - name: Login to GHCR
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Push Docker image
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: docker push ghcr.io/${{ github.repository_owner }}/workflow-service:latest
