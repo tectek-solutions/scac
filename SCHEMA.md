@@ -11,6 +11,7 @@ CREATE TABLE users (
     username VARCHAR(32) UNIQUE NOT NULL, -- Unique username
     email VARCHAR(128) UNIQUE NOT NULL, -- User email
     password_hash BIT(256) NOT NULL, -- Hashed password
+    role user_role_enum NOT NULL, -- User role
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Last update timestamp
 );
@@ -139,6 +140,9 @@ CREATE TABLE workflows (
 ```
 
 ## Enumerated Types
+
+```sql
+CREATE TYPE user_role_enum AS ENUM ('service', 'admin', 'user');
 
 ```sql
 CREATE TYPE http_method_enum AS ENUM ('GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH');
