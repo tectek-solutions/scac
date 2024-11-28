@@ -27,7 +27,7 @@ jobs:
           docker buildx build \
             --file ./services/service-integration-service/Dockerfile \
             --tag service-integration-service:latest \
-            .
+            ./services/service-integration-service/
 
       - name: If not the branch main, exit
         if: ${{ github.ref != 'refs/heads/main' }}

@@ -27,7 +27,7 @@ jobs:
           docker buildx build \
             --file ./services/user-management-service/Dockerfile \
             --tag user-management-service:latest \
-            .
+            ./services/user-management-service/
 
       - name: If not the branch main, exit
         if: ${{ github.ref != 'refs/heads/main' }}

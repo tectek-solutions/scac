@@ -25,9 +25,9 @@ jobs:
       - name: Build Docker image
         run: |
           docker buildx build \
-            --file ./Dockerfile \
+            --file ./api-gateway/Dockerfile \
             --tag api-gateway:latest \
-            .
+            ./api-gateway/
 
       - name: If not the branch main, exit
         if: ${{ github.ref != 'refs/heads/main' }}

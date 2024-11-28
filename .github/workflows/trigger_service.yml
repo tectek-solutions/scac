@@ -27,7 +27,7 @@ jobs:
           docker buildx build \
             --file ./services/trigger-service/Dockerfile \
             --tag trigger-service:latest \
-            .
+            ./services/trigger-service/
 
       - name: If not the branch main, exit
         if: ${{ github.ref != 'refs/heads/main' }}

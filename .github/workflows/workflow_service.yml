@@ -27,7 +27,7 @@ jobs:
           docker buildx build \
             --file ./services/workflow-service/Dockerfile \
             --tag workflow-service:latest \
-            .
+            ./services/workflow-service/
 
       - name: If not the branch main, exit
         if: ${{ github.ref != 'refs/heads/main' }}
