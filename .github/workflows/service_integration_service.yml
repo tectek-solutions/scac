@@ -33,10 +33,10 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' }}
         run: echo "Not on the main branch, skipping push."
 
-      - name: Login to Docker Hub
+      - name: Login to GHCR
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
       - name: Push Docker image
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: docker push service-integration-service:latest
+        run: docker push ghcr.io/${{ github.repository_owner }}/service-integration-service:latest
