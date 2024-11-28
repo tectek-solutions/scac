@@ -27,7 +27,7 @@ jobs:
           docker buildx build \
             --file ./services/action-reaction-service/Dockerfile \
             --tag action-reaction-service:latest \
-            .
+            ./services/action-reaction-service/
 
       - name: If not the branch main, exit
         if: ${{ github.ref != 'refs/heads/main' }}
