@@ -26,7 +26,7 @@ jobs:
         run: |
           docker buildx build \
             --file ./api-gateway/Dockerfile \
-            --tag api-gateway:latest \
+            --tag ${{ github.event.repository.name }}:api-gateway-latest \
             ./api-gateway/
 
       - name: If not the branch main, exit
@@ -39,5 +39,5 @@ jobs:
 
       - name: Push Docker image
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: docker push ghcr.io/${{ github.repository_owner }}/api-gateway:latest
+        run: docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:api-gateway-latest
 

@@ -26,7 +26,7 @@ jobs:
         run: |
           docker buildx build \
             --file ./services/user-tokens-service/Dockerfile \
-            --tag user-tokens-service:latest \
+            --tag ${{ github.event.repository.name }}:user-tokens-service-latest \
             ./services/user-tokens-service/
 
       - name: If not the branch main, exit
@@ -47,4 +47,4 @@ jobs:
 
       - name: Push Docker image
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: docker push ghcr.io/${{ github.repository_owner }}/user-tokens-service:latest
+        run: docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:user-tokens-service-latest
