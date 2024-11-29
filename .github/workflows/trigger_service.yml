@@ -1,4 +1,4 @@
-name: Build and Push trigger-service Docker Image
+name: Docker - Trigger Service
 
 on:
   push:

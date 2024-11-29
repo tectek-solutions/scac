@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "action-reaction-service"
+name = "actions-service"
 version = "0.1.0"

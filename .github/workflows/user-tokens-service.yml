@@ -1,4 +1,4 @@
-name: Build and Push service-integration-service Docker Image
+name: Docker - User Tokens Service
 
 on:
   push:
@@ -25,13 +25,21 @@ jobs:
       - name: Build Docker image
         run: |
           docker buildx build \
-            --file ./services/service-integration-service/Dockerfile \
-            --tag service-integration-service:latest \
-            ./services/service-integration-service/
+            --file ./services/user-tokens-service/Dockerfile \
+            --tag user-tokens-service:latest \
+            ./services/user-tokens-service/
 
       - name: If not the branch main, exit
         if: ${{ github.ref != 'refs/heads/main' }}
         run: echo "Not on the main branch, skipping push."
+
+      - name: Login to Docker Hub
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Push Docker image
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: docker push user-tokens-service:latest
 
       - name: Login to GHCR
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -39,4 +47,4 @@ jobs:
 
       - name: Push Docker image
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: docker push ghcr.io/${{ github.repository_owner }}/service-integration-service:latest
+        run: docker push ghcr.io/${{ github.repository_owner }}/user-tokens-service:latest

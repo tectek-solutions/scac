@@ -59,7 +59,7 @@
 
 ## **Authentication Services API**
 
-### **Base Path**: `/api/auth-services`
+### **Base Path**: `/api/authentification-services`
 
 - **GET** `/`  
   - **Access**: Public  
@@ -146,6 +146,107 @@
     - `500 Internal Server Error`: Error during deletion.
 
 ---
+
+## **API Services API**
+
+### **Base Path**: `/api/api-services`
+
+- **POST** `/`  
+  - **Access**: Admin  
+  - **Responses**:  
+    - `201 Created`: API service added.  
+    - `400 Bad Request`: Invalid input or duplicate name.  
+    - `500 Internal Server Error`: Error adding service.
+
+- **GET** `/:id`
+  - **Access**: Public  
+  - **Responses**:  
+    - `200 OK`: API service retrieved.  
+    - `404 Not Found`: Service ID not found.  
+    - `500 Internal Server Error`: Error fetching service.
+
+- **PUT** `/:id`
+  - **Access**: Admin  
+  - **Responses**:  
+    - `200 OK`: API service updated.  
+    - `400 Bad Request`: Invalid input.  
+    - `404 Not Found`: Service ID not found.  
+    - `500 Internal Server Error`: Error updating service.
+
+- **DELETE** `/:id`
+  - **Access**: Admin  
+  - **Responses**:  
+    - `204 No Content`: API service deleted.  
+    - `404 Not Found`: Service ID not found.  
+    - `500 Internal Server Error`: Error deleting service.
+
+---
+
+## **Actions API**
+
+### **Base Path**: `/api/actions`
+
+- **GET** `/`  
+  - **Access**: Public  
+  - **Responses**:  
+    - `200 OK`: List of actions retrieved.  
+    - `500 Internal Server Error`: Error fetching actions.
+
+- **POST** `/`
+  - **Access**: Admin  
+  - **Responses**:  
+    - `201 Created`: Action added.  
+    - `400 Bad Request`: Invalid input or duplicate name.  
+    - `500 Internal Server Error`: Error adding action.
+
+- **GET** `/:id`
+  - **Access**: Public  
+  - **Responses**:  
+    - `200 OK`: Action retrieved.  
+    - `404 Not Found`: Action ID not found.  
+    - `500 Internal Server Error`: Error fetching action.
+
+- **PUT** `/:id`
+  - **Access**: Admin  
+  - **Responses**:  
+    - `200 OK`: Action updated.  
+    - `400 Bad Request`: Invalid input.  
+    - `404 Not Found`: Action ID not found.  
+    - `500 Internal Server Error`: Error updating action.
+
+- **DELETE** `/:id`
+  - **Access**: Admin  
+  - **Responses**:  
+    - `204 No Content`: Action deleted.  
+    - `404 Not Found`: Action ID not found.  
+    - `500 Internal Server Error`: Error deleting action.
+
+---
+
+## **Reactions API**
+
+### **Base Path**: `/api/reactions`
+
+- **GET** `/`  
+  - **Access**: Public  
+  - **Responses**:  
+    - `200 OK`: List of reactions retrieved.  
+    - `500 Internal Server Error`: Error fetching reactions.
+
+- **POST** `/`
+  - **Access**: Admin  
+  - **Responses**:  
+    - `201 Created`: Reaction added.  
+    - `400 Bad Request`: Invalid input or duplicate name.  
+    - `500 Internal Server Error`: Error adding reaction.
+
+- **GET** `/:id`
+  - **Access**: Public  
+  - **Responses**:  
+    - `200 OK`: Reaction retrieved.  
+    - `404 Not Found`: Reaction ID not found.  
+    - `500 Internal Server Error`: Error fetching reaction.
+
 
 ## **Workflows API**
 

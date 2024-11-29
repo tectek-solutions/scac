@@ -9,7 +9,7 @@ FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 RUN apk add --no-cache musl-dev gcc
 
 # Set working directory
-WORKDIR /usr/src/action-reaction-service
+WORKDIR /usr/src/users-service
 
 # Copy dependencies and build in two steps to leverage caching
 COPY Cargo.toml Cargo.lock ./
@@ -25,15 +25,15 @@ FROM alpine:${ALPINE_VERSION} AS runtime
 RUN apk add --no-cache libgcc
 
 # Add non-root user and group
-RUN addgroup -S action-reaction-service
-RUN adduser -S action-reaction-service -G action-reaction-service
-USER action-reaction-service
+RUN addgroup -S users-service
+RUN adduser -S users-service -G users-service
+USER users-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/action-reaction-service/target/release/action-reaction-service /usr/local/bin/action-reaction-service
+COPY --from=builder /usr/src/users-service/target/release/users-service /usr/local/bin/users-service
 
 # Start the service
-CMD ["/usr/local/bin/action-reaction-service"]
+CMD ["/usr/local/bin/users-service"]
 
 # Expose the service port
 EXPOSE 8000
