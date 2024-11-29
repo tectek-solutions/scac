@@ -9,7 +9,7 @@ FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 RUN apk add --no-cache musl-dev gcc
 
 # Set working directory
-WORKDIR /usr/src/service-integration-service
+WORKDIR /usr/src/actions-service
 
 # Copy dependencies and build in two steps to leverage caching
 COPY Cargo.toml Cargo.lock ./
@@ -25,15 +25,15 @@ FROM alpine:${ALPINE_VERSION} AS runtime
 RUN apk add --no-cache libgcc
 
 # Add non-root user and group
-RUN addgroup -S service-integration-service
-RUN adduser -S service-integration-service -G service-integration-service
-USER $SERVICE_NAME
+RUN addgroup -S actions-service
+RUN adduser -S actions-service -G actions-service
+USER actions-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/service-integration-service/target/release/service-integration-service /usr/local/bin/service-integration-service
+COPY --from=builder /usr/src/actions-service/target/release/actions-service /usr/local/bin/actions-service
 
 # Start the service
-CMD ["/usr/local/bin/service-integration-service"]
+CMD ["/usr/local/bin/actions-service"]
 
 # Expose the service port
 EXPOSE 8000

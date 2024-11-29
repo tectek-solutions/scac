@@ -1,10 +1,10 @@
 [package]
-name = "action-reaction-service"
+name = "authentification-service"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "action-reaction-service"
+name = "authentification-service"
 path = "src/main.rs"
 
 [dependencies]

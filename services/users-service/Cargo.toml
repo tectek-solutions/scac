@@ -1,0 +1,10 @@
+[package]
+name = "users-service"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "users-service"
+path = "src/main.rs"
+
+[dependencies]
