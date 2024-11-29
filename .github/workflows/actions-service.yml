@@ -25,9 +25,9 @@ jobs:
       - name: Build Docker image
         run: |
           docker buildx build \
-            --file ./actions-service/Dockerfile \
+            --file ./services/actions-service/Dockerfile \
             --tag actions-service:latest \
-            ./actions-service/
+            ./services/actions-service/
 
       - name: If not the branch main, exit
         if: ${{ github.ref != 'refs/heads/main' }}
