@@ -1,4 +1,4 @@
-name: Docker - API Gateway
+name: Docker - Actions Service
 
 on:
   push:
