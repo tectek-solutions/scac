@@ -26,7 +26,7 @@ jobs:
         run: |
           docker buildx build \
             --file ./client/Dockerfile \
-            --tag client:latest \
+            --tag ${{ github.event.repository.name }}:client-latest \
             ./client/
 
       - name: If not the branch main, exit
@@ -39,4 +39,4 @@ jobs:
 
       - name: Push Docker image
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: docker push ghcr.io/${{ github.repository_owner }}/client:latest
+        run: docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:client-latest
