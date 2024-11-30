@@ -22,7 +22,7 @@ jobs:
         run: |
           docker buildx build \
             --file ./services/actions-service/Dockerfile \
-            --tag ${{ github.event.repository.name }}:actions-service-latest \
+            --tag ghcr.io/${{ github.event.repository.name }}:actions-service-latest \
             ./services/actions-service/
 
       - name: If not the branch main, exit

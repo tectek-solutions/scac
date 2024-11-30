@@ -22,7 +22,7 @@ jobs:
         run: |
           docker buildx build \
             --file ./services/user-tokens-service/Dockerfile \
-            --tag ${{ github.event.repository.name }}:user-tokens-service-latest \
+            --tag ghcr.io/${{ github.event.repository.name }}:user-tokens-service-latest \
             ./services/user-tokens-service/
 
       - name: If not the branch main, exit
