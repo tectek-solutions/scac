@@ -44,6 +44,9 @@ jobs:
             ${{ github.event_name == 'pull_request' && ' --load ' || ' --push ' }} \
             ${{ inputs.context }}
 
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
       - name: Push Docker image
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && inputs.push_on_main }}
         run: |
