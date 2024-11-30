@@ -22,7 +22,7 @@ jobs:
         run: |
           docker buildx build \
             --file ./services/workflow-service/Dockerfile \
-            --tag ghcr.io/${{ github.event.repository.name }}:workflow-service-latest \
+            --tag ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:workflow-service-latest \
             ./services/workflow-service/
 
       - name: If not the branch main, exit
