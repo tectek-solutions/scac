@@ -18,5 +18,5 @@ jobs:
     with:
       dockerfile: ./services/trigger-service/Dockerfile
       image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:trigger-service-latest
-      context: ./services/triggers-service/
+      context: ./services/trigger-service/
       push_on_main: true
