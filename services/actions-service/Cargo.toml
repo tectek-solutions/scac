@@ -1,0 +1,10 @@
+[package]
+name = "actions-service"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "actions-service"
+path = "src/main.rs"
+
+[dependencies]

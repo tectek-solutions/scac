@@ -1,0 +1,15 @@
+name: Deploy Argo CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  call-deploy-template:
+    uses: ./.github/workflows/deploy-helm-template.yml
+    with:
+      release-name: "argo-cd"
+      namespace: "argo-cd"
+      chart-path: "./deployments/argo-cd"
+      values-file: "./deployments/argo-cd/values.yaml"
