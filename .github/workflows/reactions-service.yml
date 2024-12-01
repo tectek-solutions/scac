@@ -1,0 +1,22 @@
+name: Docker - Reactions Service
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  call-template:
+    uses: ./.github/workflows/docker-image-template.yml
+    with:
+      dockerfile: ./services/reactions-service/Dockerfile
+      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:reactions-service-latest
+      context: ./services/reactions-service/
+      push_on_main: true

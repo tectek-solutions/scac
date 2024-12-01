@@ -72,7 +72,7 @@ To streamline development, all services and the client are stored in a single **
 /automation-platform
 │
 ├── /services
-│   ├── /user-management-service
+│   ├── /users-service
 │   ├── /service-integration-service
 │   ├── /action-reaction-service
 │   ├── /workflow-service

@@ -1,0 +1,22 @@
+name: Docker - API Services Service
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  call-template:
+    uses: ./.github/workflows/docker-image-template.yml
+    with:
+      dockerfile: ./services/api-services-service/Dockerfile
+      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:api-services-service-latest
+      context: ./services/api-services-service/
+      push_on_main: true
