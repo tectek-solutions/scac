@@ -1,0 +1,52 @@
+name: Deploy Helm Chart
+
+on:
+  workflow_call:
+    inputs:
+      release-name:
+        description: "The name of the Helm release"
+        required: true
+        type: string
+      namespace:
+        description: "The Kubernetes namespace to deploy to"
+        required: true
+        type: string
+      chart-path:
+        description: "Path to the Helm chart"
+        required: false
+        default: "./"
+        type: string
+      values-file:
+        description: "Path to the values.yaml file"
+        required: false
+        default: "./values.yaml"
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.2.2
+
+    - name: Set up Kubernetes
+      run: |
+        echo "${{ secrets.KUBERNETES_CONFIG_FILE }}" | base64 --decode > $HOME/.kube/config
+        chmod 600 $HOME/.kube/config
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.16.2
+
+    - name: Helm Dependency Update
+      run: |
+        helm dependency update "${{ inputs.chart-path }}"
+
+    - name: Deploy Helm Chart
+      run: |
+        helm upgrade --install ${{ inputs.release-name }} "${{ inputs.chart-path }}" \
+          --namespace ${{ inputs.namespace }} \
+          --create-namespace \
+          --values "${{ inputs.values-file }}"
