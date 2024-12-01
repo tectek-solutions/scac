@@ -1,3 +1,4 @@
+# Python development for hack
 charts/*
 !charts/crds/
 !charts/crds/**
