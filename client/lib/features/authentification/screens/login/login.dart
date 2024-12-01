@@ -1,3 +1,4 @@
+import 'package:client/features/authentification/screens/registration/registration.dart';
 import 'package:client/utils/constants/image_strings.dart';
 import 'package:client/utils/constants/text_string.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,7 @@ const LoginScreen({super.key});
                 
                     SizedBox(width: double.infinity, child: ElevatedButton(onPressed: (){}, child: const Text("Sign in"))),
                     const SizedBox(height: TSizes.spaceBtwItems),
-                    SizedBox(width: double.infinity, child: OutlinedButton(onPressed: (){}, child: const Text("Create an account"))),
+                    SizedBox(width: double.infinity, child: OutlinedButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (constext) => const Registration()));}, child: const Text("Create an account"))),
                 
                     const SizedBox(height: TSizes.sapceBtwSections),
                   ],
