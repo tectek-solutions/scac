@@ -1,116 +1,153 @@
-# Database Schema
 
-## **SQL Database (User Management with Multiple Tokens per Service)**
+# **Database Schema Design**
+
+## **users Table**
+
+The base table for user management.
 
 ```sql
-CREATE TABLE Users (
-    id SERIAL PRIMARY KEY,             -- Unique user ID
-    username VARCHAR(50) UNIQUE NOT NULL, -- Unique username
-    email VARCHAR(100) UNIQUE NOT NULL,   -- User email
-    password_hash TEXT NOT NULL,       -- Hashed password
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Account creation date
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY, -- Unique user ID
+    username VARCHAR(32) UNIQUE NOT NULL, -- Unique username
+    email VARCHAR(128) UNIQUE NOT NULL, -- User email
+    password_hash BIT(256) NOT NULL, -- Hashed password
+    role user_role_enum NOT NULL, -- User role
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Last update timestamp
 );
-
-CREATE TABLE Services (
-    id SERIAL PRIMARY KEY,             -- Unique service ID
-    name VARCHAR(50) UNIQUE NOT NULL,  -- Service name (e.g., GitHub, Gmail)
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE User_Tokens (
-    id SERIAL PRIMARY KEY,             -- Unique token ID
-    user_id INT NOT NULL,              -- References the user
-    service_id INT NOT NULL,           -- References the service
-    token TEXT NOT NULL,               -- OAuth2 access token
-    refresh_token TEXT,                -- Optional refresh token
-    expires_at TIMESTAMP,              -- Expiration time of the token
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users (id),
-    FOREIGN KEY (service_id) REFERENCES Services (id)
-);
-
--- Indexes for faster queries
-CREATE INDEX idx_users_email ON Users (email);
-CREATE INDEX idx_services_name ON Services (name);
-CREATE INDEX idx_user_tokens_user_id ON User_Tokens (user_id);
-CREATE INDEX idx_user_tokens_service_id ON User_Tokens (service_id);
 ```
-
-## **NoSQL Database (Dynamic Service Data)**
-
-1. **Services Collection**
-
-   ```json
-   {
-       "_id": "service_id_1",         // Unique ID for the service
-       "name": "GitHub",              // Service name
-       "actions": [                   // List of supported actions
-           { "id": "action_1", "name": "New Commit" },
-           { "id": "action_2", "name": "New Pull Request" }
-       ],
-       "reactions": [                 // List of supported reactions
-           { "id": "reaction_1", "name": "Create Issue" },
-           { "id": "reaction_2", "name": "Comment on Issue" }
-       ]
-   }
-   ```
-
-2. **Workflows Collection**
-
-   ```json
-   {
-       "_id": "workflow_id_1",       // Unique ID for the workflow
-       "user_id": "user_id_1",       // References the user
-       "name": "GitHub to Slack",    // Workflow name
-       "actions": [                  // List of actions
-           {
-               "id": "action_1",
-               "service": "GitHub",
-               "params": { "repo": "my-repo" },
-               "token_id": "token_id_123"  // References the token in SQL
-           }
-       ],
-       "reactions": [                // List of reactions
-           {
-               "id": "reaction_1",
-               "service": "Slack",
-               "params": { "channel": "#general" },
-               "token_id": "token_id_456"  // References the token in SQL
-           }
-       ],
-       "conditions": {               // Conditional logic
-           "if": "action_1.status == 'success'"
-       },
-       "created_at": "2024-11-25T12:00:00Z", // Timestamp
-       "updated_at": "2024-11-25T13:00:00Z"
-   }
-   ```
-
-3. **Trigger Logs Collection**
-
-   ```json
-   {
-       "_id": "log_id_1",            // Unique ID for the log
-       "workflow_id": "workflow_id_1", // Workflow that triggered the log
-       "trigger_event": {            // Trigger details
-           "service": "GitHub",
-           "action": "New Commit",
-           "timestamp": "2024-11-25T12:15:00Z"
-       },
-       "reaction_results": [         // Reactions executed
-           { "reaction": "Create Issue", "status": "success" }
-       ],
-       "status": "success",          // Overall status
-       "log_timestamp": "2024-11-25T12:20:00Z"
-   }
-   ```
 
 ---
 
-## **Integration and Usage**
+## **authentication_services Table**
 
-- **SQL Database**: Ensures that each user can have multiple tokens for different services. Tokens are stored securely, and their relationships are managed via foreign keys.
-- **NoSQL Database**: Enables dynamic workflows and service configurations by linking actions and reactions to the appropriate tokens (via `token_id`).
+Table to store details of external authentication providers like Google and Microsoft.
+
+```sql
+CREATE TABLE authentication_services (
+    id SERIAL PRIMARY KEY, -- Unique ID for the authentication service
+    name VARCHAR(32) UNIQUE NOT NULL, -- Name of the authentication service (e.g., Google, Microsoft)
+    auth_url TEXT NOT NULL, -- Authentication URL
+    token_url TEXT NOT NULL, -- Token exchange URL
+    client_id TEXT NOT NULL, -- OAuth2 client ID
+    client_secret TEXT NOT NULL, -- OAuth2 client secret
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Last update timestamp
+);
+```
+
+---
+
+## **user_tokens Table**
+
+Table to manage user tokens for authentication services.
+
+```sql
+CREATE TABLE user_tokens (
+    id SERIAL PRIMARY KEY, -- Unique token ID
+    user_id INT NOT NULL, -- References the user
+    auth_service_id INT NOT NULL, -- References the authentication service
+    access_token TEXT NOT NULL, -- OAuth2 access token
+    refresh_token TEXT, -- Optional refresh token
+    expires_at TIMESTAMP NOT NULL, -- Token expiration timestamp
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Last update timestamp
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (auth_service_id) REFERENCES authentication_services (id)
+);
+```
+
+---
+
+## **api_services Table**
+
+Table to store details of APIs provided by authentication services.
+
+```sql
+CREATE TABLE api_services (
+    id SERIAL PRIMARY KEY, -- Unique ID for the API service
+    auth_service_id INT NOT NULL, -- Reference to the authentication service
+    name VARCHAR(32) UNIQUE NOT NULL, -- Name of the API service (e.g., Google Calendar, Outlook)
+    base_url TEXT NOT NULL, -- Base URL of the API
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Last update timestamp
+    FOREIGN KEY (auth_service_id) REFERENCES authentication_services (id) -- Foreign key reference
+);
+```
+
+## **api_services_action Table**
+
+Table to store triggers for API services.
+
+```sql
+CREATE TABLE api_services_actions (
+    id SERIAL PRIMARY KEY, -- Unique trigger ID
+    api_service_id INT NOT NULL, -- References the API service
+    name VARCHAR(32) NOT NULL, -- Trigger name
+    description TEXT, -- Trigger description
+    endpoint TEXT NOT NULL, -- API endpoint for the trigger
+    method http_method_enum NOT NULL, -- HTTP method for the trigger
+    headers JSONB, -- Headers for the trigger, stored as JSON
+    params JSONB, -- Parameters for the trigger, stored as JSON
+    json_path TEXT, -- JSON path for data extraction
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Last update timestamp
+    FOREIGN KEY (api_service_id) REFERENCES api_services (id)
+);
+```
+
+## **api_services_reactions Table**
+
+Table to store reactions for API services.
+
+```sql
+CREATE TABLE api_services_reactions (
+    id SERIAL PRIMARY KEY, -- Unique reaction ID
+    api_service_id INT NOT NULL, -- References the API service
+    name VARCHAR(32) NOT NULL, -- Reaction name
+    description TEXT, -- Reaction description
+    endpoint TEXT NOT NULL, -- API endpoint for the reaction
+    method http_method_enum NOT NULL, -- HTTP method for the reaction
+    headers JSONB, -- Headers for the trigger, stored as JSON
+    params JSONB, -- Parameters for the reaction, stored as JSON
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Last update timestamp
+    FOREIGN KEY (api_service_id) REFERENCES api_services (id)
+);
+```
+
+---
+
+## **workflows Table**
+
+Table to store workflows created by users.
+
+```sql
+CREATE TABLE workflows (
+    id SERIAL PRIMARY KEY, -- Unique workflow ID
+    user_id INT NOT NULL, -- References the user
+    name VARCHAR(32) NOT NULL, -- Workflow
+    description TEXT, -- Workflow description
+    action_id INT NOT NULL, -- References the trigger action
+    reaction_id INT NOT NULL, -- References the reaction action
+    data_transformation JSONB, -- Transformation rules for data
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Last update timestamp
+    FOREIGN KEY (user_id) REFERENCES users (id)
+    FOREIGN KEY (action_id) REFERENCES api_services_actions (id)
+    FOREIGN KEY (reaction_id) REFERENCES api_services_reactions (id)
+);
+```
+
+## Enumerated Types
+
+```sql
+CREATE TYPE user_role_enum AS ENUM ('service', 'admin', 'user');
+
+```sql
+CREATE TYPE http_method_enum AS ENUM ('GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH');
+```
+
+```sql
+CREATE TYPE status_enum AS ENUM ('success', 'failure');
+```

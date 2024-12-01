@@ -1,0 +1,15 @@
+name: Deploy Kube Prometheus Stack
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  call-deploy-template:
+    uses: ./.github/workflows/deploy-helm-template.yml
+    with:
+      release-name: "kube-prometheus-stack"
+      namespace: "kube-prometheus-stack"
+      chart-path: "./deployments/kube-prometheus-stack"
+      values-file: "./deployments/kube-prometheus-stack/values.yaml"

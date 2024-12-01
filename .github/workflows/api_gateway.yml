@@ -1,0 +1,22 @@
+name: Docker - API Gateway
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  call-template:
+    uses: ./.github/workflows/docker-image-template.yml
+    with:
+      dockerfile: ./api-gateway/Dockerfile
+      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:api-gateway-latest
+      context: ./api-gateway/
+      push_on_main: true
