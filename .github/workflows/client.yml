@@ -1,0 +1,22 @@
+name: Docker - Client
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  call-template:
+    uses: ./.github/workflows/docker-image-template.yml
+    with:
+      dockerfile: ./client/Dockerfile
+      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:client-latest
+      context: ./client/
+      push_on_main: true

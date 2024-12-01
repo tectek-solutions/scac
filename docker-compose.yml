@@ -1,26 +1,55 @@
 services:
-  action-reaction-service:
+  actions-service:
     build:
-      context: services/action-reaction-service
+      context: ./services/actions-service
       dockerfile: Dockerfile
 
-  service-integration-service:
+  api-services-service:
     build:
-      context: services/service-integration-service
+      context: ./services/api-services-service
+      dockerfile: Dockerfile
+  
+  authentification-service:
+    build:
+      context: ./services/authentification-service
       dockerfile: Dockerfile
 
+  reactions-service:
+    build:
+      context: ./services/reactions-service
+      dockerfile: Dockerfile
+  
   trigger-service:
     build:
-      context: services/trigger-service
+      context: ./services/trigger-service
       dockerfile: Dockerfile
 
-  user-management-service:
+  user-tokens-service:
     build:
-      context: services/user-management-service
+      context: ./services/user-tokens-service
       dockerfile: Dockerfile
-
-  workflow-service:
+  
+  users-service:
     build:
-      context: services/workflow-service
+      context: ./services/users-service
       dockerfile: Dockerfile
 
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    depends_on:
+      - actions-service
+      - api-services-service
+      - authentification-service
+      - reactions-service
+      - trigger-service
+      - user-tokens-service
+      - users-service
+  
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    depends_on:
+      - api-gateway
