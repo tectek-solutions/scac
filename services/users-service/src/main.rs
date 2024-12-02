@@ -8,7 +8,7 @@ fn main() {
     // Uncomment the following lines to test the functions
 
     // add_user("user_test", "user_mail");
-    // update_user(2, "user_test_updated");
+    // update_user(1, "test_updated", "mail_updated");
     // delete_user(2);
 }
 

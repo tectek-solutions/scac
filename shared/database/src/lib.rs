@@ -1,12 +1,13 @@
 pub mod schema;
 pub mod model;
-
+pub mod auth_service_models;
 
 use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;
 
 use self::model::{NewUser, User};
+use self::auth_service_models::{NewAuthService, AuthService};
 
 pub fn etablish_connection() -> PgConnection {
     dotenv().ok();
@@ -30,4 +31,21 @@ pub fn create_user(conn: &mut PgConnection, username: &str, email: &str, passwor
         .returning(User::as_returning())
         .get_result(conn)
         .expect("Error saving new user")
+}
+
+pub fn create_auth_service(conn: &mut PgConnection, name: &str, auth_url: &str, token_url: &str, client_id: &str, client_secret: &str) -> AuthService {
+    use crate::schema::auth_service;
+
+    let new_auth_service = NewAuthService {
+        name,
+        auth_url,
+        token_url,
+        client_id,
+        client_secret,
+    };
+
+    diesel::insert_into(auth_service::table)
+        .values(&new_auth_service)
+        .get_result(conn)
+        .expect("Error saving new auth service")
 }

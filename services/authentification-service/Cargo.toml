@@ -8,3 +8,5 @@ name = "authentification-service"
 path = "src/main.rs"
 
 [dependencies]
+diesel = { version = "2.0.0", features = ["postgres", "chrono"] }
+database = { path = "../../shared/database" }
