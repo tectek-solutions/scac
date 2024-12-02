@@ -6,17 +6,18 @@ ARG ALPINE_VERSION=3.20
 FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 # Install required build dependencies
-RUN apk add --no-cache musl-dev gcc
+RUN apk add --no-cache musl-dev gcc libpq libpq-dev
 
 # Set working directory
-WORKDIR /usr/src/actions-service
+WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
+COPY shared/ shared/
+COPY services/actions-service/Cargo.toml services/actions-service/Cargo.lock services/actions-service/
+RUN cd services/actions-service && cargo fetch
 
-COPY src ./src
-RUN cargo build --release
+COPY services/actions-service/src/ services/actions-service/src/
+RUN cd services/actions-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -30,10 +31,7 @@ RUN adduser -S actions-service -G actions-service
 USER actions-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/actions-service/target/release/actions-service /usr/local/bin/actions-service
+COPY --from=builder --chown=actions-service:actions-service /usr/src/scac/services/actions-service/target/release/actions-service /usr/local/bin/actions-service
 
 # Start the service
 CMD ["/usr/local/bin/actions-service"]
-
-# Expose the service port
-EXPOSE 8000

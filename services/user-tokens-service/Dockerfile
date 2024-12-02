@@ -6,17 +6,18 @@ ARG ALPINE_VERSION=3.20
 FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 # Install required build dependencies
-RUN apk add --no-cache musl-dev gcc
+RUN apk add --no-cache musl-dev gcc libpq libpq-dev
 
 # Set working directory
-WORKDIR /usr/src/authentification-service
+WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
+COPY shared/ shared/
+COPY services/user-tokens-service/Cargo.toml services/user-tokens-service/Cargo.lock services/user-tokens-service/
+RUN cd services/user-tokens-service && cargo fetch
 
-COPY src ./src
-RUN cargo build --release
+COPY services/user-tokens-service/src/ services/user-tokens-service/src/
+RUN cd services/user-tokens-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -25,15 +26,12 @@ FROM alpine:${ALPINE_VERSION} AS runtime
 RUN apk add --no-cache libgcc
 
 # Add non-root user and group
-RUN addgroup -S authentification-service
-RUN adduser -S authentification-service -G authentification-service
-USER authentification-service
+RUN addgroup -S user-tokens-service
+RUN adduser -S user-tokens-service -G user-tokens-service
+USER user-tokens-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/authentification-service/target/release/authentification-service /usr/local/bin/authentification-service
+COPY --from=builder --chown=user-tokens-service:user-tokens-service /usr/src/scac/services/user-tokens-service/target/release/user-tokens-service /usr/local/bin/user-tokens-service
 
 # Start the service
-CMD ["/usr/local/bin/authentification-service"]
-
-# Expose the service port
-EXPOSE 8000
+CMD ["/usr/local/bin/user-tokens-service"]

@@ -18,5 +18,5 @@ jobs:
     with:
       dockerfile: ./services/users-service/Dockerfile
       image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:users-service-latest
-      context: ./services/users-service/
+      context: .
       push_on_main: true

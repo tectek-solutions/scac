@@ -6,17 +6,18 @@ ARG ALPINE_VERSION=3.20
 FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 # Install required build dependencies
-RUN apk add --no-cache musl-dev gcc
+RUN apk add --no-cache musl-dev gcc libpq libpq-dev
 
 # Set working directory
-WORKDIR /usr/src/workflow-service
+WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
+COPY shared/ shared/
+COPY services/workflow-service/Cargo.toml services/workflow-service/Cargo.lock services/workflow-service/
+RUN cd services/workflow-service && cargo fetch
 
-COPY src ./src
-RUN cargo build --release
+COPY services/workflow-service/src/ services/workflow-service/src/
+RUN cd services/workflow-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -30,10 +31,7 @@ RUN adduser -S workflow-service -G workflow-service
 USER workflow-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/workflow-service/target/release/workflow-service /usr/local/bin/workflow-service
+COPY --from=builder /usr/src/scac/services/workflow-service/target/release/workflow-service /usr/local/bin/workflow-service
 
 # Start the service
 CMD ["/usr/local/bin/workflow-service"]
-
-# Expose the service port
-EXPOSE 8000
