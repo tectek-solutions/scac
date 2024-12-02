@@ -18,5 +18,5 @@ jobs:
     with:
       dockerfile: ./services/reactions-service/Dockerfile
       image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:reactions-service-latest
-      context: ./services/reactions-service/
+      context: .
       push_on_main: true

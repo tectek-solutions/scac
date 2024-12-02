@@ -131,7 +131,7 @@ spec:
         env:
         - name: REDIS_ADDR
           value: {{ printf "redis://localhost:%v" .Values.redis.containerPorts.redis }}
-        - name: REDIS_EXPORTER_WEB_LISTEN_ADDRESS
+        - name: REDIS_EXPORTER_WEB_LISTEN_BINDING_ADDRESS
           value: {{ printf "0.0.0.0:%v" .Values.redis.containerPorts.metrics }}
         - name: REDIS_PASSWORD
           valueFrom:

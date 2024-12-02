@@ -250,7 +250,7 @@ spec:
                 name: argocd-cmd-params-cm
                 key: controller.default.cache.expiration
                 optional: true
-          - name: ARGOCD_APPLICATION_CONTROLLER_OTLP_ADDRESS
+          - name: ARGOCD_APPLICATION_CONTROLLER_OTLP_BINDING_ADDRESS
             valueFrom:
               configMapKeyRef:
                 name: argocd-cmd-params-cm
