@@ -31,7 +31,7 @@ RUN adduser -S trigger-service -G trigger-service
 USER trigger-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/scac/services/trigger-service/target/release/trigger-service /usr/local/bin/trigger-service
+COPY --from=builder --chown=trigger-service:trigger-service /usr/src/scac/services/trigger-service/target/release/trigger-service /usr/local/bin/trigger-service
 
 # Start the service
 CMD ["/usr/local/bin/trigger-service"]

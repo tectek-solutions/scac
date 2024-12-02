@@ -31,7 +31,7 @@ RUN adduser -S user-tokens-service -G user-tokens-service
 USER user-tokens-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/scac/services/user-tokens-service/target/release/user-tokens-service /usr/local/bin/user-tokens-service
+COPY --from=builder --chown=user-tokens-service:user-tokens-service /usr/src/scac/services/user-tokens-service/target/release/user-tokens-service /usr/local/bin/user-tokens-service
 
 # Start the service
 CMD ["/usr/local/bin/user-tokens-service"]

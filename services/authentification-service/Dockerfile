@@ -31,7 +31,7 @@ RUN adduser -S authentification-service -G authentification-service
 USER authentification-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/scac/services/authentification-service/target/release/authentification-service /usr/local/bin/authentification-service
+COPY --from=builder --chown=authentification-service:authentification-service /usr/src/scac/services/authentification-service/target/release/authentification-service /usr/local/bin/authentification-service
 
 # Start the service
 CMD ["/usr/local/bin/authentification-service"]

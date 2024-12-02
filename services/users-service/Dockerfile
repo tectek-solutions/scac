@@ -31,7 +31,7 @@ RUN adduser -S users-service -G users-service
 USER users-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/scac/services/users-service/target/release/users-service /usr/local/bin/users-service
+COPY --from=builder --chown=users-service:users-service /usr/src/scac/services/users-service/target/release/users-service /usr/local/bin/users-service
 
 # Start the service
 CMD ["/usr/local/bin/users-service"]

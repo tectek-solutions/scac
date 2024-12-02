@@ -31,7 +31,7 @@ RUN adduser -S actions-service -G actions-service
 USER actions-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/scac/api-gateway/target/release/actions-service /usr/local/bin/actions-service
+COPY --from=builder --chown=actions-service:actions-service /usr/src/scac/api-gateway/target/release/actions-service /usr/local/bin/actions-service
 
 # Start the service
 CMD ["/usr/local/bin/actions-service"]
