@@ -26,6 +26,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+    - name: Echo TEST secret
+      run: echo ${{ secrets.TEST }}
+
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
 
