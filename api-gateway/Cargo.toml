@@ -8,3 +8,10 @@ name = "api-gateway"
 path = "src/main.rs"
 
 [dependencies]
+async-trait = "0.1.83"
+env_logger = "0.11.5"
+log = "0.4.22"
+opt = "0.1.0"
+pingora-core = "0.4.0"
+pingora-http = "0.4.0"
+pingora-proxy = "0.4.0"

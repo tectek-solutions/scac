@@ -18,5 +18,5 @@ jobs:
     with:
       dockerfile: ./client/Dockerfile
       image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:client-latest
-      context: ./client/
+      context: .
       push_on_main: true

@@ -115,13 +115,13 @@ spec:
                 name: argocd-cmd-params-cm
                 key: reposerver.parallelism.limit
                 optional: true
-          - name: ARGOCD_REPO_SERVER_LISTEN_ADDRESS
+          - name: ARGOCD_REPO_SERVER_LISTEN_BINDING_ADDRESS
             valueFrom:
               configMapKeyRef:
                 name: argocd-cmd-params-cm
                 key: reposerver.listen.address
                 optional: true
-          - name: ARGOCD_REPO_SERVER_LISTEN_METRICS_ADDRESS
+          - name: ARGOCD_REPO_SERVER_LISTEN_METRICS_BINDING_ADDRESS
             valueFrom:
               configMapKeyRef:
                 name: argocd-cmd-params-cm
@@ -209,7 +209,7 @@ spec:
                 name: argocd-cmd-params-cm
                 key: reposerver.default.cache.expiration
                 optional: true
-          - name: ARGOCD_REPO_SERVER_OTLP_ADDRESS
+          - name: ARGOCD_REPO_SERVER_OTLP_BINDING_ADDRESS
             valueFrom:
               configMapKeyRef:
                 name: argocd-cmd-params-cm

@@ -8,6 +8,7 @@ on:
 jobs:
   call-deploy-template:
     uses: ./.github/workflows/deploy-helm-template.yml
+    secrets: inherit
     with:
       release-name: "kube-prometheus-stack"
       namespace: "kube-prometheus-stack"
