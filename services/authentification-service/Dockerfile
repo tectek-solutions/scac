@@ -9,14 +9,15 @@ FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 RUN apk add --no-cache musl-dev gcc
 
 # Set working directory
-WORKDIR /usr/src/authentification-service
+WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
+COPY shared/ shared/
+COPY services/authentifcation-service/Cargo.toml services/authentifcation-service/Cargo.lock services/authentifcation-service/
+RUN cd services/authentifcation-service && cargo fetch
 
-COPY src ./src
-RUN cargo build --release
+COPY services/authentifcation-service/src/ services/authentifcation-service/src/
+RUN cd services/authentifcation-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -25,12 +26,12 @@ FROM alpine:${ALPINE_VERSION} AS runtime
 RUN apk add --no-cache libgcc
 
 # Add non-root user and group
-RUN addgroup -S authentification-service
-RUN adduser -S authentification-service -G authentification-service
-USER authentification-service
+RUN addgroup -S authentifcation-service
+RUN adduser -S authentifcation-service -G authentifcation-service
+USER authentifcation-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/authentification-service/target/release/authentification-service /usr/local/bin/authentification-service
+COPY --from=builder /usr/src/scac/services/authentifcation-service/target/release/authentifcation-service /usr/local/bin/authentifcation-service
 
 # Start the service
-CMD ["/usr/local/bin/authentification-service"]
+CMD ["/usr/local/bin/authentifcation-service"]

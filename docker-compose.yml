@@ -5,8 +5,8 @@ networks:
 services:
   actions-service:
     build:
-      context: ./services/actions-service
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./services/actions-service/Dockerfile
     expose:
       - "8000"
     environment:

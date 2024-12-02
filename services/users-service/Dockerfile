@@ -9,15 +9,15 @@ FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 RUN apk add --no-cache musl-dev gcc
 
 # Set working directory
-WORKDIR /usr/src/users-service
+WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
+COPY shared/ shared/
+COPY services/users-service/Cargo.toml services/users-service/Cargo.lock services/users-service/
+RUN cd services/users-service && cargo fetch
 
-COPY src ./src
-COPY ../../shared /usr/shared
-RUN cargo build --release
+COPY services/users-service/src/ services/users-service/src/
+RUN cd services/users-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -31,7 +31,7 @@ RUN adduser -S users-service -G users-service
 USER users-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/users-service/target/release/users-service /usr/local/bin/users-service
+COPY --from=builder /usr/src/scac/services/users-service/target/release/users-service /usr/local/bin/users-service
 
 # Start the service
 CMD ["/usr/local/bin/users-service"]

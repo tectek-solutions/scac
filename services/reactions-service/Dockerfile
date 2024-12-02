@@ -9,14 +9,15 @@ FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 RUN apk add --no-cache musl-dev gcc
 
 # Set working directory
-WORKDIR /usr/src/reactions-service
+WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
+COPY shared/ shared/
+COPY services/reactions-service/Cargo.toml services/reactions-service/Cargo.lock services/reactions-service/
+RUN cd services/reactions-service && cargo fetch
 
-COPY src ./src
-RUN cargo build --release
+COPY services/reactions-service/src/ services/reactions-service/src/
+RUN cd services/reactions-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -30,7 +31,7 @@ RUN adduser -S reactions-service -G reactions-service
 USER reactions-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/reactions-service/target/release/reactions-service /usr/local/bin/reactions-service
+COPY --from=builder /usr/src/scac/services/reactions-service/target/release/reactions-service /usr/local/bin/reactions-service
 
 # Start the service
 CMD ["/usr/local/bin/reactions-service"]

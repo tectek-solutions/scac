@@ -9,14 +9,15 @@ FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 RUN apk add --no-cache musl-dev gcc
 
 # Set working directory
-WORKDIR /usr/src/trigger-service
+WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
+COPY shared/ shared/
+COPY services/trigger-service/Cargo.toml services/trigger-service/Cargo.lock services/trigger-service/
+RUN cd services/trigger-service && cargo fetch
 
-COPY src ./src
-RUN cargo build --release
+COPY services/trigger-service/src/ services/trigger-service/src/
+RUN cd services/trigger-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -30,7 +31,7 @@ RUN adduser -S trigger-service -G trigger-service
 USER trigger-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/trigger-service/target/release/trigger-service /usr/local/bin/trigger-service
+COPY --from=builder /usr/src/scac/services/trigger-service/target/release/trigger-service /usr/local/bin/trigger-service
 
 # Start the service
 CMD ["/usr/local/bin/trigger-service"]

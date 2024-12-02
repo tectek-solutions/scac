@@ -9,14 +9,15 @@ FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 RUN apk add --no-cache musl-dev gcc
 
 # Set working directory
-WORKDIR /usr/src/workflow-service
+WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
+COPY shared/ shared/
+COPY services/workflow-service/Cargo.toml services/workflow-service/Cargo.lock services/workflow-service/
+RUN cd services/workflow-service && cargo fetch
 
-COPY src ./src
-RUN cargo build --release
+COPY services/workflow-service/src/ services/workflow-service/src/
+RUN cd services/workflow-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -30,7 +31,7 @@ RUN adduser -S workflow-service -G workflow-service
 USER workflow-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/workflow-service/target/release/workflow-service /usr/local/bin/workflow-service
+COPY --from=builder /usr/src/scac/services/workflow-service/target/release/workflow-service /usr/local/bin/workflow-service
 
 # Start the service
 CMD ["/usr/local/bin/workflow-service"]

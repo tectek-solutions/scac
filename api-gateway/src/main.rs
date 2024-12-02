@@ -11,6 +11,7 @@ use pingora_proxy::{ProxyHttp, Session};
 
 fn check_token(request: &pingora_http::RequestHeader) -> bool {
     let _ = request;
+    info!("Checking token for request.");
     true
 }
 
@@ -34,6 +35,7 @@ impl Gateway {
         let services = service_names
             .iter()
             .map(|&name| {
+                info!("Initializing service: {}", name);
                 let address = env::var(format!("{}_SERVICE_ADDRESS", name.to_uppercase()))
                     .unwrap_or_else(|_| panic!("Missing {}_SERVICE_ADDRESS", name.to_uppercase()));
                 let port = env::var(format!("{}_SERVICE_PORT", name.to_uppercase()))
@@ -44,12 +46,15 @@ impl Gateway {
             })
             .collect();
 
+        info!("Gateway services initialized.");
         Self { services }
     }
 
     fn get_service(&self, path: &str) -> Option<&(String, u16)> {
+        info!("Searching for service to handle path: {}", path);
         self.services.iter().find_map(|(key, service)| {
             if path.starts_with(&format!("/api/{}", key.replace('_', "-"))) {
+                info!("Found service for path: {}", key);
                 Some(service)
             } else {
                 None
@@ -65,7 +70,15 @@ impl ProxyHttp for Gateway {
     fn new_ctx(&self) -> Self::CTX {}
 
     async fn request_filter(&self, session: &mut Session, _ctx: &mut Self::CTX) -> Result<bool> {
-        if session.req_header().uri.path().starts_with("/api/users/login") && !check_token(session.req_header()) {
+        info!("Request path: {}", session.req_header().uri.path());
+        if session
+            .req_header()
+            .uri
+            .path()
+            .starts_with("/api/users/login")
+            && !check_token(session.req_header())
+        {
+            info!("Invalid token for login request.");
             session.respond_error(403).await?;
             return Ok(true);
         }
@@ -78,14 +91,18 @@ impl ProxyHttp for Gateway {
         _ctx: &mut Self::CTX,
     ) -> Result<Box<HttpPeer>> {
         let path = session.req_header().uri.path();
+        info!("Resolving upstream for path: {}", path);
         let target = self.get_service(path).ok_or_else(|| {
+            info!("No service found for path: {}", path);
             pingora_core::Error::new(pingora_core::ErrorType::new_code("Not Found", 404))
         })?;
 
+        let sni = target.0.clone();
+        info!("Resolved service to: {}:{}", target.0, target.1);
         Ok(Box::new(HttpPeer::new(
             (target.0.as_str(), target.1),
-            true,
-            "service.local".to_string(),
+            false,
+            sni,
         )))
     }
 
@@ -95,6 +112,7 @@ impl ProxyHttp for Gateway {
         upstream_response: &mut ResponseHeader,
         _ctx: &mut Self::CTX,
     ) -> Result<()> {
+        info!("Applying response filter.");
         upstream_response.insert_header("Server", "Gateway")?;
         upstream_response.remove_header("alt-svc");
         Ok(())
@@ -106,7 +124,9 @@ impl ProxyHttp for Gateway {
         _e: Option<&pingora_core::Error>,
         ctx: &mut Self::CTX,
     ) {
-        let response_code = session.response_written().map_or(0, |resp| resp.status.as_u16());
+        let response_code = session
+            .response_written()
+            .map_or(0, |resp| resp.status.as_u16());
         info!(
             "{} response code: {response_code}",
             self.request_summary(session, ctx)
@@ -116,6 +136,7 @@ impl ProxyHttp for Gateway {
 
 fn main() {
     env_logger::init();
+    info!("Starting Gateway...");
 
     let address = env::var("BINDING_ADDRESS").unwrap_or_else(|_| "0.0.0.0".to_string());
     let port = env::var("BINDING_PORT").unwrap_or_else(|_| "8000".to_string());
@@ -124,9 +145,12 @@ fn main() {
     let mut server = Server::new(Some(opt)).unwrap();
     server.bootstrap();
 
+    info!("Server initialized. Binding to {}:{}", address, port);
+
     let mut proxy = pingora_proxy::http_proxy_service(&server.configuration, Gateway::new());
     proxy.add_tcp(&format!("{address}:{port}"));
     server.add_service(proxy);
 
+    info!("Starting server...");
     server.run_forever();
 }
