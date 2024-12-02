@@ -11,6 +11,7 @@ async fn health() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    get_user();
     // Retrieve and validate environment variables
     let address = match env::var("BINDING_ADDRESS") {
         Ok(addr) => addr,

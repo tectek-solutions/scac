@@ -21,6 +21,7 @@ pub fn get_user() {
 
     let connection = &mut etablish_connection();
     let results = users
+        // .limit(5) // uncomment this line to limit the number of results
         .select(User::as_select())
         .load(connection)
         .expect("Error loading users");
@@ -113,17 +114,18 @@ pub fn add_user(username: &str, email: &str) {
 /// # Panics
 ///
 /// This function will panic if the database query fails.
-pub fn update_user(user_id: i32, _username: &str) {
+pub fn update_user(user_id: i32, _username: &str, _email: &str) {
     use database::schema::users::dsl::*;
 
     let connection = &mut etablish_connection();
-    let user = diesel::update(users.find(user_id))
-        .set(username.eq(_username))
-        .returning(User::as_returning())
-        .get_result(connection)
-        .unwrap();
+    diesel::update(users.find(user_id))
+        .set((
+            username.eq(_username),
+            email.eq(_email),
+        ))
+        .execute(connection)
+        .expect(&format!("Unable to find user with id {:?}", user_id));
 
-    println!("Updated user {:?}", user.username);
 }
 
 /// Deletes a user from the database based on the provided user ID.
