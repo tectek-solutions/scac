@@ -6,8 +6,18 @@ import '../../../../common/style/spacing_styles.dart';
 import '../../../../utils/constants/helper_functions.dart';
 import '../../../../utils/constants/sizes.dart';
 
-class LoginScreen extends StatelessWidget {
-const LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _LoginScreen createState() => _LoginScreen();
+}
+
+class _LoginScreen extends State<LoginScreen> {
+
+  var _isObscured = false;
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context){
@@ -44,29 +54,30 @@ const LoginScreen({super.key});
                     const SizedBox(height: TSizes.spaceBtwItemsInputFields),
                 
                     TextFormField(
-                      decoration: const InputDecoration(prefixIcon: Icon(Icons.password), labelText: "Password",
+                        controller: _passwordController,
+                        obscureText: _isObscured,
+                        decoration: InputDecoration(
+                          labelText: "Password",
+                          prefixIcon: const Icon(Icons.password),
+                          suffixIcon: IconButton(
+                            icon: _isObscured ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility),
+                            onPressed: () {
+                              setState(() {
+                                _isObscured = !_isObscured;
+                              });
+                            },
+                          ),
+                        ),
                       ),
-                    ),
                 
                     const SizedBox(height: TSizes.spaceBtwItemsInputFields / 2),
-                
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                          Row(
-                            children: [
-                              Checkbox(value: true, onChanged: (value){}),
-                              const Text("Remember me"),
-                            ],
-                          ),
-                          TextButton(onPressed: (){}, child: const Text("Forgot password?")),
-                      ],
-                    ),
                     const SizedBox(height: TSizes.sapceBtwSections),
                 
-                    SizedBox(width: double.infinity, child: ElevatedButton(onPressed: (){}, child: const Text("Sign in"))),
+                    SizedBox(width: double.infinity, child: OutlinedButton(onPressed: (){}, child: const Text("Sign in"), style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                    ),)),
                     const SizedBox(height: TSizes.spaceBtwItems),
-                    SizedBox(width: double.infinity, child: OutlinedButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (constext) => const Registration()));}, child: const Text("Create an account"))),
+                    SizedBox(width: double.infinity, child: OutlinedButton(onPressed: (){Navigator.push(context, MaterialPageRoute(builder: (constext) => Registration()));}, child: const Text("Create an account"))),
                 
                     const SizedBox(height: TSizes.sapceBtwSections),
                   ],
