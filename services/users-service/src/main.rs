@@ -1,6 +1,9 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use std::env;
 
+use query::{get_user, get_user_by_id, add_user, update_user, delete_user};
+mod query;
+
 #[get("/health")]
 async fn health() -> impl Responder {
     HttpResponse::Ok().body("OK")
@@ -34,3 +37,5 @@ async fn main() -> std::io::Result<()> {
         .run()
         .await
 }
+
+

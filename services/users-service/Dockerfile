@@ -16,6 +16,7 @@ COPY Cargo.toml Cargo.lock ./
 RUN cargo fetch
 
 COPY src ./src
+COPY ../../shared /usr/shared
 RUN cargo build --release
 
 # Stage 2: Final Image
