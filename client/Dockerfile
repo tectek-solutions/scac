@@ -32,7 +32,7 @@ RUN flutter doctor -v
 
 # Copy the web application source code
 RUN mkdir -p $APP
-COPY --chown=flutter:flutter ./client $APP/
+COPY --chown=flutter:flutter ./client $APP/client
 WORKDIR $APP
 
 # Build the web application
