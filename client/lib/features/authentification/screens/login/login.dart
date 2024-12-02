@@ -6,8 +6,17 @@ import '../../../../common/style/spacing_styles.dart';
 import '../../../../utils/constants/helper_functions.dart';
 import '../../../../utils/constants/sizes.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _LoginScreen createState() => _LoginScreen();
+}
+
+class _LoginScreen extends State<LoginScreen> {
+  var _isObscured = true;
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -54,44 +63,40 @@ class LoginScreen extends StatelessWidget {
                               labelText: "Email",
                             ),
                           ),
-
                           const SizedBox(height: TSizes.spaceBtwItemsInputFields),
-
                           TextFormField(
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.password),
+                            controller: _passwordController,
+                            obscureText: _isObscured,
+                            decoration: InputDecoration(
                               labelText: "Password",
+                              prefixIcon: const Icon(Icons.password),
+                              suffixIcon: IconButton(
+                                icon: _isObscured
+                                    ? const Icon(Icons.visibility_off)
+                                    : const Icon(Icons.visibility),
+                                onPressed: () {
+                                  setState(() {
+                                    _isObscured = !_isObscured;
+                                  });
+                                },
+                              ),
                             ),
                           ),
-
-                          const SizedBox(height: TSizes.spaceBtwItemsInputFields / 2),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Checkbox(value: false, onChanged: (value) {}),
-                                  const Text("Remember me"),
-                                ],
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text("Forgot password?"),
-                              ),
-                            ],
-                          ),
+                          const SizedBox(height: TSizes.spaceBtwItemsInputFields),
                           const SizedBox(height: TSizes.sapceBtwSections),
 
                           SizedBox(
                             width: double.infinity,
-                            child: ElevatedButton(
+                            child: OutlinedButton(
                               onPressed: () {},
                               child: const Text("Sign in"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: TSizes.spaceBtwItems),
 
+                          const SizedBox(height: TSizes.spaceBtwItems),
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton(
@@ -99,14 +104,13 @@ class LoginScreen extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (constext) => const Registration(),
+                                    builder: (context) => const Registration(),
                                   ),
                                 );
                               },
                               child: const Text("Create an account"),
                             ),
                           ),
-
                           const SizedBox(height: TSizes.sapceBtwSections),
                         ],
                       ),
@@ -117,29 +121,27 @@ class LoginScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Flexible(
-                        child: Divider(
-                          color: dark
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade300,
-                          thickness: 1.5,
-                          indent: 60,
-                          endIndent: 5,
-                        ),
-                      ),
+                          child: Divider(
+                        color: dark
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade300,
+                        thickness: 1.5,
+                        indent: 60,
+                        endIndent: 5,
+                      )),
                       const Text(
                         "Or Sign In With",
                         style: TextStyle(color: Colors.grey),
                       ),
                       Flexible(
-                        child: Divider(
-                          color: dark
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade300,
-                          thickness: 1.5,
-                          indent: 5,
-                          endIndent: 60,
-                        ),
-                      ),
+                          child: Divider(
+                        color: dark
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade300,
+                        thickness: 1.5,
+                        indent: 5,
+                        endIndent: 60,
+                      )),
                     ],
                   ),
 
@@ -178,7 +180,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),

@@ -6,8 +6,17 @@ import 'package:client/utils/constants/image_strings.dart';
 import '../../../../utils/constants/sizes.dart';
 import 'package:client/utils/constants/text_string.dart';
 
-class Registration extends StatelessWidget {
+class Registration extends StatefulWidget {
   const Registration({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _RegistrationState createState() => _RegistrationState();
+}
+
+class _RegistrationState extends State<Registration> {
+  var _isObscured = true;
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +43,7 @@ class Registration extends StatelessWidget {
                         TText.registrationTitle,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                      const SizedBox(height: TSizes.sm),
-                      Text(
-                        TText.registrationSubtitle,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      const SizedBox(height: TSizes.spaceBtwItemsInputFields),
                     ],
                   ),
                   
@@ -48,84 +53,68 @@ class Registration extends StatelessWidget {
                           vertical: TSizes.sapceBtwSections),
                       child: Column(
                         children: [
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.person),
-                              labelText: "Name",
-                            ),
-                          ),
+                          _buildInputField(label: "Name", icon: Icons.person),
                           const SizedBox(height: TSizes.spaceBtwItemsInputFields),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.person),
-                              labelText: "First Name",
-                            ),
-                          ),
+                          _buildInputField(label: "First Name", icon: Icons.person),
                           const SizedBox(height: TSizes.spaceBtwItemsInputFields),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.email),
-                              labelText: "Email",
-                            ),
-                          ),
+                          _buildInputField(label: "Email", icon: Icons.email),
                           const SizedBox(height: TSizes.spaceBtwItemsInputFields),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.password),
-                              labelText: "Password",
-                            ),
-                          ),
+                          _buildPasswordInputField(),
                         ],
                       ),
                     ),
                   ),
 
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: OutlinedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                      ),
+                      child: const Text("Sign up"),
+                    ),
+                  ),
+
+                  const SizedBox(height: TSizes.sapceBtwSections),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Flexible(child: Divider(color: dark ? Colors.grey.shade700 : Colors.grey.shade300, thickness: 1.5, indent: 60, endIndent: 5)),
+                      Flexible(
+                          child: Divider(
+                        color: dark ? Colors.grey.shade700 : Colors.grey.shade300,
+                        thickness: 1.5,
+                        indent: 60,
+                        endIndent: 5,
+                      )),
                       const Text("Already have an account ?", style: TextStyle(color: Colors.grey)),
-                      Flexible(child: Divider(color: dark ? Colors.grey.shade700 : Colors.grey.shade300, thickness: 1.5, indent: 5, endIndent: 60)),
+                      Flexible(
+                          child: Divider(
+                        color: dark ? Colors.grey.shade700 : Colors.grey.shade300,
+                        thickness: 1.5,
+                        indent: 5,
+                        endIndent: 60,
+                      )),
                     ],
                   ),
 
                   const SizedBox(height: TSizes.sapceBtwSections),
 
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        double buttonWidth = constraints.maxWidth > 600 ? constraints.maxWidth / 3 : constraints.maxWidth / 2.5;
-
-                        return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: buttonWidth,
-                          child: OutlinedButton(
-                            onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              side: const BorderSide(
-                                color: Colors.blue,
-                              ),
-                              backgroundColor: Colors.blue,
-                            ),
-                            child: const Text("Go back"),
-                          ),
-                        ),
-                        const SizedBox(width: TSizes.spaceBtwItems),
-                        Container(
-                          width: buttonWidth,
-                          child: OutlinedButton(
-                            onPressed: () {},
-                            child: const Text("Sign up"),
-                          ),
-                        ),
-                      ],
-                    );
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        );
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                      ),
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text("Go back"),
                     ),
                   ),
                 ],
@@ -136,4 +125,34 @@ class Registration extends StatelessWidget {
       ),
     );
   }
-}      
+
+  Widget _buildInputField({required String label, required IconData icon}) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+      ),
+    );
+  }
+
+  Widget _buildPasswordInputField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: _isObscured,
+      decoration: InputDecoration(
+        labelText: "Password",
+        prefixIcon: const Icon(Icons.password),
+        suffixIcon: IconButton(
+          icon: _isObscured
+              ? const Icon(Icons.visibility_off)
+              : const Icon(Icons.visibility),
+          onPressed: () {
+            setState(() {
+              _isObscured = !_isObscured;
+            });
+          },
+        ),
+      ),
+    );
+  }
+}
