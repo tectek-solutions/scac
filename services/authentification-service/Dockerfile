@@ -13,11 +13,11 @@ WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
 COPY shared/ shared/
-COPY services/authentifcation-service/Cargo.toml services/authentifcation-service/Cargo.lock services/authentifcation-service/
-RUN cd services/authentifcation-service && cargo fetch
+COPY services/authentification-service/Cargo.toml services/authentification-service/Cargo.lock services/authentification-service/
+RUN cd services/authentification-service && cargo fetch
 
-COPY services/authentifcation-service/src/ services/authentifcation-service/src/
-RUN cd services/authentifcation-service && cargo build --release
+COPY services/authentification-service/src/ services/authentification-service/src/
+RUN cd services/authentification-service && cargo build --release
 
 # Stage 2: Final Image
 FROM alpine:${ALPINE_VERSION} AS runtime
@@ -26,12 +26,12 @@ FROM alpine:${ALPINE_VERSION} AS runtime
 RUN apk add --no-cache libgcc
 
 # Add non-root user and group
-RUN addgroup -S authentifcation-service
-RUN adduser -S authentifcation-service -G authentifcation-service
-USER authentifcation-service
+RUN addgroup -S authentification-service
+RUN adduser -S authentification-service -G authentification-service
+USER authentification-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/scac/services/authentifcation-service/target/release/authentifcation-service /usr/local/bin/authentifcation-service
+COPY --from=builder /usr/src/scac/services/authentification-service/target/release/authentification-service /usr/local/bin/authentification-service
 
 # Start the service
-CMD ["/usr/local/bin/authentifcation-service"]
+CMD ["/usr/local/bin/authentification-service"]
