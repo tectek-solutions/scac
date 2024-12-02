@@ -46,8 +46,8 @@ FROM nginx:${NGINX_VERSION}-alpine${ALPINE_VERSION}
 ARG APP=/home/flutter/client
 
 # Copy built web application to NGINX HTML directory
-COPY --from=builder --chown=nginx:nginx $APP/client/build/web /var/www/client
-COPY --from=builder --chown=root:root $APP/client/nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder --chown=nginx:nginx $APP/scac/lient/build/web /var/www/client
+COPY --from=builder --chown=root:root $APP/scac/client/nginx.conf /etc/nginx/nginx.conf
 
 # Expose and run NGINX
 EXPOSE 8000
