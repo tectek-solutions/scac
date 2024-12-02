@@ -34,6 +34,3 @@ COPY --from=builder /usr/src/users-service/target/release/users-service /usr/loc
 
 # Start the service
 CMD ["/usr/local/bin/users-service"]
-
-# Expose the service port
-EXPOSE 8000

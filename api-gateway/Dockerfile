@@ -6,7 +6,7 @@ ARG ALPINE_VERSION=3.20
 FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 # Install required build dependencies
-RUN apk add --no-cache musl-dev gcc
+RUN apk add --no-cache musl-dev gcc g++ cmake make
 
 # Set working directory
 WORKDIR /usr/src/api-gateway
@@ -34,6 +34,3 @@ COPY --from=builder /usr/src/api-gateway/target/release/api-gateway /usr/local/b
 
 # Start the service
 CMD ["/usr/local/bin/api-gateway"]
-
-# Expose the service port
-EXPOSE 8000

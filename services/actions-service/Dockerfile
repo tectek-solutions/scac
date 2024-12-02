@@ -34,6 +34,3 @@ COPY --from=builder /usr/src/actions-service/target/release/actions-service /usr
 
 # Start the service
 CMD ["/usr/local/bin/actions-service"]
-
-# Expose the service port
-EXPOSE 8000

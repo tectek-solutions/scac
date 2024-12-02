@@ -34,6 +34,3 @@ COPY --from=builder /usr/src/api-services-service/target/release/api-services-se
 
 # Start the service
 CMD ["/usr/local/bin/api-services-service"]
-
-# Expose the service port
-EXPOSE 8000

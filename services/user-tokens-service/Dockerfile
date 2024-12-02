@@ -34,6 +34,3 @@ COPY --from=builder /usr/src/authentification-service/target/release/authentific
 
 # Start the service
 CMD ["/usr/local/bin/authentification-service"]
-
-# Expose the service port
-EXPOSE 8000

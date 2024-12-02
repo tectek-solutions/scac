@@ -34,6 +34,3 @@ COPY --from=builder /usr/src/workflow-service/target/release/workflow-service /u
 
 # Start the service
 CMD ["/usr/local/bin/workflow-service"]
-
-# Expose the service port
-EXPOSE 8000

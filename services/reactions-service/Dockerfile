@@ -34,6 +34,3 @@ COPY --from=builder /usr/src/reactions-service/target/release/reactions-service 
 
 # Start the service
 CMD ["/usr/local/bin/reactions-service"]
-
-# Expose the service port
-EXPOSE 8000

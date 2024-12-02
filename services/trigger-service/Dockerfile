@@ -34,6 +34,3 @@ COPY --from=builder /usr/src/trigger-service/target/release/trigger-service /usr
 
 # Start the service
 CMD ["/usr/local/bin/trigger-service"]
-
-# Expose the service port
-EXPOSE 8000

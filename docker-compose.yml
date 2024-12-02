@@ -1,55 +1,158 @@
+networks:
+  internal:
+    driver: bridge
+
 services:
   actions-service:
     build:
       context: ./services/actions-service
       dockerfile: Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+    networks:
+      - internal
+    healthcheck:
+      test: curl --fail http://localhost:8000/health || exit 1
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
 
-  api-services-service:
-    build:
-      context: ./services/api-services-service
-      dockerfile: Dockerfile
-  
-  authentification-service:
-    build:
-      context: ./services/authentification-service
-      dockerfile: Dockerfile
 
-  reactions-service:
-    build:
-      context: ./services/reactions-service
-      dockerfile: Dockerfile
-  
-  trigger-service:
-    build:
-      context: ./services/trigger-service
-      dockerfile: Dockerfile
+  # api-services-service:
+  #   build:
+  #     context: ./services/api-services-service
+  #     dockerfile: Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #   networks:
+  #     - internal
 
-  user-tokens-service:
-    build:
-      context: ./services/user-tokens-service
-      dockerfile: Dockerfile
-  
-  users-service:
-    build:
-      context: ./services/users-service
-      dockerfile: Dockerfile
+  # authentification-service:
+  #   build:
+  #     context: ./services/authentification-service
+  #     dockerfile: Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #   networks:
+  #     - internal
+
+  # reactions-service:
+  #   build:
+  #     context: ./services/reactions-service
+  #     dockerfile: Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #   networks:
+  #     - internal
+
+  # trigger-service:
+  #   build:
+  #     context: ./services/trigger-service
+  #     dockerfile: Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #   networks:
+  #     - internal
+
+  # user-tokens-service:
+  #   build:
+  #     context: ./services/user-tokens-service
+  #     dockerfile: Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #   networks:
+  #     - internal
+
+  # users-service:
+  #   build:
+  #     context: ./services/users-service
+  #     dockerfile: Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #   networks:
+  #     - internal
+
+  # workflow-service:
+  #   build:
+  #     context: ./services/workflow-service
+  #     dockerfile: Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #   networks:
+  #     - internal
 
   api-gateway:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ACTIONS_SERVICE_ADDRESS=actions-service
+      - ACTIONS_SERVICE_PORT=8000
+      - API_SERVICES_SERVICE_ADDRESS=api-services-service
+      - API_SERVICES_SERVICE_PORT=8000
+      - AUTHENTIFICATION_SERVICE_ADDRESS=authentification-service
+      - AUTHENTIFICATION_SERVICE_PORT=8000
+      - REACTIONS_SERVICE_ADDRESS=reactions-service
+      - REACTIONS_SERVICE_PORT=8000
+      - TRIGGER_SERVICE_ADDRESS=trigger-service
+      - TRIGGER_SERVICE_PORT=8000
+      - USER_TOKENS_SERVICE_ADDRESS=user-tokens-service
+      - USER_TOKENS_SERVICE_PORT=8000
+      - USERS_SERVICE_ADDRESS=users-service
+      - USERS_SERVICE_PORT=8000
+      - WORKFLOW_SERVICE_ADDRESS=workflow-service
+      - WORKFLOW_SERVICE_PORT=8000
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+    networks:
+      - internal
     depends_on:
       - actions-service
-      - api-services-service
-      - authentification-service
-      - reactions-service
-      - trigger-service
-      - user-tokens-service
-      - users-service
-  
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    depends_on:
-      - api-gateway
+      # - api-services-service
+      # - authentification-service
+      # - reactions-service
+      # - trigger-service
+      # - user-tokens-service
+      # - users-service
+      # - workflow-service
+
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - API_GATEWAY_ADDRESS=api-gateway
+  #     - API_GATEWAY_PORT=8000
+  #   networks:
+  #     - internal
+  #   depends_on:
+  #     - api-gateway
