@@ -3,23 +3,21 @@ name: Deploy Helm Chart
 on:
   workflow_call:
     inputs:
+      chart-path:
+        description: Path to the Helm chart
+        required: true
+        type: string
       release-name:
-        description: "The name of the Helm release"
+        description: Name of the Helm release
         required: true
         type: string
       namespace:
-        description: "The Kubernetes namespace to deploy to"
+        description: Namespace to deploy the Helm release
         required: true
         type: string
-      chart-path:
-        description: "Path to the Helm chart"
-        required: false
-        default: "./"
-        type: string
       values-file:
-        description: "Path to the values.yaml file"
+        description: Path to the values file (optional)
         required: false
-        default: "./values.yaml"
         type: string
 
 jobs:
@@ -36,19 +34,23 @@ jobs:
 
       - name: Set Kubeconfig
         run: doctl kubernetes cluster kubeconfig save "${{ secrets.KUBERNETES_CLUSTER_ID }}"
-    
+
       - name: Install Helm
         uses: azure/setup-helm@v4.2.0
         with:
           version: v3.16.2
 
       - name: Helm Dependency Update
-        run: |
-          helm dependency update "${{ inputs.chart-path }}"
+        run: helm dependency update "${{ inputs.chart-path }}"
 
       - name: Deploy Helm Chart
         run: |
-          helm upgrade --install ${{ inputs.release-name }} "${{ inputs.chart-path }}" \
-            --namespace ${{ inputs.namespace }} \
+          helm upgrade --install "${{ inputs.release-name }}" "${{ inputs.chart-path }}" \
+            --namespace "${{ inputs.namespace }}" \
             --create-namespace \
-            --values "${{ inputs.values-file }}"
+            $(if [ -n "${{ inputs.values-file }}" ]; then echo "--values=${{ inputs.values-file }}"; fi)
+
+      - name: Verify Deployment
+        run: |
+          kubectl rollout status deployment/"${{ inputs.release-name }}" \
+            --namespace "${{ inputs.namespace }}"
