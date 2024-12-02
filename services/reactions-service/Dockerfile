@@ -6,7 +6,7 @@ ARG ALPINE_VERSION=3.20
 FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 # Install required build dependencies
-RUN apk add --no-cache musl-dev gcc
+RUN apk add --no-cache musl-dev gcc libpq libpq-dev
 
 # Set working directory
 WORKDIR /usr/src/scac
