@@ -7,17 +7,9 @@ on:
       - 43-fix-the-github-actions-for-deploy-helm-charts
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Echo TEST secret
-        run: |
-          echo ${{ secrets.TEST }}
-          echo ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          echo ${{ secrets.KUBERNETES_CLUSTER_ID }}
-
   call-deploy-template:
     uses: ./.github/workflows/deploy-helm-template.yml
+    secrets: inherit
     with:
       release-name: "kube-prometheus-stack"
       namespace: "kube-prometheus-stack"

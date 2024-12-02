@@ -26,35 +26,29 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Echo TEST secret
-      run: |
-        echo ${{ secrets.TEST }}
-        echo ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-        echo ${{ secrets.KUBERNETES_CLUSTER_ID }}
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
 
-    - name: Checkout repository
-      uses: actions/checkout@v4.2.2
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2.5.1
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-    - name: Install doctl
-      uses: digitalocean/action-doctl@v2.5.1
-      with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Set Kubeconfig
+        run: doctl kubernetes cluster kubeconfig save "${{ secrets.KUBERNETES_CLUSTER_ID }}"
+    
+      - name: Install Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: v3.16.2
 
-    - name: Set Kubeconfig
-      run: doctl kubernetes cluster kubeconfig save "${{ secrets.KUBERNETES_CLUSTER_ID }}"
-  
-    - name: Install Helm
-      uses: azure/setup-helm@v4.2.0
-      with:
-        version: v3.16.2
+      - name: Helm Dependency Update
+        run: |
+          helm dependency update "${{ inputs.chart-path }}"
 
-    - name: Helm Dependency Update
-      run: |
-        helm dependency update "${{ inputs.chart-path }}"
-
-    - name: Deploy Helm Chart
-      run: |
-        helm upgrade --install ${{ inputs.release-name }} "${{ inputs.chart-path }}" \
-          --namespace ${{ inputs.namespace }} \
-          --create-namespace \
-          --values "${{ inputs.values-file }}"
+      - name: Deploy Helm Chart
+        run: |
+          helm upgrade --install ${{ inputs.release-name }} "${{ inputs.chart-path }}" \
+            --namespace ${{ inputs.namespace }} \
+            --create-namespace \
+            --values "${{ inputs.values-file }}"
