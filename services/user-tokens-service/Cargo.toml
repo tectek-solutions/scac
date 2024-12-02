@@ -1,10 +1,10 @@
 [package]
-name = "authentification-service"
+name = "user-tokens-service"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "authentification-service"
+name = "user-tokens-service"
 path = "src/main.rs"
 
 [dependencies]
