@@ -27,7 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Echo TEST secret
-      run: echo ${{ secrets.TEST }}
+      run: |
+        echo ${{ secrets.TEST }}
+        echo ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        echo ${{ secrets.KUBERNETES_CLUSTER_ID }}
 
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
