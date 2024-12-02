@@ -16,7 +16,7 @@ class Registration extends StatefulWidget {
 
 class _RegistrationState extends State<Registration> {
 
-  var _isObscured = false;
+  var _isObscured = true;
   final TextEditingController _passwordController = TextEditingController();
 
   @override
