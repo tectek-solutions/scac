@@ -1,96 +1,135 @@
+use actix_web::web;
+use database;
+use database::model::{NewUser, User};
 use diesel::prelude::*;
-use database::model::*;
-use database::*;
 
-pub fn get_users() {
+pub fn get_users(db: &web::Data<database::Database>) -> Result<Option<Vec<User>>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let connection = &mut establish_connection();
-    match users.select(User::as_select()).load::<User>(connection) {
-        Ok(results) => {
-            println!("Displaying {} users", results.len());
-            for user in results {
-                println!("Username: {:?}, Email: {:?}", user.username, user.email);
-            }
+    let mut connection = db.get_connection();
+    match users.load::<User>(&mut connection) {
+        Ok(users) => Ok(users),
+        Ok(None) => Ok(None),
+        Err(err) => {
+            eprintln!("Error getting users: {:?}", err);
+            Err(err)
         }
-        Err(err) => eprintln!("Error loading users: {:?}", err),
     }
 }
 
-pub fn get_user_by_id(user_id: i32) {
+pub fn get_user_by_id(
+    db: &web::Data<database::Database>,
+    user_id: i32,
+) -> Result<Option<User>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let connection = &mut establish_connection();
+    let mut connection = db.get_connection();
+
     match users
         .find(user_id)
         .select(User::as_select())
-        .first::<User>(connection)
+        .first::<User>(&mut connection)
         .optional()
     {
-        Ok(Some(user)) => {
-            println!("Found user {:?}, with ID {:?}", user.username, user_id);
-            println!("Email: {:?}", user.email);
+        Ok(Some(user)) => Ok(Some(user)),
+        Ok(None) => Ok(None),
+        Err(err) => {
+            eprintln!("Error getting user with ID {:?}: {:?}", user_id, err);
+            Err(err)
         }
-        Ok(None) => println!("No user found with ID {:?}", user_id),
-        Err(err) => eprintln!("Error fetching user with ID {:?}: {:?}", user_id, err),
     }
 }
 
-pub fn get_user_by_email(email: &str) {
+pub fn get_user_by_email(
+    db: &web::Data<database::Database>,
+    user_email: &String,
+) -> Result<Option<User>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let connection = &mut establish_connection();
+    let mut connection = db.get_connection();
     match users
-        .filter(email.eq(email))
+        .filter(email.eq(user_email.clone()))
         .select(User::as_select())
-        .first::<User>(connection)
+        .first::<User>(&mut connection)
         .optional()
     {
-        Ok(Some(user)) => {
-            println!("Found user {:?}, with email {:?}", user.username, email);
-            println!("ID: {:?}", user.id);
+        Ok(Some(user)) => Ok(Some(user)),
+        Ok(None) => Ok(None),
+        Err(err) => {
+            eprintln!("Error getting user with email {:?}: {:?}", user_email, err);
+            Ok(None)
         }
-        Ok(None) => println!("No user found with email {:?}", email),
-        Err(err) => eprintln!("Error fetching user with email {:?}: {:?}", email, err),
     }
 }
 
-pub fn add_user(username: &str, email: &str) {
-    let connection = &mut establish_connection();
-    let password_hash = "password_hash"; // Placeholder for actual password hash generation
+pub fn add_user(
+    db: &web::Data<database::Database>,
+    username: String,
+    email: String,
+    password_hash: String,
+) -> Result<Option<User>, diesel::result::Error> {
+    use database::schema::users;
 
-    match create_user(connection, username, email, password_hash) {
-        Ok(user) => {
-            println!("Created user: {:?}", user.username);
-            println!("Email: {:?}", user.email);
-            println!("Password Hash: {:?}", user.password_hash);
-        }
-        Err(err) => eprintln!("Error creating user: {:?}", err),
-    }
-}
+    let mut connection = db.get_connection();
 
-pub fn update_user(user_id: i32, new_username: &str) {
-    use database::schema::users::dsl::*;
+    let new_user = NewUser {
+        username: &username,
+        email: &email,
+        password_hash: &password_hash,
+    };
 
-    let connection = &mut establish_connection();
-    match diesel::update(users.find(user_id))
-        .set(username.eq(new_username))
+    match diesel::insert_into(users::table)
+        .values(&new_user)
         .returning(User::as_returning())
-        .get_result::<User>(connection)
+        .get_result::<User>(&mut connection)
     {
-        Ok(user) => println!("Updated user: {:?}", user.username),
-        Err(err) => eprintln!("Error updating user with ID {:?}: {:?}", user_id, err),
+        Ok(user) => Ok(Some(user)),
+        Err(err) => {
+            eprintln!("Error adding user: {:?}", err);
+            Err(err)
+        }
     }
 }
 
-pub fn delete_user(user_id: i32) {
+pub fn update_user(
+    db: &web::Data<database::Database>,
+    user_id: i32,
+    new_username: String,
+    new_email: String,
+    new_password_hash: String,
+) -> Result<Option<User>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let connection = &mut establish_connection();
-    match diesel::delete(users.find(user_id))
-        .get_result::<User>(connection)
+    let mut connection = db.get_connection();
+    match diesel::update(users.find(user_id))
+        .set((
+            username.eq(new_username.clone()),
+            email.eq(new_email.clone()),
+            password_hash.eq(new_password_hash.clone()),
+        ))
+        .returning(User::as_returning())
+        .get_result::<User>(&mut connection)
     {
-        Ok(user) => println!("Deleted user: {:?}", user.username),
-        Err(err) => eprintln!("Error deleting user with ID {:?}: {:?}", user_id, err),
+        Ok(user) => Ok(Some(user)),
+        Err(err) => {
+            eprintln!("Error updating user with ID {:?}: {:?}", user_id, err);
+            Ok(None)
+        }
+    }
+}
+
+pub fn delete_user(
+    db: &web::Data<database::Database>,
+    user_id: i32,
+) -> Result<Option<User>, diesel::result::Error> {
+    use database::schema::users::dsl::*;
+
+    let mut connection = db.get_connection();
+    match diesel::delete(users.find(user_id)).get_result::<User>(&mut connection) {
+        Ok(user) => Ok(Some(user)),
+        Err(err) => {
+            eprintln!("Error deleting user with ID {:?}: {:?}", user_id, err);
+            Err(err)
+        }
     }
 }

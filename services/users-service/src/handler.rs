@@ -1,4 +1,4 @@
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use actix_web::{get, post, put, delete, web, HttpResponse, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use hmac::{Hmac, Mac};
 use jwt::{SignWithKey, VerifyWithKey};
@@ -10,7 +10,9 @@ use std::env;
 use utoipa::ToSchema;
 use chrono::{Utc, Duration};
 
-use crate::query::{delete_user, get_user_by_email, get_user_by_id, insert_user, update_user};
+use database;
+
+use crate::query;
 
 // ----------------------------
 // Struct Definitions
@@ -24,6 +26,7 @@ struct Claims {
 
 #[derive(ToSchema, Serialize, Deserialize)]
 struct UserRegister {
+    username: String,
     email: String,
     password: String,
     password_confirmation: String,
@@ -111,16 +114,28 @@ fn verify_jwt(token: &str) -> bool {
     false
 }
 
-fn get_user_id_by_jwt(token: &str) -> Option<i32> {
-    let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set").ok()?;
-    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_bytes()).ok()?;
-    let claims: Result<BTreeMap<String, String>, _> = token.verify_with_key(&key);
-    
-    match claims {
-        Ok(claims) => {
-            claims.get("id").and_then(|id| id.parse::<i32>().ok())
-        }
-        Err(_) => None,
+fn get_user_id_by_jwt(token: &str) -> Result<Option<i32>, String> {
+    let jwt_secret = match env::var("JWT_SECRET") {
+        Ok(secret) => secret,
+        Err(_) => return Err("JWT_SECRET not set".to_string()),
+    };
+
+    let key: HmacSha256 = match HmacSha256::new_from_slice(jwt_secret.as_ref()) {
+        Ok(k) => k,
+        Err(_) => return Err("HMAC creation failed".to_string()),
+    };
+
+    let claims: BTreeMap<String, String> = match token.verify_with_key(&key) {
+        Ok(c) => c,
+        Err(_) => return Err("Failed to verify token".to_string()),
+    };
+
+    match claims.get("id") {
+        Some(id) => match id.parse::<i32>() {
+            Ok(id) => Ok(Some(id)),
+            Err(_) => Err("Failed to parse user ID".to_string()),
+        },
+        None => Ok(None),
     }
 }
 
@@ -130,8 +145,6 @@ fn get_user_id_by_jwt(token: &str) -> Option<i32> {
 // ----------------------------
 
 #[utoipa::path(
-
-
     post,
     path = "/users/register",
     request_body = UserRegister,
@@ -144,10 +157,23 @@ fn get_user_id_by_jwt(token: &str) -> Option<i32> {
     )
 )]
 #[post("/register")]
-async fn register(user: web::Json<UserRegister>) -> impl Responder {
-    if get_user_by_email(&user.email).is_some() {
-        return ErrorResponse::Conflict("User already exists".to_string())
-            .to_response(actix_web::http::StatusCode::CONFLICT);
+async fn register(db: web::Data<database::Database>, user: web::Json<UserRegister>) -> impl Responder {
+    // if query::get_user_by_email(&db, &user.email).is_some() {
+    //     return ErrorResponse::Conflict("User already exists".to_string())
+    //         .to_response(actix_web::http::StatusCode::CONFLICT);
+    // }
+
+    match query::get_user_by_email(&db, &user.email) {
+        Ok(Some(_)) => {}
+        Ok(None) => {
+            return ErrorResponse::InternalServerError("Failed to check for existing user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
+        Err(err) => {
+            eprintln!("Error checking for existing user: {:?}", err);
+            return ErrorResponse::InternalServerError("Failed to check for existing user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
     }
 
     if !is_valid_email(&user.email) {
@@ -167,9 +193,20 @@ async fn register(user: web::Json<UserRegister>) -> impl Responder {
         .to_response(actix_web::http::StatusCode::BAD_REQUEST);
     }
 
-    let hashed_password = hash(&user.password, DEFAULT_COST).expect("Password hashing failed");
-    let new_user = insert_user(user.email.clone(), hashed_password);
-    HttpResponse::Created().json(new_user)
+    let password_hash = hash(&user.password, DEFAULT_COST).expect("Password hashing failed");
+    match query::add_user(&db, user.username.clone(), user.email.clone(), password_hash) {
+        Ok(Some(new_user)) => {
+            let token = signing_jwt(new_user.id);
+            HttpResponse::Created().json(token)
+        }
+        Ok(None) => ErrorResponse::InternalServerError("Failed to add user".to_string())
+            .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR),
+        Err(err) => {
+            eprintln!("Error adding user: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to add user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
 }
 
 #[utoipa::path(
@@ -184,12 +221,17 @@ async fn register(user: web::Json<UserRegister>) -> impl Responder {
     )
 )]
 #[post("/login")]
-async fn login(user: web::Json<UserLogin>) -> impl Responder {
-    let existing_user = match get_user_by_email(&user.email) {
-        Some(user) => user,
-        None => {
+async fn login(db: web::Data<database::Database>, user: web::Json<UserLogin>) -> impl Responder {
+    let existing_user = match query::get_user_by_email(&db, &user.email) {
+        Ok(Some(user)) => user,
+        Ok(None) => {
             return ErrorResponse::Unauthorized("User not found".to_string())
                 .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+        }
+        Err(err) => {
+            eprintln!("Error getting user: {:?}", err);
+            return ErrorResponse::InternalServerError("Failed to get user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -198,8 +240,11 @@ async fn login(user: web::Json<UserLogin>) -> impl Responder {
             .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
     }
 
-    let token = signing_jwt(existing_user.id);
-    HttpResponse::Ok().json(token)
+    match signing_jwt(existing_user.id) {
+        Ok(token) => HttpResponse::Ok().json(token),
+        Err(_) => ErrorResponse::InternalServerError("Failed to sign token".to_string())
+            .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR),
+    }
 }
 
 #[utoipa::path(
@@ -213,15 +258,28 @@ async fn login(user: web::Json<UserLogin>) -> impl Responder {
     )
 )]
 #[get("/me")]
-async fn get_user_profile_handler(token: web::ReqData<String>) -> impl Responder {
-    match get_user_id_by_jwt(&token.into_inner()) {
-        Some(user_id) => match get_user_by_id(user_id) {
-            Some(user) => HttpResponse::Ok().json(user),
-            None => ErrorResponse::NotFound("User not found".to_string())
-                .to_response(actix_web::http::StatusCode::NOT_FOUND),
-        },
-        None => ErrorResponse::Unauthorized("Invalid token".to_string())
+async fn get_user_profile_handler(db: web::Data<database::Database>, token: web::ReqData<String>) -> impl Responder {
+    let user_id = match get_user_id_by_jwt(&token.into_inner()) {
+        Ok(Some(id)) => id,
+        Ok(None) => {
+            return ErrorResponse::Unauthorized("User not found".to_string())
+                .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+        }
+        Err(_) => {
+            return ErrorResponse::Unauthorized("Invalid token".to_string())
+                .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+        }
+    };
+
+    match query::get_user_by_id(&db, user_id) {
+        Ok(Some(user)) => HttpResponse::Ok().json(user),
+        Ok(None) => ErrorResponse::Unauthorized("User not found".to_string())
             .to_response(actix_web::http::StatusCode::UNAUTHORIZED),
+        Err(err) => {
+            eprintln!("Error getting user: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
+        }
     }
 }
 
@@ -237,14 +295,18 @@ async fn get_user_profile_handler(token: web::ReqData<String>) -> impl Responder
     )
 )]
 #[get("/{id}")]
-async fn get_user_handler(id: web::Path<i32>) -> impl Responder {
-    match get_user_by_id(id.into_inner()) {
-        Some(user) => HttpResponse::Ok().json(user),
-        None => ErrorResponse::NotFound("User not found".to_string())
+async fn get_user_handler(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
+    match query::get_user_by_id(&db, id.clone()) {
+        Ok(Some(user)) => HttpResponse::Ok().json(user),
+        Ok(None) => ErrorResponse::NotFound("User not found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
+        Err(err) => {
+            eprintln!("Error getting user: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
+        }
     }
 }
-
 
 #[utoipa::path(
     put,
@@ -259,12 +321,21 @@ async fn get_user_handler(id: web::Path<i32>) -> impl Responder {
 )]
 #[put("/{id}")]
 async fn update_user_handler(
+    db: web::Data<database::Database>,
     id: web::Path<i32>,
     user: web::Json<UserRegister>,
 ) -> impl Responder {
-    if get_user_by_id(id.into_inner()).is_none() {
-        return ErrorResponse::NotFound("User not found".to_string())
-            .to_response(actix_web::http::StatusCode::NOT_FOUND);
+    match query::get_user_by_id(&db, id.clone()) {
+        Ok(Some(_)) => {}
+        Ok(None) => {
+            return ErrorResponse::NotFound("User not found".to_string())
+                .to_response(actix_web::http::StatusCode::NOT_FOUND);
+        }
+        Err(err) => {
+            eprintln!("Error getting user: {:?}", err);
+            return ErrorResponse::InternalServerError("Failed to get user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
     }
 
     if !is_valid_email(&user.email) || !is_valid_password(&user.password) {
@@ -272,9 +343,17 @@ async fn update_user_handler(
             .to_response(actix_web::http::StatusCode::BAD_REQUEST);
     }
 
-    let hashed_password = hash(&user.password, DEFAULT_COST).expect("Password hashing failed");
-    let updated_user = update_user(id.into_inner(), user.email.clone(), hashed_password);
-    HttpResponse::Ok().json(updated_user)
+    let password_hash = hash(&user.password, DEFAULT_COST).expect("Password hashing failed");
+    match query::update_user(&db, id.clone(), user.username.clone(), user.email.clone(), password_hash) {
+        Ok(Some(updated_user)) => HttpResponse::Ok().json(updated_user),
+        Ok(None) => ErrorResponse::InternalServerError("Failed to update user".to_string())
+            .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR),
+        Err(err) => {
+            eprintln!("Error updating user: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to update user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
 }
 
 #[utoipa::path(
@@ -289,14 +368,28 @@ async fn update_user_handler(
     )
 )]
 #[delete("/{id}")]
-async fn delete_user_handler(id: web::Path<i32>) -> impl Responder {
-    if get_user_by_id(id.into_inner()).is_none() {
-        return ErrorResponse::NotFound("User not found".to_string())
-            .to_response(actix_web::http::StatusCode::NOT_FOUND);
+async fn delete_user_handler(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
+    match query::get_user_by_id(&db, id.clone()) {
+        Ok(Some(_)) => {}
+        Ok(None) => {
+            return ErrorResponse::NotFound("User not found".to_string())
+                .to_response(actix_web::http::StatusCode::NOT_FOUND);
+        }
+        Err(err) => {
+            eprintln!("Error getting user: {:?}", err);
+            return ErrorResponse::InternalServerError("Failed to get user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
     }
 
-    delete_user(id.into_inner());
-    HttpResponse::NoContent().finish()
+    match query::delete_user(&db, id.clone()) {
+        Ok(_) => HttpResponse::NoContent().finish(),
+        Err(err) => {
+            eprintln!("Error deleting user: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to delete user".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
 }
 
 // ----------------------------

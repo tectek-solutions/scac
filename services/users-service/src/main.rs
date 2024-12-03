@@ -1,49 +1,51 @@
+pub mod handler;
+pub mod query;
+
 use actix_cors::Cors;
-use actix_web::middleware::Logger;
-use actix_web::{http::header, App, HttpResponse, HttpServer, Responder};
+use actix_web::{web, middleware::Logger, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 use utoipa::{Modify, OpenApi};
-use utoipa_rapidoc::RapiDoc;
-use utoipa_redoc::{Redoc, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::handler;
+use database;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // Initialize logging and environment variables
     setup_logging_and_env();
 
-    // Retrieve server configuration
     let (address, port) = get_server_config();
 
-    // Define OpenAPI documentation
+    let database_url = env::var("POSTGRES_URL").expect("POSTGRES_URL must be set");
+    let db = web::Data::new(database::Database::new(&database_url));
+
     #[derive(OpenApi)]
     #[openapi(
         tags((name = "users-service", description = "Users service")),
         modifiers(&SecurityAddon),
-        paths(handler::login, handler::register, handler::get_user_handler, handler::get_user_profile_handler, handler::update_user_handler, handler::delete_user_handler),
+        paths(
+            handler::login,
+            handler::register,
+            handler::get_user_handler,
+            handler::get_user_profile_handler,
+            handler::update_user_handler,
+            handler::delete_user_handler
+        ),
     )]
     struct ApiDoc;
 
-    println!("🚀 Server started successfully on {}:{}", address, port);
-
-    // Start the server
     HttpServer::new(move || {
         let cors = configure_cors();
 
         App::new()
+            .app_data(db.clone())
             .configure(handler::config)
             .wrap(cors)
             .wrap(Logger::default())
-            .service(health)
             .service(
                 SwaggerUi::new("/swagger-ui/{_:.*}")
                     .url("/api-docs/openapi.json", ApiDoc::openapi()),
             )
-            .service(Redoc::with_url("/redoc", ApiDoc::openapi()))
-            .service(RapiDoc::new("/api-docs/openapi.json").path("/rapidoc"))
     })
     .bind((address.as_str(), port))?
     .run()
@@ -81,11 +83,11 @@ fn get_server_config() -> (String, u16) {
 fn configure_cors() -> Cors {
     Cors::default()
         .allowed_origin("http://localhost:8000")
-        .allowed_methods(vec!["GET", "POST"])
+        .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
         .allowed_headers(vec![
-            header::CONTENT_TYPE,
-            header::AUTHORIZATION,
-            header::ACCEPT,
+            actix_web::http::header::CONTENT_TYPE,
+            actix_web::http::header::AUTHORIZATION,
+            actix_web::http::header::ACCEPT,
         ])
         .supports_credentials()
 }
@@ -105,9 +107,4 @@ impl Modify for SecurityAddon {
             );
         }
     }
-}
-
-#[actix_web::get("/health")]
-async fn health() -> impl Responder {
-    HttpResponse::Ok().body("OK")
 }
