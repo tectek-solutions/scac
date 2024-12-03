@@ -3,113 +3,126 @@ networks:
     driver: bridge
 
 services:
+  database:
+    image: postgres:17.2-alpine3.20
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: scac
+    networks:
+      - internal
+
   actions-service:
     build:
-      context: ./
+      context: .
       dockerfile: ./services/actions-service/Dockerfile
     expose:
       - "8000"
     environment:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
-    healthcheck:
-      test: curl --fail http://localhost:8000/health || exit 1
-      interval: 40s
-      timeout: 30s
-      retries: 3
-      start_period: 60s
 
+  api-services-service:
+    build:
+      context: .
+      dockerfile: ./services/api-services-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
 
-  # api-services-service:
-  #   build:
-  #     context: ./services/api-services-service
-  #     dockerfile: Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #   networks:
-  #     - internal
+  authentification-service:
+    build:
+      context: .
+      dockerfile: ./services/authentification-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
 
-  # authentification-service:
-  #   build:
-  #     context: ./services/authentification-service
-  #     dockerfile: Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #   networks:
-  #     - internal
+  reactions-service:
+    build:
+      context: .
+      dockerfile: ./services/reactions-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
 
-  # reactions-service:
-  #   build:
-  #     context: ./services/reactions-service
-  #     dockerfile: Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #   networks:
-  #     - internal
+  trigger-service:
+    build:
+      context: .
+      dockerfile: ./services/trigger-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
 
-  # trigger-service:
-  #   build:
-  #     context: ./services/trigger-service
-  #     dockerfile: Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #   networks:
-  #     - internal
+  user-tokens-service:
+    build:
+      context: .
+      dockerfile: ./services/user-tokens-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
 
-  # user-tokens-service:
-  #   build:
-  #     context: ./services/user-tokens-service
-  #     dockerfile: Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #   networks:
-  #     - internal
+  users-service:
+    build:
+      context: .
+      dockerfile: ./services/users-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
+    depends_on:
+      - database
 
-  # users-service:
-  #   build:
-  #     context: ./services/users-service
-  #     dockerfile: Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #   networks:
-  #     - internal
-
-  # workflow-service:
-  #   build:
-  #     context: ./services/workflow-service
-  #     dockerfile: Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #   networks:
-  #     - internal
+  workflow-service:
+    build:
+      context: .
+      dockerfile: ./services/workflow-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
 
   api-gateway:
     build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -134,19 +147,19 @@ services:
     networks:
       - internal
     depends_on:
-      - actions-service
+      # - actions-service
       # - api-services-service
       # - authentification-service
       # - reactions-service
       # - trigger-service
       # - user-tokens-service
-      # - users-service
+      - users-service
       # - workflow-service
 
   # client:
   #   build:
-  #     context: ./client
-  #     dockerfile: Dockerfile
+  #     context: .
+  #     dockerfile: ./client/Dockerfile
   #   ports:
   #     - "3000:3000"
   #   environment:
