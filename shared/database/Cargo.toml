@@ -9,5 +9,7 @@ edition = "2021"
 # pq-sys = { version = "0.6", features = ["bundled"] }
 # openssl-sys = { version = "0.9.100", features = ["vendored"] } 
 diesel = { version = "2.0.0", features = ["postgres", "chrono"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_derive = "1.0"
 dotenvy = "0.15"
-chrono = { version = "0.4", features = ["serde"] }
+chrono = "0.4"
