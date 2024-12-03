@@ -1,80 +1,135 @@
+use actix_web::web;
+use database;
+use database::model::{Authentification, NewUser};
 use diesel::prelude::*;
-use database::auth_service_models::*;
-use database::*;
 
-pub fn get_auth_service() {
-    use database::schema::auth_service::dsl::*;
+pub fn get_authentifications(
+    db: &web::Data<database::Database>,
+) -> Result<Option<Vec<Authentification>>, diesel::result::Error> {
+    use database::schema::authentifications::dsl::*;
 
-    let connection = &mut etablish_connection();
-    let results = auth_service
-        // .limit(5) // uncomment this line to limit the number of results
-        .select(AuthService::as_select())
-        .load(connection)
-        .expect("Error loading auth services");
-    println!("Displaying {} auth services", results.len());
-    for auth_services in results {
-        println!("{:?}", auth_services.name);
-        println!("----------\n");
-        println!("{:?}", auth_services.auth_url);
-    }
-}
+    let mut connection = db.get_connection();
+    let result = authentifications.load::<Authentification>(&mut connection);
 
-pub fn get_auth_service_by_id(auth_service_id: i32) {
-    use database::schema::auth_service::dsl::*;
-
-    let connection = &mut etablish_connection();
-    let auth_services = auth_service
-        .find(auth_service_id)
-        .select(AuthService::as_select())
-        .first(connection)
-        .optional();
-    match auth_services {
-        Ok(Some(auth_services)) => {
-            println!("Found auth service {:?}, with id {:?}", auth_services.name, auth_service_id);
-            println!("Found auth_url {:?} for auth_service_id {:?}", auth_services.auth_url, auth_service_id);
-        },
-        Ok(None) => {
-            println!("No auth service found with id {:?}", auth_service_id);
-        },
+    match result {
+        Ok(result) => Ok(Some(result)),
         Err(err) => {
-            println!("Error: {:?} when fetching post {:?}", err, auth_service_id);
+            eprintln!("Error getting authentifications: {:?}", err);
+            Err(err)
         }
     }
 }
 
-pub fn add_auth_service(auth_name: &str, auth_url: &str, token_url: &str, client_id: &str, client_secret: &str) {
-    let connection = &mut etablish_connection();
+pub fn get_authentification_by_id(
+    db: &web::Data<database::Database>,
+    authentification_id: i32,
+) -> Result<Option<Authentification>, diesel::result::Error> {
+    use database::schema::authentifications::dsl::*;
 
-    let new_auth_service = create_auth_service(connection, auth_name, auth_url, token_url, client_id, client_secret);
+    let mut connection = db.get_connection();
 
-    println!("Created auth service {:?}", new_auth_service.name);
-    println!("Created auth_url {:?}", new_auth_service.auth_url);
-    println!("Created token_url {:?}", new_auth_service.token_url);
-    println!("Created client_id {:?}", new_auth_service.client_id);
+    match authentifications
+        .find(authentification_id)
+        .select(Authentification::as_select())
+        .first::<Authentification>(&mut connection)
+        .optional()
+    {
+        Ok(Some(authentification)) => Ok(Some(authentification)),
+        Ok(None) => Ok(None),
+        Err(err) => {
+            eprintln!(
+                "Error getting authentification with ID {:?}: {:?}",
+                authentification_id, err
+            );
+            Err(err)
+        }
+    }
 }
 
-pub fn update_auth_service(auth_service_id: i32, auth_name: &str, url: &str, token: &str, id_client: &str, secret: &str) {
-    use database::schema::auth_service::dsl::*;
+pub fn add_authentification(
+    db: &web::Data<database::Database>,
+    name: String,
+    auth_url: String,
+    token_url: String,
+    client_id: String,
+    client_secret: String,
+) -> Result<Option<Authentification>, diesel::result::Error> {
+    use database::schema::authentifications;
 
-    let connection = &mut etablish_connection();
-    let num_updated = diesel::update(auth_service.find(auth_service_id))
+    let mut connection = db.get_connection();
+
+    let new_authentification = NewUser {
+        name: &name,
+        auth_url: &auth_url,
+        token_url: &token_url,
+        client_id: &client_id,
+        client_secret: &client_secret,
+    };
+
+    match diesel::insert_into(authentifications::table)
+        .values(&new_authentification)
+        .returning(Authentification::as_returning())
+        .get_result::<Authentification>(&mut connection)
+    {
+        Ok(authentification) => Ok(Some(authentification)),
+        Err(err) => {
+            eprintln!("Error adding authentification: {:?}", err);
+            Err(err)
+        }
+    }
+}
+
+pub fn update_authentification(
+    db: &web::Data<database::Database>,
+    authentification_id: i32,
+    new_name: String,
+    new_auth_url: String,
+    new_token_url: String,
+    new_client_id: String,
+    new_client_secret: String,
+) -> Result<Option<Authentification>, diesel::result::Error> {
+    use database::schema::authentifications::dsl::*;
+
+    let mut connection = db.get_connection();
+    match diesel::update(authentifications.find(authentification_id))
         .set((
-            name.eq(auth_name),
-            auth_url.eq(url),
-            token_url.eq(token),
-            client_id.eq(id_client),
-            client_secret.eq(secret),
+            name.eq(new_name.clone()),
+            auth_url.eq(new_auth_url.clone()),
+            token_url.eq(new_token_url.clone()),
+            client_id.eq(new_client_id.clone()),
+            client_secret.eq(new_client_secret.clone()),
         ))
-        .execute(connection)
-        .expect(&format!("Unable to find auth service with id {:?}", auth_service_id));
+        .returning(Authentification::as_returning())
+        .get_result::<Authentification>(&mut connection)
+    {
+        Ok(authentification) => Ok(Some(authentification)),
+        Err(err) => {
+            eprintln!(
+                "Error updating authentification with ID {:?}: {:?}",
+                authentification_id, err
+            );
+            Ok(None)
+        }
+    }
 }
 
-pub fn delete_auth_service(auth_service_id: i32) {
-    use database::schema::auth_service::dsl::*;
+pub fn delete_authentification(
+    db: &web::Data<database::Database>,
+    authentification_id: i32,
+) -> Result<Option<Authentification>, diesel::result::Error> {
+    use database::schema::authentifications::dsl::*;
 
-    let connection = &mut etablish_connection();
-    let num_deleted: AuthService = diesel::delete(auth_service.find(auth_service_id))
-        .get_result(connection)
-        .expect(&format!("Unable to delete auth service with id {:?}", auth_service_id));
-    println!("Deleted {} auth service with id {:?}", num_deleted.name, auth_service_id);
+    let mut connection = db.get_connection();
+    match diesel::delete(authentifications.find(authentification_id))
+        .get_result::<Authentification>(&mut connection)
+    {
+        Ok(authentification) => Ok(Some(authentification)),
+        Err(err) => {
+            eprintln!(
+                "Error deleting authentification with ID {:?}: {:?}",
+                authentification_id, err
+            );
+            Err(err)
+        }
+    }
 }

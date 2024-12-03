@@ -26,7 +26,7 @@ struct Claims {
 
 #[derive(ToSchema, Serialize, Deserialize)]
 struct UserRegister {
-    username: String,
+    name: String,
     email: String,
     password: String,
     password_confirmation: String,
@@ -194,7 +194,7 @@ async fn register(db: web::Data<database::Database>, user: web::Json<UserRegiste
     }
 
     let password_hash = hash(&user.password, DEFAULT_COST).expect("Password hashing failed");
-    match query::add_user(&db, user.username.clone(), user.email.clone(), password_hash) {
+    match query::add_user(&db, user.name.clone(), user.email.clone(), password_hash) {
         Ok(Some(new_user)) => {
             let token = signing_jwt(new_user.id);
             HttpResponse::Created().json(token)
@@ -344,7 +344,7 @@ async fn update_user_handler(
     }
 
     let password_hash = hash(&user.password, DEFAULT_COST).expect("Password hashing failed");
-    match query::update_user(&db, id.clone(), user.username.clone(), user.email.clone(), password_hash) {
+    match query::update_user(&db, id.clone(), user.name.clone(), user.email.clone(), password_hash) {
         Ok(Some(updated_user)) => HttpResponse::Ok().json(updated_user),
         Ok(None) => ErrorResponse::InternalServerError("Failed to update user".to_string())
             .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR),

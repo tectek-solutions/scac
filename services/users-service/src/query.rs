@@ -65,7 +65,7 @@ pub fn get_user_by_email(
 
 pub fn add_user(
     db: &web::Data<database::Database>,
-    username: String,
+    name: String,
     email: String,
     password_hash: String,
 ) -> Result<Option<User>, diesel::result::Error> {
@@ -74,7 +74,7 @@ pub fn add_user(
     let mut connection = db.get_connection();
 
     let new_user = NewUser {
-        username: &username,
+        name: &name,
         email: &email,
         password_hash: &password_hash,
     };
@@ -95,7 +95,7 @@ pub fn add_user(
 pub fn update_user(
     db: &web::Data<database::Database>,
     user_id: i32,
-    new_username: String,
+    new_name: String,
     new_email: String,
     new_password_hash: String,
 ) -> Result<Option<User>, diesel::result::Error> {
@@ -104,7 +104,7 @@ pub fn update_user(
     let mut connection = db.get_connection();
     match diesel::update(users.find(user_id))
         .set((
-            username.eq(new_username.clone()),
+            name.eq(new_name.clone()),
             email.eq(new_email.clone()),
             password_hash.eq(new_password_hash.clone()),
         ))
