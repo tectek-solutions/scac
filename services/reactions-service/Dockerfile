@@ -6,7 +6,7 @@ ARG ALPINE_VERSION=3.20
 FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 # Install required build dependencies
-RUN apk add --no-cache musl-dev gcc g++ cmake make libpq libpq-dev postgresql-libs postgresql-dev curl openssl-dev openssl-dev
+RUN apk add --no-cache musl-dev gcc g++ cmake make libpq libpq-dev postgresql-libs postgresql-dev curl openssl openssl-dev
 
 # Set working directory
 WORKDIR /usr/src/scac
@@ -23,8 +23,7 @@ RUN cd services/reactions-service && cargo build --release
 FROM alpine:${ALPINE_VERSION} AS runtime
 
 # Install runtime dependencies if required
-RUN apk add --no-cache libgcc
-
+RUN apk add --no-cache musl libpq postgresql-libs openssl
 # Add non-root user and group
 RUN addgroup -S reactions-service
 RUN adduser -S reactions-service -G reactions-service
