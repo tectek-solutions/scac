@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE auth_service (
+CREATE TABLE authentification (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) UNIQUE NOT NULL,
     auth_url TEXT NOT NULL,

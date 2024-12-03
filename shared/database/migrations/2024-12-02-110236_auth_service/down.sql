@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE IF EXISTS auth_service;
+DROP TABLE IF EXISTS authentification;

@@ -1,7 +1,7 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    auth_service (id) {
+    authentification (id) {
         id -> Int4,
         #[max_length = 32]
         name -> Varchar,
@@ -28,6 +28,6 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
-    auth_service,
+    authentification,
     users,
 );
