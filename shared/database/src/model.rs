@@ -23,7 +23,7 @@ pub struct NewUser<'a> {
 }
 
 #[derive(Queryable, Selectable)]
-#[diesel(table_name = crate::schema::authentification)]
+#[diesel(table_name = crate::schema::authentifications)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Authentification {
     pub id: i32,
@@ -37,7 +37,7 @@ pub struct Authentification {
 }
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::authentification)]
+#[diesel(table_name = crate::schema::authentifications)]
 pub struct NewAuthentification<'a> {
     pub name: &'a str,
     pub auth_url: &'a str,
