@@ -1,12 +1,12 @@
 # Define build arguments
 ARG RUST_VERSION=1.82.0
-ARG ALPINE_VERSION=3.20
 
 # Stage 1: Builder
-FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
+FROM rust:${RUST_VERSION}-bookworm AS builder
 
 # Install required build dependencies
-RUN apk add --no-cache musl-dev gcc libpq libpq-dev
+RUN apt-get update
+RUN apt-get install -y musl-dev gcc g++ cmake make libpq-dev
 
 # Set working directory
 WORKDIR /usr/src/scac
@@ -20,14 +20,15 @@ COPY services/authentification-service/src/ services/authentification-service/sr
 RUN cd services/authentification-service && cargo build --release
 
 # Stage 2: Final Image
-FROM alpine:${ALPINE_VERSION} AS runtime
+FROM debian:bookworm AS runtime
 
 # Install runtime dependencies if required
-RUN apk add --no-cache libgcc
+RUN apt-get update
+RUN apt-get install -y libpq5
 
 # Add non-root user and group
-RUN addgroup -S authentification-service
-RUN adduser -S authentification-service -G authentification-service
+RUN groupadd authentification-service
+RUN useradd -m -g authentification-service authentification-service
 USER authentification-service
 
 # Copy compiled binary from builder

@@ -1,51 +1,29 @@
-pub mod schema;
 pub mod model;
-pub mod auth_service_models;
+pub mod schema;
 
-use diesel::prelude::*;
-use dotenvy::dotenv;
-use std::env;
+use diesel::pg::PgConnection;
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
+use std::sync::Arc;
 
-use self::model::{NewUser, User};
-use self::auth_service_models::{NewAuthService, AuthService};
-
-pub fn etablish_connection() -> PgConnection {
-    dotenv().ok();
-
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+#[derive(Clone)]
+pub struct Database {
+    pool: Arc<Pool<ConnectionManager<PgConnection>>>,
 }
 
-pub fn create_user(conn: &mut PgConnection, username: &str, email: &str, password_hash: &str) -> User {
-    use crate::schema::users;
+impl Database {
+    pub fn new(database_url: &str) -> Self {
+        let manager = ConnectionManager::<PgConnection>::new(database_url);
+        let pool = Pool::builder()
+            .build(manager)
+            .expect("Failed to create pool.");
+        Self {
+            pool: Arc::new(pool),
+        }
+    }
 
-    let new_user = NewUser {
-        username,
-        email,
-        password_hash,
-    };
-
-    diesel::insert_into(users::table)
-        .values(&new_user)
-        .returning(User::as_returning())
-        .get_result(conn)
-        .expect("Error saving new user")
-}
-
-pub fn create_auth_service(conn: &mut PgConnection, name: &str, auth_url: &str, token_url: &str, client_id: &str, client_secret: &str) -> AuthService {
-    use crate::schema::auth_service;
-
-    let new_auth_service = NewAuthService {
-        name,
-        auth_url,
-        token_url,
-        client_id,
-        client_secret,
-    };
-
-    diesel::insert_into(auth_service::table)
-        .values(&new_auth_service)
-        .get_result(conn)
-        .expect("Error saving new auth service")
+    pub fn get_connection(&self) -> PooledConnection<ConnectionManager<PgConnection>> {
+        self.pool
+            .get()
+            .expect("Failed to get a connection from the pool.")
+    }
 }

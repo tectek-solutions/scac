@@ -1,7 +1,8 @@
 use diesel::prelude::*;
 use chrono::NaiveDateTime;
+use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {

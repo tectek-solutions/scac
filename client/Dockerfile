@@ -7,7 +7,7 @@ ARG NGINX_VERSION=1.27.3
 FROM alpine:${ALPINE_VERSION} AS builder
 
 # Install dependencies
-RUN apk add --no-cache curl git unzip bash coreutils libc6-compat
+RUN apk add --no-cache curl openssl-dev git unzip bash coreutils libc6-compat
 
 RUN addgroup -S flutter
 RUN adduser -S flutter -G flutter
