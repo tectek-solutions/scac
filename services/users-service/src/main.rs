@@ -8,7 +8,7 @@ use utoipa_rapidoc::RapiDoc;
 use utoipa_redoc::{Redoc, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 
-mod handler;
+use crate::handler;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

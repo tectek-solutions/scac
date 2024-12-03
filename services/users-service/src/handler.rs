@@ -10,7 +10,7 @@ use std::env;
 use utoipa::ToSchema;
 use chrono::{Utc, Duration};
 
-use query::{delete_user, get_user_by_email, get_user_by_id, insert_user, update_user};
+use crate::query::{delete_user, get_user_by_email, get_user_by_id, insert_user, update_user};
 
 // ----------------------------
 // Struct Definitions
@@ -74,8 +74,7 @@ type HmacSha256 = Hmac<Sha256>;
 
 fn signing_jwt(user_id: i32) -> Result<String, String> {
     let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set")?;
-    let key: HmacSha256 = HmacSha256::new_from_slice(jwt_secret.as_ref())
-        .map_err(|_| "Failed to create HMAC key")?;
+    let key: HmacSha256 = Hmac::new_from_slice(jwt_secret.as_ref()).expect("HMAC creation failed");
     
     let mut claims = BTreeMap::new();
     claims.insert("id".to_string(), user_id.to_string());
@@ -84,7 +83,7 @@ fn signing_jwt(user_id: i32) -> Result<String, String> {
         (Utc::now() + Duration::days(1)).timestamp().to_string(),
     );
 
-    claims.sign_with_key(&key).map_err(|_| "Failed to sign claims")
+    claims.sign_with_key(&key).map_err(|_| "Failed to sign claims".to_string())
 }
 
 fn verify_jwt(token: &str) -> bool {
@@ -113,15 +112,18 @@ fn verify_jwt(token: &str) -> bool {
 }
 
 fn get_user_id_by_jwt(token: &str) -> Option<i32> {
-    let jwt_secret = env::var("JWT_SECRET").expect("JWT_SECRET not set");
-    let key = Hmac::new_from_slice(jwt_secret.as_ref()).expect("HMAC creation failed");
-    let claims: BTreeMap<String, String>  = token.verify_with_key(&key).unwrap();
-
-    match claims.get("id") {
-        Some(id) => Some(id.parse::<i32>().unwrap()),
-        None => None,
+    let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set").ok()?;
+    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_bytes()).ok()?;
+    let claims: Result<BTreeMap<String, String>, _> = token.verify_with_key(&key);
+    
+    match claims {
+        Ok(claims) => {
+            claims.get("id").and_then(|id| id.parse::<i32>().ok())
+        }
+        Err(_) => None,
     }
 }
+
 
 // ----------------------------
 // Handlers
@@ -211,7 +213,7 @@ async fn login(user: web::Json<UserLogin>) -> impl Responder {
     )
 )]
 #[get("/me")]
-async fn get_user_profile_handler(token: web::Header<String>) -> impl Responder {
+async fn get_user_profile_handler(token: web::ReqData<String>) -> impl Responder {
     match get_user_id_by_jwt(&token.into_inner()) {
         Some(user_id) => match get_user_by_id(user_id) {
             Some(user) => HttpResponse::Ok().json(user),
@@ -222,7 +224,6 @@ async fn get_user_profile_handler(token: web::Header<String>) -> impl Responder 
             .to_response(actix_web::http::StatusCode::UNAUTHORIZED),
     }
 }
-
 
 #[utoipa::path(
     get,
