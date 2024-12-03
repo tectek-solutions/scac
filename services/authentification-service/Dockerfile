@@ -5,7 +5,8 @@ ARG RUST_VERSION=1.82.0
 FROM rust:${RUST_VERSION}-bookworm AS builder
 
 # Install required build dependencies
-RUN apt-get update && apt-get install -y musl-dev gcc g++ cmake make libpq-dev libssl-dev
+RUN apt-get update
+RUN apt-get install -y musl-dev gcc g++ cmake make libpq-dev
 
 # Set working directory
 WORKDIR /usr/src/scac
@@ -22,7 +23,7 @@ RUN cd services/authentification-service && cargo build --release
 FROM debian:bookworm AS runtime
 
 # Install runtime dependencies if required
-RUN apt-get update && apt-get install -y libpq libssl
+RUN apt-get update && apt-get install -y libpq
 
 # Add non-root user and group
 RUN addgroup -S authentification-service
