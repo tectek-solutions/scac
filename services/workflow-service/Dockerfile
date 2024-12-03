@@ -28,7 +28,7 @@ RUN apt-get install -y libpq5
 
 # Add non-root user and group
 RUN addgroup --service workflow-service
-RUN adduser --service workflow-service -G workflow-service
+RUN adduser --service --ingroup workflow-service workflow-service
 USER workflow-service
 
 # Copy compiled binary from builder

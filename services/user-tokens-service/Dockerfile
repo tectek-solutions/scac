@@ -28,7 +28,7 @@ RUN apt-get install -y libpq5
 
 # Add non-root user and group
 RUN addgroup --service user-tokens-service
-RUN adduser --service user-tokens-service -G user-tokens-service
+RUN adduser --service --ingroup user-tokens-service user-tokens-service
 USER user-tokens-service
 
 # Copy compiled binary from builder
