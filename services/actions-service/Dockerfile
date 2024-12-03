@@ -2,7 +2,7 @@
 ARG RUST_VERSION=1.82.0
 
 # Stage 1: Builder
-FROM rust:${RUST_VERSION}-slim-bookworm AS builder
+FROM rust:${RUST_VERSION}-bookworm AS builder
 
 # Install required build dependencies
 RUN apt-get update && apt-get install -y musl-dev gcc g++ cmake make libpq-dev libssl-dev
@@ -19,7 +19,7 @@ COPY services/actions-service/src/ services/actions-service/src/
 RUN cd services/actions-service && cargo build --release
 
 # Stage 2: Final Image
-FROM debian:slim-bookworm AS runtime
+FROM debian:bookworm AS runtime
 
 # Install runtime dependencies if required
 RUN apt-get update && apt-get install -y libpq libssl
