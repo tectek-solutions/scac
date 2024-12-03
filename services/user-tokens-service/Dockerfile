@@ -23,7 +23,8 @@ RUN cd services/user-tokens-service && cargo build --release
 FROM debian:bookworm AS runtime
 
 # Install runtime dependencies if required
-RUN apt-get update && apt-get install -y libpq
+RUN apt-get update
+RUN apt-get install -y libpq5
 
 # Add non-root user and group
 RUN addgroup -S user-tokens-service
