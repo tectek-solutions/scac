@@ -58,7 +58,7 @@ pub fn add_authentification(
 
     let mut connection = db.get_connection();
 
-    let new_authentification = NewUser {
+    let new_authentification = NewAuthentification {
         name: &name,
         auth_url: &auth_url,
         token_url: &token_url,
