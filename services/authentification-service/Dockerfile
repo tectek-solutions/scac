@@ -28,7 +28,7 @@ RUN apt-get install -y libpq5
 
 # Add non-root user and group
 RUN groupadd authentification-service
-RUN useradd -m -G authentification-service authentification-service
+RUN useradd -m -g authentification-service authentification-service
 USER authentification-service
 
 # Copy compiled binary from builder

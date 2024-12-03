@@ -28,7 +28,7 @@ RUN apt-get install -y libpq5
 
 # Add non-root user and group
 RUN groupadd actions-service
-RUN useradd -m -G actions-service actions-service
+RUN useradd -m -g actions-service actions-service
 USER actions-service
 
 # Copy compiled binary from builder
