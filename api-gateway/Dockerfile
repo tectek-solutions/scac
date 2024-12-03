@@ -26,8 +26,8 @@ FROM alpine:${ALPINE_VERSION} AS runtime
 RUN apk add --no-cache musl
 
 # Add non-root user and group
-RUN addgroup --service actions-service
-RUN adduser --service actions-service -G actions-service
+RUN addgroup -S actions-service
+RUN adduser -S actions-service -G actions-service
 USER actions-service
 
 # Copy compiled binary from builder
