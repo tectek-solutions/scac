@@ -28,4 +28,6 @@ database = { path = "../../shared/database" }
 bcrypt = "0.16.0"
 jwt = "0.16.0"
 regex = "1.11.1"
+hmac = "0.12.1"
+sha2 = "0.10.8"
 

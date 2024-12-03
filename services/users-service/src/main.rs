@@ -1,6 +1,6 @@
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
-use actix_web::{http::header, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{http::header, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use std::env;
 use utoipa::{Modify, OpenApi};
@@ -23,7 +23,7 @@ async fn main() -> std::io::Result<()> {
     #[openapi(
         tags((name = "users-service", description = "Users service")),
         modifiers(&SecurityAddon),
-        paths(handler::login, handler::register, handler::user_by_id, handler::user_profile, handler::get_user_handler, handler::update_user_handler, handler::delete_user_handler),
+        paths(handler::login, handler::register, handler::get_user_handler, handler::get_user_profile_handler, handler::update_user_handler, handler::delete_user_handler),
     )]
     struct ApiDoc;
 
