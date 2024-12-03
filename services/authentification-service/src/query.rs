@@ -1,6 +1,6 @@
 use actix_web::web;
 use database;
-use database::model::{Authentification, NewUser};
+use database::model::{Authentification, NewAuthentification};
 use diesel::prelude::*;
 
 pub fn get_authentifications(

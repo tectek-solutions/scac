@@ -3,11 +3,13 @@ use database;
 use database::model::{NewUser, User};
 use diesel::prelude::*;
 
-pub fn get_users(db: &web::Data<database::Database>) -> Result<Option<Vec<User>>, diesel::result::Error> {
+pub fn get_users(
+    db: &web::Data<database::Database>,
+) -> Result<Option<Vec<User>>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
     let mut connection = db.get_connection();
-    let result  = users.load::<User>(&mut connection);
+    let result = users.load::<User>(&mut connection);
 
     match result {
         Ok(result) => Ok(Some(result)),
