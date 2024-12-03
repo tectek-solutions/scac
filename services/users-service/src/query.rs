@@ -7,9 +7,10 @@ pub fn get_users(db: &web::Data<database::Database>) -> Result<Option<Vec<User>>
     use database::schema::users::dsl::*;
 
     let mut connection = db.get_connection();
-    match users.load::<User>(&mut connection) {
-        Ok(users) => Ok(users),
-        Ok(None) => Ok(None),
+    let result  = users.load::<User>(&mut connection);
+
+    match result {
+        Ok(result) => Ok(Some(result)),
         Err(err) => {
             eprintln!("Error getting users: {:?}", err);
             Err(err)
