@@ -27,8 +27,8 @@ RUN apt-get update
 RUN apt-get install -y libpq5
 
 # Add non-root user and group
-RUN addgroup -S api-services-service
-RUN adduser -S api-services-service -G api-services-service
+RUN addgroup --service api-services-service
+RUN adduser --service api-services-service -G api-services-service
 USER api-services-service
 
 # Copy compiled binary from builder

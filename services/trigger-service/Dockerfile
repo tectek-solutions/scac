@@ -27,8 +27,8 @@ RUN apt-get update
 RUN apt-get install -y libpq5
 
 # Add non-root user and group
-RUN addgroup -S trigger-service
-RUN adduser -S trigger-service -G trigger-service
+RUN addgroup --service trigger-service
+RUN adduser --service trigger-service -G trigger-service
 USER trigger-service
 
 # Copy compiled binary from builder

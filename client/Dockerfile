@@ -9,8 +9,8 @@ FROM alpine:${ALPINE_VERSION} AS builder
 # Install dependencies
 RUN apk add --no-cache curl openssl-dev git unzip bash coreutils libc6-compat
 
-RUN addgroup -S flutter
-RUN adduser -S flutter -G flutter
+RUN addgroup --service flutter
+RUN adduser --service flutter -G flutter
 USER flutter
 
 # Define variables

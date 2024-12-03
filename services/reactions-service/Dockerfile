@@ -27,8 +27,8 @@ RUN apt-get update
 RUN apt-get install -y libpq5
 
 # Add non-root user and group
-RUN addgroup -S reactions-service
-RUN adduser -S reactions-service -G reactions-service
+RUN addgroup --service reactions-service
+RUN adduser --service reactions-service -G reactions-service
 USER reactions-service
 
 # Copy compiled binary from builder
