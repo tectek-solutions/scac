@@ -1,12 +1,11 @@
 # Define build arguments
 ARG RUST_VERSION=1.82.0
-ARG ALPINE_VERSION=3.20
 
 # Stage 1: Builder
-FROM rust:${RUST_VERSION}-alpine${ALPINE_VERSION} AS builder
+FROM rust:${RUST_VERSION}-slim-bookworn AS builder
 
 # Install required build dependencies
-RUN apk add --no-cache musl-dev gcc g++ cmake make libpq libpq-dev postgresql-libs postgresql-dev curl openssl openssl-dev
+RUN apt-get update && apt-get install -y musl-dev gcc g++ cmake make libpq-dev libssl-dev
 
 # Set working directory
 WORKDIR /usr/src/scac
@@ -20,17 +19,18 @@ COPY services/workflow-service/src/ services/workflow-service/src/
 RUN cd services/workflow-service && cargo build --release
 
 # Stage 2: Final Image
-FROM alpine:${ALPINE_VERSION} AS runtime
+FROM debian:slim-bookworn AS runtime
 
 # Install runtime dependencies if required
-RUN apk add --no-cache musl libpq postgresql-libs openssl
+RUN apt-get update && apt-get install -y libpq libssl
+
 # Add non-root user and group
 RUN addgroup -S workflow-service
 RUN adduser -S workflow-service -G workflow-service
 USER workflow-service
 
 # Copy compiled binary from builder
-COPY --from=builder /usr/src/scac/services/workflow-service/target/release/workflow-service /usr/local/bin/workflow-service
+COPY --from=builder --chown=workflow-service:workflow-service /usr/src/scac/services/workflow-service/target/release/workflow-service /usr/local/bin/workflow-service
 
 # Start the service
 CMD ["/usr/local/bin/workflow-service"]
