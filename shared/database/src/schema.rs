@@ -125,11 +125,29 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    workflows (id) {
+        id -> Int4,
+        user_id -> Int4,
+        #[max_length = 32]
+        name -> Varchar,
+        description -> Nullable<Text>,
+        action_id -> Int4,
+        reaction_id -> Int4,
+        data_transformation -> Nullable<Jsonb>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+    }
+}
+
 diesel::joinable!(api_services -> auth_service (auth_service_id));
 diesel::joinable!(api_services_actions -> api_services (api_service_id));
 diesel::joinable!(api_services_reactions -> api_services (api_service_id));
 diesel::joinable!(user_tokens -> auth_service (auth_service_id));
 diesel::joinable!(user_tokens -> users (user_id));
+diesel::joinable!(workflows -> api_services_actions (action_id));
+diesel::joinable!(workflows -> api_services_reactions (reaction_id));
+diesel::joinable!(workflows -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     api_services,
@@ -138,4 +156,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     auth_service,
     user_tokens,
     users,
+    workflows,
 );
