@@ -39,6 +39,26 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use super::sql_types::HttpMethodEnum;
+
+    api_services_reactions (id) {
+        id -> Int4,
+        api_service_id -> Int4,
+        #[max_length = 32]
+        name -> Varchar,
+        description -> Nullable<Text>,
+        endpoint -> Text,
+        method -> HttpMethodEnum,
+        headers -> Nullable<Jsonb>,
+        params -> Nullable<Jsonb>,
+        json_path -> Nullable<Text>,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
     auth_service (id) {
         id -> Int4,
         #[max_length = 32]
@@ -107,12 +127,14 @@ diesel::table! {
 
 diesel::joinable!(api_services -> auth_service (auth_service_id));
 diesel::joinable!(api_services_actions -> api_services (api_service_id));
+diesel::joinable!(api_services_reactions -> api_services (api_service_id));
 diesel::joinable!(user_tokens -> auth_service (auth_service_id));
 diesel::joinable!(user_tokens -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     api_services,
     api_services_actions,
+    api_services_reactions,
     auth_service,
     user_tokens,
     users,
