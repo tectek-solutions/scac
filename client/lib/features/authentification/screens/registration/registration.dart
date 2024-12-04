@@ -26,7 +26,7 @@ class _RegistrationState extends State<Registration> {
         child: Padding(
           padding: TSpacingStyles.defaultPaddingWithAppBarHeight,
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 800),
+            constraints: const BoxConstraints(maxWidth: 800),
             child: SingleChildScrollView(
               child: Column(
                 children: [

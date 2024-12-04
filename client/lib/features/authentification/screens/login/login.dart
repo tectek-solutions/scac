@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../common/style/spacing_styles.dart';
 import '../../../../utils/constants/helper_functions.dart';
 import '../../../../utils/constants/sizes.dart';
+import '../main-screen/main-screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,7 +27,7 @@ class _LoginScreen extends State<LoginScreen> {
         child: Padding(
           padding: TSpacingStyles.defaultPaddingWithAppBarHeight,
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 800),
+            constraints: const BoxConstraints(maxWidth: 800),
             child: SingleChildScrollView(
               child: Column(
                 children: [
@@ -88,11 +89,16 @@ class _LoginScreen extends State<LoginScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton(
-                              onPressed: () {},
-                              child: const Text("Sign in"),
+                              onPressed: () {Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainScreen(),
+                                ),
+                              );},
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue,
                               ),
+                              child: const Text("Sign in"),
                             ),
                           ),
 
@@ -121,7 +127,7 @@ class _LoginScreen extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Flexible(
-                          child: Divider(
+                        child: Divider(
                         color: dark
                             ? Colors.grey.shade700
                             : Colors.grey.shade300,
