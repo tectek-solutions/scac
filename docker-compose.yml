@@ -4,7 +4,7 @@ networks:
 
 services:
   database:
-    image: postgres:17.2-alpine3.20
+    image: postgres:17.2-bookworm
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -156,16 +156,16 @@ services:
       - users-service
       # - workflow-service
 
-  # client:
-  #   build:
-  #     context: .
-  #     dockerfile: ./client/Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - API_GATEWAY_ADDRESS=api-gateway
-  #     - API_GATEWAY_PORT=8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - api-gateway
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - API_GATEWAY_ADDRESS=api-gateway
+      - API_GATEWAY_PORT=8000
+    networks:
+      - internal
+    depends_on:
+      - api-gateway

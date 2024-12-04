@@ -1,16 +1,16 @@
 # Define build arguments
-ARG ALPINE_VERSION=3.20
 ARG FLUTTER_VERSION=2.24.5
 ARG NGINX_VERSION=1.27.3
 
 # Environment to install Flutter and build web
-FROM alpine:${ALPINE_VERSION} AS builder
+FROM debian:bookworm-slim AS builder
 
 # Install dependencies
-RUN apk add --no-cache curl openssl-dev git unzip bash coreutils libc6-compat
+RUN apt-get update
+RUN apt-get install -y curl git unzip xz-utils zip libglu1-mesa
 
-RUN addgroup -S flutter
-RUN adduser -S flutter -G flutter
+RUN groupadd flutter
+RUN useradd -m -g flutter flutter
 USER flutter
 
 # Define variables
@@ -41,7 +41,7 @@ RUN cd client && flutter pub get
 RUN cd client && flutter build web
 
 # Deploy using NGINX
-FROM nginx:${NGINX_VERSION}-alpine${ALPINE_VERSION}
+FROM nginx:${NGINX_VERSION}-bookworm
 
 ARG APP=/home/flutter/scac
 
