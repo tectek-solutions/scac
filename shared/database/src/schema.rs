@@ -15,6 +15,19 @@ diesel::table! {
 }
 
 diesel::table! {
+    user_tokens (id) {
+        id -> Int4,
+        user_id -> Int4,
+        auth_service_id -> Int4,
+        access_token -> Text,
+        refresh_token -> Nullable<Text>,
+        expires_at -> Timestamp,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
+    }
+}
+
+diesel::table! {
     users (id) {
         id -> Int4,
         #[max_length = 50]
@@ -26,6 +39,16 @@ diesel::table! {
         updated_at -> Nullable<Timestamp>,
     }
 }
+
+diesel::joinable!(api_services -> auth_service (auth_service_id));
+diesel::joinable!(user_tokens -> auth_service (auth_service_id));
+diesel::joinable!(user_tokens -> users (user_id));
+
+diesel::allow_tables_to_appear_in_same_query!(
+    api_services,
+    auth_service,
+    user_tokens,
+)
 
 diesel::allow_tables_to_appear_in_same_query!(
     authentifications,
