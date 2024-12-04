@@ -73,20 +73,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    user_tokens (id) {
-        id -> Int4,
-        user_id -> Int4,
-        auth_service_id -> Int4,
-        access_token -> Text,
-        refresh_token -> Nullable<Text>,
-        expires_at -> Timestamp,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
-    }
-}
-
-diesel::table! {
-    authentifications (id) {
+    authentification (id) {
         id -> Int4,
         #[max_length = 32]
         name -> Varchar,
@@ -116,7 +103,7 @@ diesel::table! {
     users (id) {
         id -> Int4,
         #[max_length = 50]
-        name -> Varchar,
+        username -> Varchar,
         #[max_length = 100]
         email -> Varchar,
         password_hash -> Text,
@@ -154,6 +141,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     api_services_actions,
     api_services_reactions,
     auth_service,
+    authentification,
     user_tokens,
     users,
     workflows,

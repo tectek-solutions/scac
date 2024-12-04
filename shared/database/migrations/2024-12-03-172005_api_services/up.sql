@@ -6,5 +6,5 @@ CREATE TABLE api_services (
     base_url  TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (auth_service_id) REFERENCES auth_service(id)
+    FOREIGN KEY (auth_service_id) REFERENCES authentification(id)
 );
