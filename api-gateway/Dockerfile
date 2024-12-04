@@ -23,7 +23,7 @@ RUN cd api-gateway && cargo build --release
 FROM alpine:${ALPINE_VERSION} AS runtime
 
 # Install runtime dependencies if required
-RUN apk add --no-cache libgcc
+RUN apk add --no-cache musl
 
 # Add non-root user and group
 RUN addgroup -S actions-service

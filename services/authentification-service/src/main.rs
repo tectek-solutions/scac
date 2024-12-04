@@ -1,3 +1,5 @@
+mod query;
+
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use std::env;
 

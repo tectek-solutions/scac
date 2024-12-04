@@ -1,19 +1,7 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    api_services (id) {
-        id -> Int4,
-        auth_service_id -> Int4,
-        #[max_length = 32]
-        name -> Varchar,
-        base_url -> Text,
-        created_at -> Nullable<Timestamp>,
-        updated_at -> Nullable<Timestamp>,
-    }
-}
-
-diesel::table! {
-    auth_service (id) {
+    authentifications (id) {
         id -> Int4,
         #[max_length = 32]
         name -> Varchar,
@@ -43,7 +31,7 @@ diesel::table! {
     users (id) {
         id -> Int4,
         #[max_length = 50]
-        username -> Varchar,
+        name -> Varchar,
         #[max_length = 100]
         email -> Varchar,
         password_hash -> Text,
@@ -60,5 +48,9 @@ diesel::allow_tables_to_appear_in_same_query!(
     api_services,
     auth_service,
     user_tokens,
+)
+
+diesel::allow_tables_to_appear_in_same_query!(
+    authentifications,
     users,
 );
