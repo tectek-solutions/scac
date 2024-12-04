@@ -12,83 +12,83 @@ services:
     networks:
       - internal
 
-  actions-service:
-    build:
-      context: .
-      dockerfile: ./services/actions-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # actions-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/actions-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  api-services-service:
-    build:
-      context: .
-      dockerfile: ./services/api-services-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # api-services-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/api-services-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  authentification-service:
-    build:
-      context: .
-      dockerfile: ./services/authentification-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # authentification-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/authentification-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  reactions-service:
-    build:
-      context: .
-      dockerfile: ./services/reactions-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # reactions-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/reactions-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  trigger-service:
-    build:
-      context: .
-      dockerfile: ./services/trigger-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # trigger-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/trigger-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  user-tokens-service:
-    build:
-      context: .
-      dockerfile: ./services/user-tokens-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # user-tokens-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/user-tokens-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
   users-service:
     build:
@@ -106,18 +106,18 @@ services:
     depends_on:
       - database
 
-  workflow-service:
-    build:
-      context: .
-      dockerfile: ./services/workflow-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # workflow-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/workflow-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
   api-gateway:
     build:
