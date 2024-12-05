@@ -9,5 +9,5 @@ CREATE TABLE user_tokens (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (auth_service_id) REFERENCES auth_service(id)
+    FOREIGN KEY (auth_service_id) REFERENCES authentification(id)
 );

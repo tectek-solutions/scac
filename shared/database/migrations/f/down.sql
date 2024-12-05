@@ -1,2 +1,2 @@
 -- This file should undo anything in `up.sql`
-DROP TABLE IF EXISTS api_services_actions;
+DROP TABLE IF EXISTS reactions;

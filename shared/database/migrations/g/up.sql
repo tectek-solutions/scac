@@ -10,6 +10,6 @@ CREATE TABLE workflows (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (action_id) REFERENCES api_services_actions(id),
-    FOREIGN KEY (reaction_id) REFERENCES api_services_reactions(id)
+    FOREIGN KEY (action_id) REFERENCES actions(id),
+    FOREIGN KEY (reaction_id) REFERENCES reactions(id)
 );

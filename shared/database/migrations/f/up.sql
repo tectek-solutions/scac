@@ -1,5 +1,5 @@
 -- Your SQL goes here
-CREATE TABLE api_services_actions (
+CREATE TABLE reactions (
     id SERIAL PRIMARY KEY,
     api_service_id INT NOT NULL,
     name VARCHAR(32) NOT NULL,
