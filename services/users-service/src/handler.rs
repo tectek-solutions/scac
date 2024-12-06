@@ -1,4 +1,4 @@
-use actix_web::{get, post, put, delete, web, HttpResponse, Responder};
+use actix_web::{get, post, web, HttpResponse, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use hmac::{Hmac, Mac};
 use jwt::{SignWithKey, VerifyWithKey};
@@ -25,7 +25,7 @@ struct Claims {
 }
 
 #[derive(ToSchema, Serialize, Deserialize)]
-struct UserRegister {
+struct UserSignUp {
     name: String,
     email: String,
     password: String,
@@ -33,7 +33,7 @@ struct UserRegister {
 }
 
 #[derive(ToSchema, Serialize, Deserialize)]
-struct UserLogin {
+struct UserSignIn {
     email: String,
     password: String,
 }
@@ -146,23 +146,18 @@ fn get_user_id_by_jwt(token: &str) -> Result<Option<i32>, String> {
 
 #[utoipa::path(
     post,
-    path = "/users/register",
-    request_body = UserRegister,
+    path = "/users/sign_up",
+    request_body = UserSignUp,
     tag = "users",
     responses(
-        (status = 201, description = "User registered successfully"),
+        (status = 201, description = "User sign up successfully"),
         (status = 400, description = "Invalid request", body = ErrorResponse),
         (status = 409, description = "User already exists", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
-#[post("/register")]
-async fn register(db: web::Data<database::Database>, user: web::Json<UserRegister>) -> impl Responder {
-    // if query::get_user_by_email(&db, &user.email).is_some() {
-    //     return ErrorResponse::Conflict("User already exists".to_string())
-    //         .to_response(actix_web::http::StatusCode::CONFLICT);
-    // }
-
+#[post("/sign_up")]
+async fn sign_up(db: web::Data<database::Database>, user: web::Json<UserSignUp>) -> impl Responder {
     match query::get_user_by_email(&db, &user.email) {
         Ok(Some(_)) => {}
         Ok(None) => {
@@ -211,17 +206,17 @@ async fn register(db: web::Data<database::Database>, user: web::Json<UserRegiste
 
 #[utoipa::path(
     post,
-    path = "/users/login",
-    request_body = UserLogin,
+    path = "/users/sign_in",
+    request_body = UserSignIn,
     tag = "users",
     responses(
-        (status = 200, description = "User logged in successfully"),
+        (status = 200, description = "User sign in in successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
-#[post("/login")]
-async fn login(db: web::Data<database::Database>, user: web::Json<UserLogin>) -> impl Responder {
+#[post("/sign_in")]
+async fn sign_in(db: web::Data<database::Database>, user: web::Json<UserSignIn>) -> impl Responder {
     let existing_user = match query::get_user_by_email(&db, &user.email) {
         Ok(Some(user)) => user,
         Ok(None) => {
@@ -248,6 +243,26 @@ async fn login(db: web::Data<database::Database>, user: web::Json<UserLogin>) ->
 }
 
 #[utoipa::path(
+    post,
+    path = "/users/sign_out",
+    tag = "users",
+    responses(
+        (status = 200, description = "User sign out successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse)
+    )
+)]
+#[post("/sign_out")]
+async fn sign_out(token: web::ReqData<String>) -> impl Responder {
+    if !verify_jwt(&token.into_inner()) {
+        return ErrorResponse::Unauthorized("Invalid token".to_string())
+            .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+    }
+
+    HttpResponse::Ok().finish()
+}
+
+#[utoipa::path(
     get,
     path = "/users/me",
     tag = "users",
@@ -258,7 +273,7 @@ async fn login(db: web::Data<database::Database>, user: web::Json<UserLogin>) ->
     )
 )]
 #[get("/me")]
-async fn get_user_profile_handler(db: web::Data<database::Database>, token: web::ReqData<String>) -> impl Responder {
+async fn me(db: web::Data<database::Database>, token: web::ReqData<String>) -> impl Responder {
     let user_id = match get_user_id_by_jwt(&token.into_inner()) {
         Ok(Some(id)) => id,
         Ok(None) => {
@@ -283,115 +298,6 @@ async fn get_user_profile_handler(db: web::Data<database::Database>, token: web:
     }
 }
 
-#[utoipa::path(
-    get,
-    path = "/users/{id}",
-    params(("id" = i32, Path, description = "User ID")),
-    tag = "users",
-    responses(
-        (status = 200, description = "User found"),
-        (status = 404, description = "User not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse)
-    )
-)]
-#[get("/{id}")]
-async fn get_user_handler(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
-    match query::get_user_by_id(&db, id.clone()) {
-        Ok(Some(user)) => HttpResponse::Ok().json(user),
-        Ok(None) => ErrorResponse::NotFound("User not found".to_string())
-            .to_response(actix_web::http::StatusCode::NOT_FOUND),
-        Err(err) => {
-            eprintln!("Error getting user: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to get user".to_string())
-                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
-        }
-    }
-}
-
-#[utoipa::path(
-    put,
-    path = "/users/{id}",
-    params(("id" = i32, Path, description = "User ID")),
-    tag = "users",
-    responses(
-        (status = 200, description = "User updated"),
-        (status = 404, description = "User not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse)
-    )
-)]
-#[put("/{id}")]
-async fn update_user_handler(
-    db: web::Data<database::Database>,
-    id: web::Path<i32>,
-    user: web::Json<UserRegister>,
-) -> impl Responder {
-    match query::get_user_by_id(&db, id.clone()) {
-        Ok(Some(_)) => {}
-        Ok(None) => {
-            return ErrorResponse::NotFound("User not found".to_string())
-                .to_response(actix_web::http::StatusCode::NOT_FOUND);
-        }
-        Err(err) => {
-            eprintln!("Error getting user: {:?}", err);
-            return ErrorResponse::InternalServerError("Failed to get user".to_string())
-                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    if !is_valid_email(&user.email) || !is_valid_password(&user.password) {
-        return ErrorResponse::InternalServerError("Invalid input".to_string())
-            .to_response(actix_web::http::StatusCode::BAD_REQUEST);
-    }
-
-    let password_hash = hash(&user.password, DEFAULT_COST).expect("Password hashing failed");
-    match query::update_user(&db, id.clone(), user.name.clone(), user.email.clone(), password_hash) {
-        Ok(Some(updated_user)) => HttpResponse::Ok().json(updated_user),
-        Ok(None) => ErrorResponse::InternalServerError("Failed to update user".to_string())
-            .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR),
-        Err(err) => {
-            eprintln!("Error updating user: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to update user".to_string())
-                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
-        }
-    }
-}
-
-#[utoipa::path(
-    delete,
-    path = "/users/{id}",
-    params(("id" = i32, Path, description = "User ID")),
-    tag = "users",
-    responses(
-        (status = 204, description = "User deleted"),
-        (status = 404, description = "User not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse)
-    )
-)]
-#[delete("/{id}")]
-async fn delete_user_handler(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
-    match query::get_user_by_id(&db, id.clone()) {
-        Ok(Some(_)) => {}
-        Ok(None) => {
-            return ErrorResponse::NotFound("User not found".to_string())
-                .to_response(actix_web::http::StatusCode::NOT_FOUND);
-        }
-        Err(err) => {
-            eprintln!("Error getting user: {:?}", err);
-            return ErrorResponse::InternalServerError("Failed to get user".to_string())
-                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    match query::delete_user(&db, id.clone()) {
-        Ok(_) => HttpResponse::NoContent().finish(),
-        Err(err) => {
-            eprintln!("Error deleting user: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to delete user".to_string())
-                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
-        }
-    }
-}
-
 // ----------------------------
 // Service Configuration
 // ----------------------------
@@ -399,11 +305,9 @@ async fn delete_user_handler(db: web::Data<database::Database>, id: web::Path<i3
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/users")
-            .service(register)
-            .service(login)
-            .service(get_user_handler)
-            .service(get_user_profile_handler)
-            .service(update_user_handler)
-            .service(delete_user_handler),
+            .service(sign_up)
+            .service(sign_in)
+            .service(sign_out)
+            .service(me)
     );
 }
