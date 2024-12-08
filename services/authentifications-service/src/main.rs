@@ -62,12 +62,10 @@ async fn main() -> std::io::Result<()> {
 
     #[derive(OpenApi)]
     #[openapi(
-        tags((name = "users", description = "Users")),
+        tags((name = "authentifications", description = "Authentifications")),
         paths(
-            handler::sign_up,
-            handler::sign_in,
-            handler::sign_out,
-            handler::me,
+            handler::list_authentifications,
+            handler::get_authentification_by_id,
         ),
     )]
     struct ApiDoc;

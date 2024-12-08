@@ -24,7 +24,7 @@ impl Gateway {
         let service_names = [
             "actions",
             "api_services",
-            "authentification",
+            "authentifications",
             "reactions",
             "trigger",
             "user_tokens",

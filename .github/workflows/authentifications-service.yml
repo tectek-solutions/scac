@@ -1,4 +1,4 @@
-name: Docker - Authentification Service
+name: Docker - Authentifications Service
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
   call-template:
     uses: ./.github/workflows/docker-image-template.yml
     with:
-      dockerfile: ./services/authentification-service/Dockerfile
-      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:authentification-service-latest
+      dockerfile: ./services/authentifications-service/Dockerfile
+      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:authentifications-service-latest
       context: .
       push_on_main: true

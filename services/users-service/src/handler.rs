@@ -18,12 +18,6 @@ use crate::query;
 // Struct Definitions
 // ----------------------------
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Claims {
-    id: i32,
-    expiration: i64,
-}
-
 #[derive(ToSchema, Serialize, Deserialize)]
 struct UserSignUp {
     name: String,
@@ -73,11 +67,9 @@ fn is_valid_password(password: &str) -> bool {
         .is_match(password)
 }
 
-type HmacSha256 = Hmac<Sha256>;
-
 fn signing_jwt(user_id: i32) -> Result<String, String> {
     let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set")?;
-    let key: HmacSha256 = Hmac::new_from_slice(jwt_secret.as_ref()).expect("HMAC creation failed");
+    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_ref()).expect("HMAC creation failed");
     
     let mut claims = BTreeMap::new();
     claims.insert("id".to_string(), user_id.to_string());
@@ -95,7 +87,7 @@ fn verify_jwt(token: &str) -> bool {
         Err(_) => return false,
     };
     
-    let key: HmacSha256 = match HmacSha256::new_from_slice(jwt_secret.as_ref()) {
+    let key: Hmac<Sha256> = match Hmac::new_from_slice(jwt_secret.as_ref()) {
         Ok(k) => k,
         Err(_) => return false,
     };
@@ -120,7 +112,7 @@ fn get_user_id_by_jwt(token: &str) -> Result<Option<i32>, String> {
         Err(_) => return Err("JWT_SECRET not set".to_string()),
     };
 
-    let key: HmacSha256 = match HmacSha256::new_from_slice(jwt_secret.as_ref()) {
+    let key: Hmac<Sha256> = match Hmac::new_from_slice(jwt_secret.as_ref()) {
         Ok(k) => k,
         Err(_) => return Err("HMAC creation failed".to_string()),
     };
