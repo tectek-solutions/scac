@@ -2,7 +2,7 @@
 
 ## **Users API**
 
-### **Base Path**: `/api/users`
+### **Base Path**: `/users`
 
 - **POST** `/register`  
   - **Access**: Public  
@@ -33,46 +33,17 @@
     - `401 Unauthorized`: Token missing or invalid.  
     - `500 Internal Server Error`: Error generating token.
 
-- **GET** `/:id`  
-  - **Access**: Admin  
-  - **Responses**:  
-    - `200 OK`: User profile retrieved.  
-    - `404 Not Found`: User ID not found.  
-    - `500 Internal Server Error`: Database/server error.
-
-- **PUT** `/:id`  
-  - **Access**: Admin or Authenticated User (if `id` matches the authenticated user)  
-  - **Responses**:  
-    - `200 OK`: User details updated.  
-    - `400 Bad Request`: Invalid input (e.g., invalid email format).  
-    - `404 Not Found`: User ID not found.  
-    - `500 Internal Server Error`: Server error during update.
-
-- **DELETE** `/:id`  
-  - **Access**: Admin or Authenticated User (if `id` matches the authenticated user)  
-  - **Responses**:  
-    - `204 No Content`: User deleted.  
-    - `404 Not Found`: User ID not found.  
-    - `500 Internal Server Error`: Error during deletion.
-
 ---
 
 ## **Authentication Services API**
 
-### **Base Path**: `/api/authentification-services`
+### **Base Path**: `/authentificationa`
 
 - **GET** `/`  
   - **Access**: Public  
   - **Responses**:  
     - `200 OK`: List of services retrieved.  
     - `500 Internal Server Error`: Error fetching services.
-
-- **POST** `/`  
-  - **Access**: Admin  
-  - **Responses**:  
-    - `201 Created`: Service added.  
-    - `400 Bad Request`: Invalid input or duplicate name.  
-    - `500 Internal Server Error`: Server error.
 
 - **GET** `/:id`  
   - **Access**: Public  
@@ -81,30 +52,15 @@
     - `404 Not Found`: Service ID not found.  
     - `500 Internal Server Error`: Error fetching details.
 
-- **PUT** `/:id`  
-  - **Access**: Admin  
-  - **Responses**:  
-    - `200 OK`: Service updated.  
-    - `400 Bad Request`: Invalid input.  
-    - `404 Not Found`: Service ID not found.  
-    - `500 Internal Server Error`: Error during update.
-
-- **DELETE** `/:id`  
-  - **Access**: Admin  
-  - **Responses**:  
-    - `204 No Content`: Service deleted.  
-    - `404 Not Found`: Service ID not found.  
-    - `500 Internal Server Error`: Error during deletion.
-
-- **GET** `/:id/api-services`  
-  - **Access**: Admin  
+- **GET** `/:id-services`  
+  - **Access**: Public  
   - **Responses**:  
     - `200 OK`: List of API services retrieved.  
     - `404 Not Found`: Service ID not found.  
     - `500 Internal Server Error`: Error fetching services.
 
 - **GET** `/:id/tokens`  
-  - **Access**: Admin or Authenticated User (with access to the service)  
+  - **Access**: Authenticated User
   - **Responses**:  
     - `200 OK`: Tokens retrieved.  
     - `404 Not Found`: Service ID not found.  
@@ -114,24 +70,32 @@
 
 ## **User Tokens API**
 
-### **Base Path**: `/api/user-tokens`
+### **Base Path**: `/user-tokens`
 
 - **POST** `/`  
-  - **Access**: Admin or Authenticated User  
+  - **Access**: Authenticated User  
   - **Responses**:  
     - `201 Created`: Token added successfully.  
     - `400 Bad Request`: Invalid input.  
     - `500 Internal Server Error`: Error creating token.
 
-- **GET** `/user/:userId`  
-  - **Access**: Admin or Authenticated User (if `userId` matches the authenticated user)  
+- **GET** `/users/:id`
+  - **Access**: Authenticated User (if `id` matches the authenticated user)
   - **Responses**:  
     - `200 OK`: Tokens retrieved.  
     - `404 Not Found`: User ID not found.  
     - `500 Internal Server Error`: Error fetching tokens.
 
+- **PATCH** `/:id`  
+  - **Access**: Authenticated User (if `user_id` matches the authenticated user)
+  - **Responses**:  
+    - `200 OK`: Token updated successfully.  
+    - `400 Bad Request`: Invalid input.  
+    - `404 Not Found`: Token ID not found.  
+    - `500 Internal Server Error`: Error during update.
+
 - **PUT** `/:id`  
-  - **Access**: Admin or Authenticated User  
+  - **Access**: Authenticated User (if `user_id` matches the authenticated user)
   - **Responses**:  
     - `200 OK`: Token updated successfully.  
     - `400 Bad Request`: Invalid input.  
@@ -139,7 +103,7 @@
     - `500 Internal Server Error`: Error during update.
 
 - **DELETE** `/:id`  
-  - **Access**: Admin or Authenticated User  
+  - **Access**: Authenticated User  
   - **Responses**:  
     - `204 No Content`: Token deleted.  
     - `404 Not Found`: Token ID not found.  
@@ -149,14 +113,13 @@
 
 ## **API Services API**
 
-### **Base Path**: `/api/api-services`
+### **Base Path**: `/api-services`
 
-- **POST** `/`  
-  - **Access**: Admin  
+- **GET** `/`  
+  - **Access**: Public  
   - **Responses**:  
-    - `201 Created`: API service added.  
-    - `400 Bad Request`: Invalid input or duplicate name.  
-    - `500 Internal Server Error`: Error adding service.
+    - `200 OK`: List of API services retrieved.  
+    - `500 Internal Server Error`: Error fetching services.
 
 - **GET** `/:id`
   - **Access**: Public  
@@ -165,39 +128,24 @@
     - `404 Not Found`: Service ID not found.  
     - `500 Internal Server Error`: Error fetching service.
 
-- **PUT** `/:id`
-  - **Access**: Admin  
+- **GET** `/authentification/:id`
+  - **Access**: Public  
   - **Responses**:  
-    - `200 OK`: API service updated.  
-    - `400 Bad Request`: Invalid input.  
-    - `404 Not Found`: Service ID not found.  
-    - `500 Internal Server Error`: Error updating service.
-
-- **DELETE** `/:id`
-  - **Access**: Admin  
-  - **Responses**:  
-    - `204 No Content`: API service deleted.  
-    - `404 Not Found`: Service ID not found.  
-    - `500 Internal Server Error`: Error deleting service.
+    - `200 OK`: List of authentication services retrieved.
+    - `404 Not Found`: Service ID not found.
+    - `500 Internal Server Error`: Error fetching services.
 
 ---
 
 ## **Actions API**
 
-### **Base Path**: `/api/actions`
+### **Base Path**: `/actions`
 
 - **GET** `/`  
   - **Access**: Public  
   - **Responses**:  
     - `200 OK`: List of actions retrieved.  
     - `500 Internal Server Error`: Error fetching actions.
-
-- **POST** `/`
-  - **Access**: Admin  
-  - **Responses**:  
-    - `201 Created`: Action added.  
-    - `400 Bad Request`: Invalid input or duplicate name.  
-    - `500 Internal Server Error`: Error adding action.
 
 - **GET** `/:id`
   - **Access**: Public  
@@ -206,39 +154,17 @@
     - `404 Not Found`: Action ID not found.  
     - `500 Internal Server Error`: Error fetching action.
 
-- **PUT** `/:id`
-  - **Access**: Admin  
-  - **Responses**:  
-    - `200 OK`: Action updated.  
-    - `400 Bad Request`: Invalid input.  
-    - `404 Not Found`: Action ID not found.  
-    - `500 Internal Server Error`: Error updating action.
-
-- **DELETE** `/:id`
-  - **Access**: Admin  
-  - **Responses**:  
-    - `204 No Content`: Action deleted.  
-    - `404 Not Found`: Action ID not found.  
-    - `500 Internal Server Error`: Error deleting action.
-
 ---
 
 ## **Reactions API**
 
-### **Base Path**: `/api/reactions`
+### **Base Path**: `/reactions`
 
 - **GET** `/`  
   - **Access**: Public  
   - **Responses**:  
     - `200 OK`: List of reactions retrieved.  
     - `500 Internal Server Error`: Error fetching reactions.
-
-- **POST** `/`
-  - **Access**: Admin  
-  - **Responses**:  
-    - `201 Created`: Reaction added.  
-    - `400 Bad Request`: Invalid input or duplicate name.  
-    - `500 Internal Server Error`: Error adding reaction.
 
 - **GET** `/:id`
   - **Access**: Public  
@@ -250,24 +176,24 @@
 
 ## **Workflows API**
 
-### **Base Path**: `/api/workflows`
+### **Base Path**: `/workflows`
 
 - **POST** `/`  
-  - **Access**: Admin or Authenticated User  
+  - **Access**:  Authenticated User  
   - **Responses**:  
     - `201 Created`: Workflow created successfully.  
     - `400 Bad Request`: Invalid input.  
     - `500 Internal Server Error`: Error creating workflow.
 
-- **GET** `/user/:userId`  
-  - **Access**: Admin or Authenticated User (if `userId` matches the authenticated user)  
+- **GET** `/users/:id`  
+  - **Access**: Authenticated User (if `user_id` matches the authenticated user)  
   - **Responses**:  
-    - `200 OK`: Workflows retrieved successfully.  
+    - `200 OK`: Workflows retrieved.  
     - `404 Not Found`: User ID not found.  
     - `500 Internal Server Error`: Error fetching workflows.
 
 - **GET** `/:id`  
-  - **Access**: Admin or Authenticated User (with access to the workflow)  
+  - **Access**: Authenticated User
   - **Responses**:  
     - `200 OK`: Workflow retrieved.  
     - `404 Not Found`: Workflow ID not found.  
@@ -282,17 +208,26 @@
     - `500 Internal Server Error`: Error during update.
 
 - **DELETE** `/:id`  
-  - **Access**: Admin or Authenticated User  
+  - **Access**: Authenticated User  
   - **Responses**:  
     - `204 No Content`: Workflow deleted.  
     - `404 Not Found`: Workflow ID not found.  
     - `500 Internal Server Error`: Error during deletion.
 
+## **Trigger API**
+
+- **GET** `/users/:id`  
+  - **Access**: Authenticated User (if `user_id` matches the authenticated user)  
+  - **Responses**:  
+    - `200 OK`: Triggers retrieved.  
+    - `404 Not Found`: User ID not found.  
+    - `500 Internal Server Error`: Error fetching triggers.
+
+- **GET** `/:id`
+  - **Access**: Authenticated User
+  - **Responses**:  
+    - `200 OK`: Trigger retrieved.  
+    - `404 Not Found`: Trigger ID not found.  
+    - `500 Internal Server Error`: Error fetching trigger.  
+
 ---
-
-## **Roles Summary**
-
-- **Public**: No token required.  
-- **Authenticated User**: Requires valid JWT.  
-- **Admin**: Requires admin JWT.  
-- **Service**: Requires service token.  
