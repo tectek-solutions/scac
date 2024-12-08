@@ -5,7 +5,7 @@ use actix_cors::Cors;
 use actix_web::{web, middleware::Logger, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
-use utoipa::{OpenApi};
+use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use database;
