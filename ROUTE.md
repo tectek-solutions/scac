@@ -35,9 +35,9 @@
 
 ---
 
-## **Authentication Services API**
+## **Authentications Services API**
 
-### **Base Path**: `/authentificationa`
+### **Base Path**: `/authentifications`
 
 - **GET** `/`  
   - **Access**: Public  
@@ -51,20 +51,6 @@
     - `200 OK`: Service details retrieved.  
     - `404 Not Found`: Service ID not found.  
     - `500 Internal Server Error`: Error fetching details.
-
-- **GET** `/:id-services`  
-  - **Access**: Public  
-  - **Responses**:  
-    - `200 OK`: List of API services retrieved.  
-    - `404 Not Found`: Service ID not found.  
-    - `500 Internal Server Error`: Error fetching services.
-
-- **GET** `/:id/tokens`  
-  - **Access**: Authenticated User
-  - **Responses**:  
-    - `200 OK`: Tokens retrieved.  
-    - `404 Not Found`: Service ID not found.  
-    - `500 Internal Server Error`: Error fetching tokens.
 
 ---
 

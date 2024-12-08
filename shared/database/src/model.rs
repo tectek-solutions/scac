@@ -22,7 +22,7 @@ pub struct NewUser<'a> {
     pub password_hash: &'a str,
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::authentifications)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Authentification {
