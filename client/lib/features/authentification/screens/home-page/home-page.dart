@@ -60,6 +60,7 @@
 //   }
 // }
 
+import 'package:client/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 
 class ClickableCardScreen extends StatefulWidget {
@@ -79,14 +80,10 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Animated Card Detail Section'),
-      ),
       body: Stack(
         children: [
-          // Main Content
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(top: TSizes.appBarHeight, left: 16.0, right: 16.0),
             child: Column(
               children: [
                 GestureDetector(
@@ -145,39 +142,42 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
             right: _showDetail ? 0 : -MediaQuery.of(context).size.width,
             top: 0,
             bottom: 0,
-            child: Material(
-              elevation: 8.0,
-              child: Container(
-                color: Colors.white,
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: toggleDetail,
-                        ),
-                        const SizedBox(width: 16.0),
-                        const Text(
-                          'Card Details',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
+            child: Padding(
+              padding: const EdgeInsets.only(top: TSizes.appBarHeight),
+              child: Material(
+                elevation: 8.0,
+                child: Container(
+                  color: Colors.white,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: toggleDetail,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      'This is the detailed section of the card. It slides in from the right.',
-                      style: TextStyle(fontSize: 16.0, color: Colors.grey[700]),
-                    ),
-                    const Spacer(),
-                  ],
+                          const SizedBox(width: 16.0),
+                          const Text(
+                            'Card Details',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        'This is the detailed section of the card. It slides in from the right.',
+                        style: TextStyle(fontSize: 16.0, color: Colors.grey[700]),
+                      ),
+                      const Spacer(),
+                    ],
+                  ),
                 ),
               ),
             ),
