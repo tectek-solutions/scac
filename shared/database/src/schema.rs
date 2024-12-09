@@ -1,35 +1,8 @@
 // @generated automatically by Diesel CLI.
 
-// pub mod sql_types {
-//     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
-//     #[diesel(postgres_type(name = "http_method_enum"))]
-//     pub struct HttpMethodEnum;
-
-//     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
-//     #[diesel(postgres_type(name = "status_enum"))]
-//     pub struct StatusEnum;
-// }
-
-#[derive(Debug, Clone, Copy, AsExpression, FromSqlRow)]
-#[diesel(sql_type = Text)]
-pub enum HttpMethodEnum {
-    Get,
-    Post,
-    Put,
-    Delete,
-}
-
-#[derive(Debug, Clone, Copy, AsExpression, FromSqlRow)]
-#[diesel(sql_type = Text)]
-pub enum StatusEnum {
-    Active,
-    Inactive,
-    Pending,
-}
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::schema::HttpMethodEnum;
 
     actions (id) {
         id -> Int4,
@@ -38,7 +11,8 @@ diesel::table! {
         name -> Varchar,
         description -> Nullable<Text>,
         endpoint -> Text,
-        method -> HttpMethodEnum,
+        #[max_length = 10]
+        method -> Varchar,
         headers -> Nullable<Jsonb>,
         params -> Nullable<Jsonb>,
         json_path -> Nullable<Text>,
@@ -75,7 +49,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use crate::schema::HttpMethodEnum;
 
     reactions (id) {
         id -> Int4,
@@ -84,7 +57,8 @@ diesel::table! {
         name -> Varchar,
         description -> Nullable<Text>,
         endpoint -> Text,
-        method -> HttpMethodEnum,
+        #[max_length = 10]
+        method -> Varchar,
         headers -> Nullable<Jsonb>,
         params -> Nullable<Jsonb>,
         json_path -> Nullable<Text>,
@@ -94,14 +68,12 @@ diesel::table! {
 }
 
 diesel::table! {
-    use diesel::sql_types::*;
-    use crate::schema::StatusEnum;
 
     triggers (id) {
         id -> Int4,
         workflow_id -> Int4,
         data -> Jsonb,
-        status -> StatusEnum,
+        status -> Bool,
         created_at -> Nullable<Timestamp>,
     }
 }

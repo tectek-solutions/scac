@@ -23,7 +23,7 @@ utoipa-redoc = { version = "5.0.0", features = ["actix-web"] }
 utoipa-scalar = { version = "0.2.0", features = ["actix-web"] }
 utoipa-swagger-ui = { version = "8", features = ["actix-web"] }
 uuid = { version = "1.11.0", features = ["v4"] }
-diesel = { version = "2.0.0", features = ["postgres", "chrono"] }
+diesel = { version = "2.0.0", features = ["postgres", "chrono", "serde_json"] }
 database = { path = "../../shared/database" }
 bcrypt = "0.16.0"
 jwt = "0.16.0"

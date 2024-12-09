@@ -5,7 +5,7 @@ CREATE TABLE reactions (
     name VARCHAR(32) NOT NULL,
     description TEXT,
     endpoint TEXT NOT NULL,
-    method http_method_enum NOT NULL,
+    method VARCHAR(10) NOT NULL,
     headers JSONB,
     params JSONB,
     json_path TEXT,

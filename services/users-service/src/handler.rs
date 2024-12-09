@@ -78,7 +78,7 @@ type HmacSha256 = Hmac<Sha256>;
 fn signing_jwt(user_id: i32) -> Result<String, String> {
     let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set")?;
     let key: HmacSha256 = Hmac::new_from_slice(jwt_secret.as_ref()).expect("HMAC creation failed");
-    
+
     let mut claims = BTreeMap::new();
     claims.insert("id".to_string(), user_id.to_string());
     claims.insert(

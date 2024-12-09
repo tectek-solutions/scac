@@ -6,10 +6,10 @@ use diesel::prelude::*;
 pub fn get_authentifications(
     db: &web::Data<database::Database>,
 ) -> Result<Option<Vec<Authentification>>, diesel::result::Error> {
-    use database::schema::authentifications::dsl::*;
+    use database::schema::authentification::dsl::*;
 
     let mut connection = db.get_connection();
-    let result = authentifications.load::<Authentification>(&mut connection);
+    let result = authentification.load::<Authentification>(&mut connection);
 
     match result {
         Ok(result) => Ok(Some(result)),
@@ -24,17 +24,17 @@ pub fn get_authentification_by_id(
     db: &web::Data<database::Database>,
     authentification_id: i32,
 ) -> Result<Option<Authentification>, diesel::result::Error> {
-    use database::schema::authentifications::dsl::*;
+    use database::schema::authentification::dsl::*;
 
     let mut connection = db.get_connection();
 
-    match authentifications
+    match authentification
         .find(authentification_id)
         .select(Authentification::as_select())
         .first::<Authentification>(&mut connection)
         .optional()
     {
-        Ok(Some(authentification)) => Ok(Some(authentification)),
+        Ok(Some(Authentification)) => Ok(Some(Authentification)),
         Ok(None) => Ok(None),
         Err(err) => {
             eprintln!(
@@ -54,7 +54,7 @@ pub fn add_authentification(
     client_id: String,
     client_secret: String,
 ) -> Result<Option<Authentification>, diesel::result::Error> {
-    use database::schema::authentifications;
+    use database::schema::authentification;
 
     let mut connection = db.get_connection();
 
@@ -66,7 +66,7 @@ pub fn add_authentification(
         client_secret: &client_secret,
     };
 
-    match diesel::insert_into(authentifications::table)
+    match diesel::insert_into(authentification::table)
         .values(&new_authentification)
         .returning(Authentification::as_returning())
         .get_result::<Authentification>(&mut connection)
@@ -88,10 +88,10 @@ pub fn update_authentification(
     new_client_id: String,
     new_client_secret: String,
 ) -> Result<Option<Authentification>, diesel::result::Error> {
-    use database::schema::authentifications::dsl::*;
+    use database::schema::authentification::dsl::*;
 
     let mut connection = db.get_connection();
-    match diesel::update(authentifications.find(authentification_id))
+    match diesel::update(authentification.find(authentification_id))
         .set((
             name.eq(new_name.clone()),
             auth_url.eq(new_auth_url.clone()),
@@ -102,7 +102,7 @@ pub fn update_authentification(
         .returning(Authentification::as_returning())
         .get_result::<Authentification>(&mut connection)
     {
-        Ok(authentification) => Ok(Some(authentification)),
+        Ok(Authentification) => Ok(Some(Authentification)),
         Err(err) => {
             eprintln!(
                 "Error updating authentification with ID {:?}: {:?}",
@@ -117,13 +117,13 @@ pub fn delete_authentification(
     db: &web::Data<database::Database>,
     authentification_id: i32,
 ) -> Result<Option<Authentification>, diesel::result::Error> {
-    use database::schema::authentifications::dsl::*;
+    use database::schema::authentification::dsl::*;
 
     let mut connection = db.get_connection();
-    match diesel::delete(authentifications.find(authentification_id))
+    match diesel::delete(authentification.find(authentification_id))
         .get_result::<Authentification>(&mut connection)
     {
-        Ok(authentification) => Ok(Some(authentification)),
+        Ok(Authentification) => Ok(Some(Authentification)),
         Err(err) => {
             eprintln!(
                 "Error deleting authentification with ID {:?}: {:?}",
