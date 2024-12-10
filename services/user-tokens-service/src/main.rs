@@ -1,7 +1,6 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use std::env;
-use chrono::{NaiveDateTime, Utc};
-use query::{get_user_tokens, get_user_tokens_by_id, get_user_tokens_by_user_id, get_user_tokens_by_auth_service_id, add_user_tokens, update_user_tokens};
+use chrono::{Utc};
 mod query;
 
 #[get("/health")]
@@ -11,11 +10,8 @@ async fn health() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let now = Utc::now().naive_utc();
-    // add_user_tokens(1, 3, "access_token", Some("refresh_token"), now, Some(now), Some(now));
+    let _now = Utc::now().naive_utc();
 
-    update_user_tokens(3, Some(3), None, Some("new_access_token"), None, None, None, None);
-    get_user_tokens();
     // Retrieve and validate environment variables
     let address = match env::var("BINDING_ADDRESS") {
         Ok(addr) => addr,

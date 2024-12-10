@@ -1,85 +1,113 @@
 use diesel::prelude::*;
-use database::user_tokens_model::*;
-use database::*;
+use database::model::{NewUserTokens, UserTokens, UpdateUserTokens};
 use chrono::NaiveDateTime;
+use actix_web::web;
 
 
-pub fn get_user_tokens() {
+
+pub fn get_user_tokens(db: &web::Data<database::Database>) -> Result<Option<Vec<UserTokens>>, diesel::result::Error> {
     use database::schema::user_tokens::dsl::*;
 
-    let connection = &mut etablish_connection();
-    let results = user_tokens
-        .select(UserTokens::as_select())
-        .load(connection)
-        .expect("Error loading user tokens");
-    println!("Displaying {} user tokens", results.len());
-    for user_token in results {
-        println!("{:?}", user_token.user_id);
-        println!("{:?}", user_token.auth_service_id);
+    let mut connection = db.get_connection();
+    let result = user_tokens.load::<UserTokens>(&mut connection);
+
+    match result {
+        Ok(result) => Ok(Some(result)),
+        Err(err) => {
+            eprintln!("Error getting user tokens: {:?}", err);
+            Err(err)
+        }
     }
 }
 
-pub fn get_user_tokens_by_id(token_id: i32) {
+pub fn get_user_tokens_by_id(
+    token_id: i32,
+    db: &web::Data<database::Database>
+) -> Result<Option<UserTokens>, diesel::result::Error> {
     use database::schema::user_tokens::dsl::*;
 
-    let connection = &mut etablish_connection();
-    let user_token = user_tokens
+    let mut connection = db.get_connection();
+    match user_tokens
         .find(token_id)
         .select(UserTokens::as_select())
-        .first(connection)
-        .optional();
-    match user_token {
-        Ok(Some(user_token)) => {
-            println!("Found user token {:?}, with id {:?}", user_token.user_id, token_id);
-            println!("Found auth_service_id {:?} for token_id {:?}", user_token.auth_service_id, token_id);
-        },
-        Ok(None) => println!("No user token found with id {:?}", token_id),
-        Err(err) => println!("Error finding user token: {:?}", err),
+        .first::<UserTokens>(&mut connection)
+        .optional()
+    {
+        Ok(Some(user_token)) => Ok(Some(user_token)),
+        Ok(None) => Ok(None),
+        Err(err) => {
+            eprintln!("Error getting user token with ID {:?}: {:?}", token_id, err);
+            Err(err)
+        }
     }
 }
 
-pub fn get_user_tokens_by_user_id(user_id_param: i32) {
+pub fn get_user_tokens_by_user_id(
+    user_id_param: i32,
+    db: &web::Data<database::Database>
+) -> Result<Option<Vec<UserTokens>>, diesel::result::Error> {
     use database::schema::user_tokens::dsl::*;
 
-    let connection = &mut etablish_connection();
-    let tokens = user_tokens
+    let mut connection = db.get_connection();
+    match user_tokens
         .filter(user_id.eq(user_id_param))
         .select(UserTokens::as_select())
-        .load(connection)
-        .expect("Error loading user tokens");
-    println!("Displaying {} user tokens for user_id {}", tokens.len(), user_id_param);
-    for user_token in tokens {
-        println!("{:?}", user_token.user_id);
-        println!("{:?}", user_token.auth_service_id);
+        .load::<UserTokens>(&mut connection)
+    {
+        Ok(user_token) => Ok(Some(user_token)),
+        Err(err) => {
+            eprintln!("Error getting user tokens with user_id {:?}: {:?}", user_id_param, err);
+            Err(err)
+        }
     }
 }
 
-pub fn get_user_tokens_by_auth_service_id(auth_service_id_param: i32) {
+pub fn get_user_tokens_by_auth_service_id(
+    auth_service_id_param: i32,
+    db: &web::Data<database::Database>
+) -> Result<Option<UserTokens>, diesel::result::Error> {
     use database::schema::user_tokens::dsl::*;
 
-    let connection = &mut etablish_connection();
-    let tokens = user_tokens
-        .filter(auth_service_id.eq(auth_service_id))
+    let mut connection = db.get_connection();
+    match user_tokens
+        .filter(auth_service_id.eq(auth_service_id_param))
         .select(UserTokens::as_select())
-        .load(connection)
-        .expect("Error loading user tokens");
-    println!("Displaying {} user tokens for auth_service_id {}", tokens.len(), auth_service_id_param);
-    for user_token in tokens {
-        println!("{:?}", user_token.user_id);
-        println!("{:?}", user_token.auth_service_id);
+        .first::<UserTokens>(&mut connection)
+        .optional()
+    {
+        Ok(Some(user_token)) => Ok(Some(user_token)),
+        Ok(None) => Ok(None),
+        Err(err) => {
+            eprintln!("Error getting user token with auth_service_id {:?}: {:?}", auth_service_id_param, err);
+            Err(err)
+        }
     }
 }
 
-pub fn add_user_tokens(user_id: i32, auth_service_id: i32, access_token: &str, refresh_token: Option<&str>, expires_at: chrono::NaiveDateTime, created_at: Option<chrono::NaiveDateTime>, updated_at: Option<chrono::NaiveDateTime>) {
-    let connection = &mut etablish_connection();
-    let user_token = create_user_tokens(connection, user_id, auth_service_id, access_token, refresh_token, expires_at, created_at, updated_at);
-    println!("Saved user token {:?}", user_token.user_id);
-    println!("Saved auth_service_id {:?}", user_token.auth_service_id);
-    println!("Saved access_token {:?}", user_token.access_token);
-    println!("Saved refresh_token {:?}", user_token.refresh_token);
-    println!("Saved expires_at {:?}", user_token.expires_at);
-    println!("Saved created_at {:?}", user_token.created_at);
-    println!("Saved updated_at {:?}", user_token.updated_at);
+pub fn add_user_tokens(userid: i32, auth_serviceid: i32, accesstoken: &str, refreshtoken: Option<&str>, expiresat: chrono::NaiveDateTime, createdat: Option<chrono::NaiveDateTime>, updatedat: Option<chrono::NaiveDateTime>, db: &web::Data<database::Database>) -> Result<Option<UserTokens>, diesel::result::Error> {
+    use database::schema::user_tokens::dsl::*;
+    let mut connection = db.get_connection();
+
+    let new_user_tokens = NewUserTokens {
+        user_id: userid,
+        auth_service_id: auth_serviceid,
+        access_token: accesstoken,
+        refresh_token: refreshtoken,
+        expires_at: expiresat,
+        created_at: createdat,
+        updated_at: updatedat,
+    };
+    match diesel::insert_into(user_tokens)
+        .values(&new_user_tokens)
+        .get_result::<UserTokens>(&mut connection)
+    {
+        Ok(user_token) => Ok(Some(user_token)),
+        Err(err) => {
+            eprintln!("Error adding user token: {:?}", err);
+            Err(err)
+        }
+    }
+
 }
 
 pub fn update_user_tokens(
@@ -91,9 +119,10 @@ pub fn update_user_tokens(
     new_expires_at: Option<NaiveDateTime>,
     new_created_at: Option<NaiveDateTime>,
     new_updated_at: Option<NaiveDateTime>,
-) {
+    db: &web::Data<database::Database>
+) -> Result<Option<UserTokens>, diesel::result::Error> {
     use database::schema::user_tokens::dsl::*;
-    let connection = &mut etablish_connection();
+    let mut connection = db.get_connection();
 
     // Crée une structure avec les valeurs optionnelles
     let changes = UpdateUserTokens {
@@ -106,33 +135,34 @@ pub fn update_user_tokens(
         updated_at: new_updated_at,
     };
 
-    // Appliquer les changements à la requête
-    let updated_rows = diesel::update(user_tokens.find(token_id))
-        .set(changes)
-        .execute(connection)
-        .expect("Error updating user token");
-
-    println!(
-        "Updated {} user token(s) with token_id {:?}",
-        updated_rows, token_id
-    );
+    match diesel::update(user_tokens.find(token_id))
+        .set(&changes)
+        .get_result::<UserTokens>(&mut connection)
+    {
+        Ok(user_token) => Ok(Some(user_token)),
+        Err(err) => {
+            eprintln!("Error updating user token: {:?}", err);
+            Err(err)
+        }
+    }
 }
 
-pub fn delete_user_tokens(token_id: i32) {
+pub fn delete_user_tokens(
+    token_id: i32,
+    db: &web::Data<database::Database>
+) -> Result<Option<UserTokens>, diesel::result::Error> {
     use database::schema::user_tokens::dsl::*;
 
-    let connection = &mut etablish_connection();
-    let deleted_user_token: UserTokens = diesel::delete(user_tokens.find(token_id))
-        .get_result(connection)
-        .expect("Error deleting user token");
-
-    println!("Deleted user token {:?}", deleted_user_token.user_id);
-    println!("Deleted auth_service_id {:?}", deleted_user_token.auth_service_id);
-    println!("Deleted access_token {:?}", deleted_user_token.access_token);
-    println!("Deleted refresh_token {:?}", deleted_user_token.refresh_token);
-    println!("Deleted expires_at {:?}", deleted_user_token.expires_at);
-    println!("Deleted created_at {:?}", deleted_user_token.created_at);
-    println!("Deleted updated_at {:?}", deleted_user_token.updated_at);
+    let mut connection = db.get_connection();
+    match diesel::delete(user_tokens.find(token_id))
+        .get_result::<UserTokens>(&mut connection)
+    {
+        Ok(user_token) => Ok(Some(user_token)),
+        Err(err) => {
+            eprintln!("Error deleting user token with ID {:?}: {:?}", token_id, err);
+            Err(err)
+        }
+    }
 }
 
 
