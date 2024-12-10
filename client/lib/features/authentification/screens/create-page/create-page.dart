@@ -30,11 +30,16 @@ class _CreatePageState extends State<CreatePage> {
             ),
             const SizedBox(height: 20.0),
             GestureDetector(
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                final result = await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ServicesPage()),
                 );
+                if (result != null) {
+                  print('Data received from Widget B: $result');
+                } else {
+                  print('No data received');
+                }
               },
               child: Card(
                 elevation: 4.0,

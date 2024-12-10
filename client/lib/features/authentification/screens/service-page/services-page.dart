@@ -11,12 +11,22 @@ class _ServicesPageState extends State<ServicesPage> {
   List<dynamic> cards = [
     {
       'title': 'Card 1',
-      'action': 'Action 1',
+      'action': [
+        'Action 1',
+        'Action 2',
+        'Action 3',
+        'Action 4',
+      ],
       'description': 'Description 1',
     },
     {
       'title': 'Card 2',
-      'action': 'Action 2',
+      'action': [
+        'Action 1',
+        'Action 2',
+        'Action 3',
+        'Action 4',
+      ],
       'description': 'Description 2',
     },
     {
@@ -28,26 +38,6 @@ class _ServicesPageState extends State<ServicesPage> {
       'title': 'Card 4',
       'action': 'Action 4',
       'description': 'Description 4',
-    },
-    {
-      'title': 'Card 5',
-      'action': 'Action 5',
-      'description': 'Description 5',
-    },
-    {
-      'title': 'Card 6',
-      'action': 'Action 6',
-      'description': 'Description 6',
-    },
-    {
-      'title': 'Card 7',
-      'action': 'Action 7',
-      'description': 'Description 7',
-    },
-    {
-      'title': 'Card 8',
-      'action': 'Action 8',
-      'description': 'Description 8',
     },
   ];
   final ApiService apiService = ApiService();
@@ -150,10 +140,70 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(card['title']),
+        title: Text('Detail Page'),
       ),
-      body: Center(
-        child: Text('Detail Page for ${card['title']}'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      card['title'] ?? 'No Title',
+                      style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10.0),
+                    Text(
+                      card['description'] ?? 'No Description',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: card['action'] is List
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: (card['action'] as List).map<Widget>((action) {
+                          return ElevatedButton(
+                            onPressed: () {
+                              int count = 0;
+                              Navigator.of(context).popUntil((route) {
+                                count++;
+                                if (count == 2) { // Adjust count based on how many levels you want to pop
+                                  Navigator.pop(context, card['title']); // Pass data back
+                                  return true;
+                                }
+                                return false;
+                              });
+                              print('$action button pressed');
+                            },
+                            child: Text(action),
+                          );
+                        }).toList(),
+                      )
+                    : ElevatedButton(
+                        onPressed: () {
+                          // Define the action for the button here
+                          print('${card['action']} button pressed2');
+                        },
+                        child: Text(card['action'] ?? 'No Action'),
+                      ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
