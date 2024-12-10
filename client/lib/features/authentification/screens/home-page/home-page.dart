@@ -1,65 +1,3 @@
-// import 'package:flutter/material.dart';
-
-// class HomePage extends StatefulWidget {
-//   const HomePage({ Key? key }) : super(key: key);
-
-//   @override
-//   _HomePageState createState() => _HomePageState();
-// }
-
-// class _HomePageState extends State<HomePage> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Home Page'),
-//         ),
-//         body: ListView(
-//           children: <Widget>[
-//             const Text("Let's get started"),
-//             InkWell(
-//               onTap: () {
-//                 showDialog(
-//                   context: context,
-//                   builder: (BuildContext context) {
-//                     return AlertDialog(
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(15.0),
-//                       ),
-//                       content: const NewPage(),
-//                     );
-//                   },
-//                 );
-//               },
-//               child: Card(
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(15.0),
-//                 ),
-//                 elevation: 5,
-//                 child: const ListTile(
-//                   title: Text('Welcome to the Home Page'),
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class NewPage extends StatelessWidget {
-//   const NewPage({ Key? key }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Center(
-//       child: Text('This is the new page'),
-//     );
-//   }
-// }
-
 import 'package:client/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 
@@ -69,7 +7,7 @@ class ClickableCardScreen extends StatefulWidget {
 }
 
 class _ClickableCardScreenState extends State<ClickableCardScreen> {
-  bool _showDetail = false; // State to manage detail section visibility
+  bool _showDetail = false;
 
   void toggleDetail() {
     setState(() {
@@ -98,19 +36,19 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SizedBox(width: 16.0),
+                          const SizedBox(width: 16.0),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Automation Trigger',
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 8.0),
+                                const SizedBox(height: 8.0),
                                 Text(
                                   'Perform an action when a condition is met.',
                                   style: TextStyle(
@@ -137,7 +75,7 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
 
           // Animated Detail Section
           AnimatedPositioned(
-            duration: Duration(milliseconds: 300), // Animation duration
+            duration: const Duration(milliseconds: 300), // Animation duration
             curve: Curves.easeInOut, // Animation curve
             right: _showDetail ? 0 : -MediaQuery.of(context).size.width,
             top: 0,

@@ -1,5 +1,6 @@
 import 'package:client/common/style/spacing_styles.dart';
 import 'package:client/features/authentification/screens/create-page/create-page.dart';
+import 'package:client/features/authentification/screens/service-page/services-page.dart';
 import 'package:client/features/authentification/screens/explore-page/explore-page.dart';
 import 'package:client/features/authentification/screens/home-page/home-page.dart';
 import 'package:client/features/authentification/screens/login/login.dart';
@@ -22,9 +23,9 @@ class _MainScreenState extends State<MainScreen> {
   int currentPage = 0;
   final List<Widget> pages = [
     ClickableCardScreen(),
-    const ExplorePage(),
-    CreatePage(),
-    Profile(),
+    // const ExplorePage(),
+    const CreatePage(),
+    const Profile(),
   ];
 
   @override
@@ -44,11 +45,11 @@ class _MainScreenState extends State<MainScreen> {
             label: 'My Applets',
             backgroundColor: TColors.lightColor,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-            backgroundColor: TColors.lightColor,
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.search),
+          //   label: 'Search',
+          //   backgroundColor: TColors.lightColor,
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Create',
