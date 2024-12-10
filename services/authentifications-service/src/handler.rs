@@ -148,7 +148,7 @@ async fn get_authentification_by_id(
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/authentifications")
+        web::scope("/")
             .service(list_authentifications)
             .service(get_authentification_by_id)
     );

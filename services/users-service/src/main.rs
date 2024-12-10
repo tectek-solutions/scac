@@ -6,7 +6,7 @@ use actix_web::{web, middleware::Logger, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
+use utoipa_swagger_ui::{Config, SwaggerUi};
 
 use database;
 
@@ -50,6 +50,17 @@ fn configure_cors() -> Cors {
         .supports_credentials()
 }
 
+#[derive(OpenApi)]
+#[openapi(
+    tags((name = "users", description = "Users")),
+    paths(
+        handler::sign_up,
+        handler::sign_in,
+        handler::sign_out,
+        handler::me,
+    ),
+)]
+struct ApiDoc;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -60,30 +71,19 @@ async fn main() -> std::io::Result<()> {
     let database_url = env::var("POSTGRES_URL").expect("POSTGRES_URL must be set");
     let db = web::Data::new(database::Database::new(&database_url));
 
-    #[derive(OpenApi)]
-    #[openapi(
-        tags((name = "users", description = "Users")),
-        paths(
-            handler::sign_up,
-            handler::sign_in,
-            handler::sign_out,
-            handler::me,
-        ),
-    )]
-    struct ApiDoc;
-
     HttpServer::new(move || {
         let cors = configure_cors();
+        let config = Config::new("/users/api-docs/openapi.json");
+        let swagger = SwaggerUi::new("/users/swagger-ui/{_:.*}")
+             .url("/api-docs/openapi.json", ApiDoc::openapi())
+             .config(config);
 
         App::new()
             .app_data(db.clone())
             .configure(handler::config)
             .wrap(cors)
             .wrap(Logger::default())
-            .service(
-                SwaggerUi::new("/swagger-ui/{_:.*}")
-                    .url("/api-docs/openapi.json", ApiDoc::openapi()),
-            )
+            .service(swagger)
     })
     .bind((address.as_str(), port))?
     .run()

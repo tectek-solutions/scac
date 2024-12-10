@@ -17,7 +17,7 @@ COPY services/authentifications-service/Cargo.toml services/authentifications-se
 RUN cd services/authentifications-service && cargo fetch
 
 COPY services/authentifications-service/src/ services/authentifications-service/src/
-RUN cd services/authentifications-service && cargo build --release
+RUN cd services/authentifications-service && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm AS runtime
@@ -32,7 +32,7 @@ RUN useradd -m -g authentifications-service authentifications-service
 USER authentifications-service
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=authentifications-service:authentifications-service /usr/src/scac/services/authentifications-service/target/release/authentifications-service /usr/local/bin/authentifications-service
+COPY --from=builder --chown=authentifications-service:authentifications-service /usr/src/scac/services/authentifications-service/target/debug/authentifications-service /usr/local/bin/authentifications-service
 
 # Start the service
 CMD ["/usr/local/bin/authentifications-service"]

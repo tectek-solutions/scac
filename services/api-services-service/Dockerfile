@@ -17,7 +17,7 @@ COPY services/api-services-service/Cargo.toml services/api-services-service/Carg
 RUN cd services/api-services-service && cargo fetch
 
 COPY services/api-services-service/src/ services/api-services-service/src/
-RUN cd services/api-services-service && cargo build --release
+RUN cd services/api-services-service && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm AS runtime
@@ -32,7 +32,7 @@ RUN useradd -m -g api-services-service api-services-service
 USER api-services-service
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=api-services-service:api-services-service /usr/src/scac/services/api-services-service/target/release/api-services-service /usr/local/bin/api-services-service
+COPY --from=builder --chown=api-services-service:api-services-service /usr/src/scac/services/api-services-service/target/debug/api-services-service /usr/local/bin/api-services-service
 
 # Start the service
 CMD ["/usr/local/bin/api-services-service"]

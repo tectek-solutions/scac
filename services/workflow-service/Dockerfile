@@ -17,7 +17,7 @@ COPY services/workflow-service/Cargo.toml services/workflow-service/Cargo.lock s
 RUN cd services/workflow-service && cargo fetch
 
 COPY services/workflow-service/src/ services/workflow-service/src/
-RUN cd services/workflow-service && cargo build --release
+RUN cd services/workflow-service && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm AS runtime
@@ -32,7 +32,7 @@ RUN useradd -m -g workflow-service workflow-service
 USER workflow-service
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=workflow-service:workflow-service /usr/src/scac/services/workflow-service/target/release/workflow-service /usr/local/bin/workflow-service
+COPY --from=builder --chown=workflow-service:workflow-service /usr/src/scac/services/workflow-service/target/debug/workflow-service /usr/local/bin/workflow-service
 
 # Start the service
 CMD ["/usr/local/bin/workflow-service"]

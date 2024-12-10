@@ -17,7 +17,7 @@ COPY services/trigger-service/Cargo.toml services/trigger-service/Cargo.lock ser
 RUN cd services/trigger-service && cargo fetch
 
 COPY services/trigger-service/src/ services/trigger-service/src/
-RUN cd services/trigger-service && cargo build --release
+RUN cd services/trigger-service && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm AS runtime
@@ -32,7 +32,7 @@ RUN useradd -m -g trigger-service trigger-service
 USER trigger-service
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=trigger-service:trigger-service /usr/src/scac/services/trigger-service/target/release/trigger-service /usr/local/bin/trigger-service
+COPY --from=builder --chown=trigger-service:trigger-service /usr/src/scac/services/trigger-service/target/debug/trigger-service /usr/local/bin/trigger-service
 
 # Start the service
 CMD ["/usr/local/bin/trigger-service"]
