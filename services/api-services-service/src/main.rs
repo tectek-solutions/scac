@@ -1,4 +1,6 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+pub mod query;
+
 use std::env;
 
 #[get("/health")]
