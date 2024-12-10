@@ -1,6 +1,7 @@
 pub mod model;
 pub mod schema;
 
+
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use std::sync::Arc;
@@ -27,3 +28,4 @@ impl Database {
             .expect("Failed to get a connection from the pool.")
     }
 }
+

@@ -76,7 +76,7 @@ pub fn add_user(
     let mut connection = db.get_connection();
 
     let new_user = NewUser {
-        name: &name,
+        username: &name,
         email: &email,
         password_hash: &password_hash,
     };
@@ -106,7 +106,7 @@ pub fn update_user(
     let mut connection = db.get_connection();
     match diesel::update(users.find(user_id))
         .set((
-            name.eq(new_name.clone()),
+            username.eq(new_name.clone()),
             email.eq(new_email.clone()),
             password_hash.eq(new_password_hash.clone()),
         ))

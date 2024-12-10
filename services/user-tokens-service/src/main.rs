@@ -1,5 +1,7 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use std::env;
+use chrono::{Utc};
+mod query;
 
 #[get("/health")]
 async fn health() -> impl Responder {
@@ -8,6 +10,8 @@ async fn health() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let _now = Utc::now().naive_utc();
+
     // Retrieve and validate environment variables
     let address = match env::var("BINDING_ADDRESS") {
         Ok(addr) => addr,
