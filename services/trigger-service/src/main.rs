@@ -1,6 +1,8 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use std::env;
 
+pub mod query;
+
 #[get("/health")]
 async fn health() -> impl Responder {
     HttpResponse::Ok().body("OK")
