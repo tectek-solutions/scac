@@ -4,7 +4,7 @@ networks:
 
 services:
   database:
-    image: postgres:17.2-alpine3.20
+    image: postgres:17.2-bookworm
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -21,6 +21,7 @@ services:
     environment:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
@@ -34,6 +35,7 @@ services:
     environment:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
@@ -47,6 +49,7 @@ services:
     environment:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
@@ -60,6 +63,7 @@ services:
     environment:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
@@ -73,6 +77,7 @@ services:
     environment:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
@@ -86,6 +91,7 @@ services:
     environment:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
@@ -115,6 +121,7 @@ services:
     environment:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
@@ -147,25 +154,25 @@ services:
     networks:
       - internal
     depends_on:
-      # - actions-service
-      # - api-services-service
-      # - authentification-service
-      # - reactions-service
-      # - trigger-service
-      # - user-tokens-service
+      - actions-service
+      - api-services-service
+      - authentification-service
+      - reactions-service
+      - trigger-service
+      - user-tokens-service
       - users-service
-      # - workflow-service
+      - workflow-service
 
-  # client:
-  #   build:
-  #     context: .
-  #     dockerfile: ./client/Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - API_GATEWAY_ADDRESS=api-gateway
-  #     - API_GATEWAY_PORT=8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - api-gateway
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - API_GATEWAY_ADDRESS=api-gateway
+      - API_GATEWAY_PORT=8000
+    networks:
+      - internal
+    depends_on:
+      - api-gateway

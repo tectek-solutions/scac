@@ -24,7 +24,7 @@ impl Gateway {
         let service_names = [
             "actions",
             "api_services",
-            "authentification",
+            "authentifications",
             "reactions",
             "trigger",
             "user_tokens",
@@ -53,7 +53,7 @@ impl Gateway {
     fn get_service(&self, path: &str) -> Option<&(String, u16)> {
         info!("Searching for service to handle path: {}", path);
         self.services.iter().find_map(|(key, service)| {
-            if path.starts_with(&format!("/api/{}", key.replace('_', "-"))) {
+            if path.starts_with(&format!("/{}", key.replace('_', "-"))) {
                 info!("Found service for path: {}", key);
                 Some(service)
             } else {
@@ -75,7 +75,7 @@ impl ProxyHttp for Gateway {
             .req_header()
             .uri
             .path()
-            .starts_with("/api/users/login")
+            .starts_with("/users/login")
             && !check_token(session.req_header())
         {
             info!("Invalid token for login request.");

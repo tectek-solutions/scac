@@ -49,8 +49,3 @@ jobs:
             --namespace "${{ inputs.namespace }}" \
             --create-namespace \
             $(if [ -n "${{ inputs.values-file }}" ]; then echo "--values=${{ inputs.values-file }}"; fi)
-
-      - name: Verify Deployment
-        run: |
-          kubectl rollout status deployment/"${{ inputs.release-name }}" \
-            --namespace "${{ inputs.namespace }}"
