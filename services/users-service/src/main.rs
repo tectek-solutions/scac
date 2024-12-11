@@ -73,9 +73,9 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = configure_cors();
-        let config = Config::new("/users/api-docs/openapi.json");
+        let config = Config::new(vec!["/users/api-docs/openapi.json"]);
         let swagger = SwaggerUi::new("/users/swagger-ui/{_:.*}")
-             .url("/api-docs/openapi.json", ApiDoc::openapi())
+             .url("/users/api-docs/openapi.json", ApiDoc::openapi())
              .config(config);
 
         App::new()
