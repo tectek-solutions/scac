@@ -8,7 +8,7 @@ use crate::query;
 
 // ----------------------------
 // Struct Definitions
-// ---------------------------
+// ----------------------------
 
 #[derive(Serialize, Deserialize, Clone, ToSchema)]
 pub enum ErrorResponse {
@@ -33,23 +33,26 @@ impl ErrorResponse {
 
 #[utoipa::path(
     get,
-    path = "/",
-    tag = "authentifications",
+    path = "/users/{user_id}",
+    tag = "user-tokens",
     responses(
-        (status = 200, description = "List of authentifications retrieved"),
+        (status = 200, description = "List of user tokens retrieved"),
         (status = 403, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
-#[get("/")]
-async fn list_authentifications(db: web::Data<database::Database>) -> impl Responder {
-    match query::list_authentifications_query(&db) {
-        Ok(Some(authentifications)) => HttpResponse::Ok().json(authentifications),
-        Ok(None) => ErrorResponse::NotFound("No authentifications found".to_string())
+#[get("/users/{user_id}")]
+async fn list_user_tokens_by_user_id(
+    db: web::Data<database::Database>,
+    user_id: web::Path<i32>,
+) -> impl Responder {
+    match query::list_user_tokens_by_user_id_query(&db, user_id.into_inner()) {
+        Ok(Some(user_tokens)) => HttpResponse::Ok().json(user_tokens),
+        Ok(None) => ErrorResponse::NotFound("User tokens not found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
         Err(err) => {
-            eprintln!("Error getting authentifications: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to get authentifications".to_string())
+            eprintln!("Error getting user tokens: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get user tokens".to_string())
                 .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -58,25 +61,25 @@ async fn list_authentifications(db: web::Data<database::Database>) -> impl Respo
 #[utoipa::path(
     get,
     path = "/{id}",
-    tag = "authentifications",
+    tag = "user-tokens",
     responses(
-        (status = 200, description = "Authentification details retrieved"),
-        (status = 404, description = "Authentification ID not found", body = ErrorResponse),
+        (status = 200, description = "User token details retrieved"),
+        (status = 404, description = "User token ID not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
 #[get("/{id}")]
-async fn get_authentification_by_id(
+async fn get_user_token_by_id(
     db: web::Data<database::Database>,
     id: web::Path<i32>,
 ) -> impl Responder {
-    match query::get_authentification_by_id_query(&db, id.into_inner()) {
-        Ok(Some(authentification)) => HttpResponse::Ok().json(authentification),
-        Ok(None) => ErrorResponse::NotFound("Authentification not found".to_string())
+    match query::get_user_token_by_id_query(&db, id.into_inner()) {
+        Ok(Some(user_token)) => HttpResponse::Ok().json(user_token),
+        Ok(None) => ErrorResponse::NotFound("User token not found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
         Err(err) => {
-            eprintln!("Error getting authentification: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to get authentification".to_string())
+            eprintln!("Error getting user token: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get user token".to_string())
                 .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -88,8 +91,8 @@ async fn get_authentification_by_id(
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/authentifications")
-            .service(list_authentifications)
-            .service(get_authentification_by_id)
+        web::scope("/user-tokens")
+            .service(list_user_tokens_by_user_id)
+            .service(get_user_token_by_id)
     );
 }

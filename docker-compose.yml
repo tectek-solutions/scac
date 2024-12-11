@@ -47,20 +47,20 @@ services:
   #   networks:
   #     - internal
 
-  # authentifications-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/authentifications-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - RUST_LOG=info
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-  #   networks:
-  #     - internal
+  authentifications-service:
+    build:
+      context: .
+      dockerfile: ./services/authentifications-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - RUST_LOG=info
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
 
   # reactions-service:
   #   build:
@@ -92,20 +92,20 @@ services:
   #   networks:
   #     - internal
 
-  # user-tokens-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/user-tokens-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #     - RUST_LOG=info
-  #   environment:
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-  #   networks:
-  #     - internal
+  user-tokens-service:
+    build:
+      context: .
+      dockerfile: ./services/user-tokens-service/Dockerfile
+    expose:
+      - "8000"
+      - RUST_LOG=info
+    environment:
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
 
   users-service:
     build:
@@ -172,10 +172,10 @@ services:
     depends_on:
       # - actions-service
       # - api-services-service
-      # - authentifications-service
+      - authentifications-service
       # - reactions-service
       # - trigger-service
-      # - user-tokens-service
+      - user-tokens-service
       - users-service
       # - workflow-service
 

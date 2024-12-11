@@ -41,7 +41,7 @@ fn get_server_config() -> (String, u16) {
 fn configure_cors() -> Cors {
     Cors::default()
         .allowed_origin("http://localhost:8000")
-        .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+        .allowed_methods(vec!["POST", "GET", "PUT", "PATCH", "DELETE"])
         .allowed_headers(vec![
             actix_web::http::header::CONTENT_TYPE,
             actix_web::http::header::AUTHORIZATION,

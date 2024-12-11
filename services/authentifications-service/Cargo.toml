@@ -18,14 +18,8 @@ serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
 utoipa = "5"
 utoipa-actix-web = "0.1"
-utoipa-rapidoc = { version = "5.0.0", features = ["actix-web"] }
-utoipa-redoc = { version = "5.0.0", features = ["actix-web"] }
-utoipa-scalar = { version = "0.2.0", features = ["actix-web"] }
 utoipa-swagger-ui = { version = "8", features = ["actix-web"] }
 uuid = { version = "1.11.0", features = ["v4"] }
 diesel = { version = "2.0.0", features = ["postgres", "chrono", "serde_json"] }
 database = { path = "../../shared/database" }
-jwt = "0.16.0"
-hmac = "0.12.1"
-sha2 = "0.10.8"
 
