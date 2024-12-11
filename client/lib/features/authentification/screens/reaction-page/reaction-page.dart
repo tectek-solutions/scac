@@ -1,28 +1,28 @@
+import 'package:client/features/authentification/screens/service-page/api-page-services.dart';
 import 'package:flutter/material.dart';
-import 'api-page-services.dart';
 import '../../../../widgets/card-grid.dart';
 
-class ServicesPage extends StatefulWidget {
+class ReactionPage extends StatefulWidget {
   @override
-  _ServicesPageState createState() => _ServicesPageState();
+  _ReactionPageState createState() => _ReactionPageState();
 }
 
-class _ServicesPageState extends State<ServicesPage> {
+class _ReactionPageState extends State<ReactionPage> {
   // Exemple de comment doivent etre les donnees
   List<dynamic> cards = [
     {
-      'title': 'Service 1',
-      'description': 'Service 1 Description',
+      'title': 'Reaction 1',
+      'description': 'Reaction 1 Description',
       'action': ['Action 1', 'Action 2'],
     },
     {
-      'title': 'Service 2',
-      'description': 'Service 2 Description',
+      'title': 'Reaction 2',
+      'description': 'Reaction 2 Description',
       'action': ['Action 1', 'Action 2'],
     },
     {
-      'title': 'Service 3',
-      'description': 'Service 3 Description',
+      'title': 'Reaction 3',
+      'description': 'Reaction 3 Description',
       'action': ['Action 1', 'Action 2'],
     },
   ];
@@ -59,7 +59,7 @@ class _ServicesPageState extends State<ServicesPage> {
   @override
   Widget build(BuildContext context) {
     return CardGrid(
-      appBarTitle: 'Choose a Service',
+      appBarTitle: 'Choose a Reaction',
       cards: cards,
       icon: Icons.star_half,
       onTap: navigateToDetailPage,

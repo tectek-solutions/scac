@@ -1,14 +1,24 @@
+import 'package:client/features/authentification/screens/reaction-page/reaction-page.dart';
 import 'package:client/features/authentification/screens/service-page/services-page.dart';
 import 'package:flutter/material.dart';
 
 class CreatePage extends StatefulWidget {
-  const CreatePage({Key? key}) : super(key: key);
+  const CreatePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CreatePageState createState() => _CreatePageState();
 }
 
 class _CreatePageState extends State<CreatePage> {
+  String resultTitleService = 'Services';
+  String resultDescriptionService = 'Go to Services Page';
+  String resultActionService = 'No action selected';
+
+  String resultTitleReaction = 'Reactions';
+  String resultDescriptionReaction = 'Go to Reaction Page';
+  String resultActionReaction = 'No action selected';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +45,12 @@ class _CreatePageState extends State<CreatePage> {
                   context,
                   MaterialPageRoute(builder: (context) => ServicesPage()),
                 );
-                if (result != null) {
+                if (result != null && result['title'] != null && result['description'] != null && result['action'] != null) {
+                  setState(() {
+                    resultTitleService = result['title'];
+                    resultDescriptionService = result['description'];
+                    resultActionService = result['action'];
+                  });
                   print('Data received from Widget B: $result');
                 } else {
                   print('No data received');
@@ -57,18 +72,39 @@ class _CreatePageState extends State<CreatePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Services',
-                              style: TextStyle(
+                            Text(
+                              resultTitleService,
+                              style: const TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 8.0),
                             Text(
-                              'Go to Services Page',
+                              resultDescriptionService,
                               style: TextStyle(
-                                  fontSize: 14.0, color: Colors.grey[700]),
+                                fontSize: 14.0,
+                                color: Colors.grey[700]
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Row(
+                              children: [
+                                Text(
+                                  'Action: ',
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                                Text(
+                                  resultActionService,
+                                  style: const TextStyle(
+                                    fontSize: 14.0,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -80,9 +116,23 @@ class _CreatePageState extends State<CreatePage> {
             ),
             const SizedBox(height: 10.0),
             const Icon(Icons.add, size: 30.0),
+            const SizedBox(height: 10.0),
             GestureDetector(
-              onTap: () {
-                // Add navigation or action for the new card here
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ReactionPage()),
+                );
+                if (result != null && result['title'] != null && result['description'] != null && result['action'] != null) {
+                  setState(() {
+                    resultTitleReaction = result['title'];
+                    resultDescriptionReaction = result['description'];
+                    resultActionReaction = result['action'];
+                  });
+                  print('Data received from Widget B: $result');
+                } else {
+                  print('No data received');
+                }
               },
               child: Card(
                 elevation: 4.0,
@@ -100,18 +150,39 @@ class _CreatePageState extends State<CreatePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'New Feature',
-                              style: TextStyle(
+                            Text(
+                              resultTitleReaction,
+                              style: const TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 8.0),
                             Text(
-                              'Description of the new feature',
+                              resultDescriptionReaction,
                               style: TextStyle(
-                                  fontSize: 14.0, color: Colors.grey[700]),
+                                  fontSize: 14.0,
+                                  color: Colors.grey[700]
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Row(
+                              children: [
+                                Text(
+                                  'Action: ',
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                                Text(
+                                  resultActionReaction,
+                                  style: const TextStyle(
+                                    fontSize: 14.0,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -124,7 +195,7 @@ class _CreatePageState extends State<CreatePage> {
             const SizedBox(height: 10.0),
             TextButton(
               onPressed: () {
-                // Add navigation or action for the continue button here
+                //La tu ajoute les fonctionalités pour quand tu clique sur le bouton
               },
               child: const Text(
                 'Continue',
