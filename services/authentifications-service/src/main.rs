@@ -6,7 +6,7 @@ use actix_web::{web, middleware::Logger, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
+use utoipa_swagger_ui::{Config, SwaggerUi};
 
 use database;
 
@@ -41,7 +41,7 @@ fn get_server_config() -> (String, u16) {
 fn configure_cors() -> Cors {
     Cors::default()
         .allowed_origin("http://localhost:8000")
-        .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+        .allowed_methods(vec!["POST", "GET", "PUT", "PATCH", "DELETE"])
         .allowed_headers(vec![
             actix_web::http::header::CONTENT_TYPE,
             actix_web::http::header::AUTHORIZATION,
@@ -50,6 +50,15 @@ fn configure_cors() -> Cors {
         .supports_credentials()
 }
 
+#[derive(OpenApi)]
+#[openapi(
+    tags((name = "authentifications", description = "Authentifications")),
+    paths(
+        handler::list_authentifications,
+        handler::get_authentification_by_id,
+    ),
+)]
+struct ApiDoc;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -60,28 +69,19 @@ async fn main() -> std::io::Result<()> {
     let database_url = env::var("POSTGRES_URL").expect("POSTGRES_URL must be set");
     let db = web::Data::new(database::Database::new(&database_url));
 
-    #[derive(OpenApi)]
-    #[openapi(
-        tags((name = "authentifications", description = "Authentifications")),
-        paths(
-            handler::list_authentifications,
-            handler::get_authentification_by_id,
-        ),
-    )]
-    struct ApiDoc;
-
     HttpServer::new(move || {
         let cors = configure_cors();
+        let config = Config::new(vec!["/authentifications/api-docs/openapi.json"]);
+        let swagger = SwaggerUi::new("/authentifications/swagger-ui/{_:.*}")
+             .url("/authentifications/api-docs/openapi.json", ApiDoc::openapi())
+             .config(config);
 
         App::new()
             .app_data(db.clone())
             .configure(handler::config)
             .wrap(cors)
             .wrap(Logger::default())
-            .service(
-                SwaggerUi::new("/swagger-ui/{_:.*}")
-                    .url("/api-docs/openapi.json", ApiDoc::openapi()),
-            )
+            .service(swagger)
     })
     .bind((address.as_str(), port))?
     .run()

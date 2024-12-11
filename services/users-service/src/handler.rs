@@ -32,11 +32,6 @@ struct UserSignIn {
     password: String,
 }
 
-#[derive(ToSchema, Serialize, Deserialize, Clone)]
-struct UserId {
-    id: i32,
-}
-
 #[derive(Serialize, Deserialize, Clone, ToSchema)]
 pub enum ErrorResponse {
     NotFound(String),

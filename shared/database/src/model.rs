@@ -55,7 +55,7 @@ pub struct NewAuthentification<'a> {
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::actions)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Actions {
@@ -87,7 +87,7 @@ pub struct NewActions<'a> {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::api_services)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct ApiServices {
@@ -109,7 +109,7 @@ pub struct NewApiServices<'a> {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable,     Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::reactions)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Reactions {
@@ -142,7 +142,7 @@ pub struct NewReactions<'a> {
 }
 
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::user_tokens)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct UserTokens {
@@ -168,7 +168,7 @@ pub struct NewUserTokens<'a> {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Serialize, Deserialize, AsChangeset)]
+#[derive(Serialize, Deserialize, AsChangeset    )]
 #[diesel(table_name = crate::schema::user_tokens)]
 pub struct UpdateUserTokens<'a> {
     pub user_id: Option<i32>,
