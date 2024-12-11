@@ -17,7 +17,7 @@ COPY services/actions-service/Cargo.toml services/actions-service/Cargo.lock ser
 RUN cd services/actions-service && cargo fetch
 
 COPY services/actions-service/src/ services/actions-service/src/
-RUN cd services/actions-service && cargo build --release
+RUN cd services/actions-service && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm AS runtime
@@ -32,7 +32,7 @@ RUN useradd -m -g actions-service actions-service
 USER actions-service
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=actions-service:actions-service /usr/src/scac/services/actions-service/target/release/actions-service /usr/local/bin/actions-service
+COPY --from=builder --chown=actions-service:actions-service /usr/src/scac/services/actions-service/target/debug/actions-service /usr/local/bin/actions-service
 
 # Start the service
 CMD ["/usr/local/bin/actions-service"]

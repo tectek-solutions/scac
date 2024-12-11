@@ -17,7 +17,7 @@ COPY api-gateway/Cargo.toml api-gateway/Cargo.lock api-gateway/
 RUN cd api-gateway && cargo fetch
 
 COPY api-gateway/src/ api-gateway/src/
-RUN cd api-gateway && cargo build --release
+RUN cd api-gateway && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm-slim AS runtime
@@ -31,7 +31,7 @@ RUN useradd -m -g api-gateway api-gateway
 USER api-gateway
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=api-gateway:api-gateway /usr/src/scac/api-gateway/target/release/api-gateway /usr/local/bin/api-gateway
+COPY --from=builder --chown=api-gateway:api-gateway /usr/src/scac/api-gateway/target/debug/api-gateway /usr/local/bin/api-gateway
 
 # Start the service
 CMD ["/usr/local/bin/api-gateway"]

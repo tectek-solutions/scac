@@ -9,92 +9,103 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: scac
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - internal
 
-  actions-service:
-    build:
-      context: .
-      dockerfile: ./services/actions-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # actions-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/actions-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - RUST_LOG=info
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  api-services-service:
-    build:
-      context: .
-      dockerfile: ./services/api-services-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # api-services-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/api-services-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - RUST_LOG=info
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  authentification-service:
-    build:
-      context: .
-      dockerfile: ./services/authentification-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # authentifications-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/authentifications-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - RUST_LOG=info
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  reactions-service:
-    build:
-      context: .
-      dockerfile: ./services/reactions-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # reactions-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/reactions-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - RUST_LOG=info
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  trigger-service:
-    build:
-      context: .
-      dockerfile: ./services/trigger-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # trigger-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/trigger-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - RUST_LOG=info
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
-  user-tokens-service:
-    build:
-      context: .
-      dockerfile: ./services/user-tokens-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # user-tokens-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/user-tokens-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #     - RUST_LOG=info
+  #   environment:
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
   users-service:
     build:
@@ -103,28 +114,32 @@ services:
     expose:
       - "8000"
     environment:
+      - RUST_LOG=info
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
       - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
+    ports:
+      - "9000:8000"
     depends_on:
       - database
 
-  workflow-service:
-    build:
-      context: .
-      dockerfile: ./services/workflow-service/Dockerfile
-    expose:
-      - "8000"
-    environment:
-      - BINDING_ADDRESS=0.0.0.0
-      - BINDING_PORT=8000
-      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-    networks:
-      - internal
+  # workflow-service:
+  #   build:
+  #     context: .
+  #     dockerfile: ./services/workflow-service/Dockerfile
+  #   expose:
+  #     - "8000"
+  #   environment:
+  #     - RUST_LOG=info
+  #     - BINDING_ADDRESS=0.0.0.0
+  #     - BINDING_PORT=8000
+  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+  #   networks:
+  #     - internal
 
   api-gateway:
     build:
@@ -133,12 +148,13 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - RUST_LOG=info
       - ACTIONS_SERVICE_ADDRESS=actions-service
       - ACTIONS_SERVICE_PORT=8000
       - API_SERVICES_SERVICE_ADDRESS=api-services-service
       - API_SERVICES_SERVICE_PORT=8000
-      - AUTHENTIFICATION_SERVICE_ADDRESS=authentification-service
-      - AUTHENTIFICATION_SERVICE_PORT=8000
+      - AUTHENTIFICATIONS_SERVICE_ADDRESS=authentifications-service
+      - AUTHENTIFICATIONS_SERVICE_PORT=8000
       - REACTIONS_SERVICE_ADDRESS=reactions-service
       - REACTIONS_SERVICE_PORT=8000
       - TRIGGER_SERVICE_ADDRESS=trigger-service
@@ -154,25 +170,25 @@ services:
     networks:
       - internal
     depends_on:
-      - actions-service
-      - api-services-service
-      - authentification-service
-      - reactions-service
-      - trigger-service
-      - user-tokens-service
+      # - actions-service
+      # - api-services-service
+      # - authentifications-service
+      # - reactions-service
+      # - trigger-service
+      # - user-tokens-service
       - users-service
-      - workflow-service
+      # - workflow-service
 
-  client:
-    build:
-      context: .
-      dockerfile: ./client/Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - API_GATEWAY_ADDRESS=api-gateway
-      - API_GATEWAY_PORT=8000
-    networks:
-      - internal
-    depends_on:
-      - api-gateway
+  # client:
+  #   build:
+  #     context: .
+  #     dockerfile: ./client/Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - API_GATEWAY_ADDRESS=api-gateway
+  #     - API_GATEWAY_PORT=8000
+  #   networks:
+  #     - internal
+  #   depends_on:
+  #     - api-gateway
