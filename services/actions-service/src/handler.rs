@@ -31,26 +31,25 @@ impl ErrorResponse {
 // Handlers
 // ----------------------------
 
-
 #[utoipa::path(
     get,
-    path = "/authentification/{id}",
-    tag = "api-services",
+    path = "/api-services/{id}",
+    tag = "actions",
     responses(
-        (status = 200, description = "List of api-services retrieved"),
+        (status = 200, description = "List of actions retrieved"),
         (status = 403, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
-#[get("/authentification/{id}")]
-async fn list_api_services_by_authentification_id(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
-    match query::list_api_services_by_authentification_id_query(&db, id.into_inner()) {
-        Ok(Some(api_services)) => HttpResponse::Ok().json(api_services),
-        Ok(None) => ErrorResponse::NotFound("No api services found".to_string())
+#[get("/")]
+async fn list_actions_by_api_service_id(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
+    match query::list_actions_by_api_service_id_query(&db, id.into_inner()) {
+        Ok(Some(actions)) => HttpResponse::Ok().json(actions),
+        Ok(None) => ErrorResponse::NotFound("No actions found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
         Err(err) => {
-            eprintln!("Error getting api services: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to get api services".to_string())
+            eprintln!("Error getting actions: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get actions".to_string())
                 .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -59,25 +58,25 @@ async fn list_api_services_by_authentification_id(db: web::Data<database::Databa
 #[utoipa::path(
     get,
     path = "/{id}",
-    tag = "api-services",
+    tag = "actions",
     responses(
-        (status = 200, description = "Authentification details retrieved"),
-        (status = 404, description = "Authentification ID not found", body = ErrorResponse),
+        (status = 200, description = "Actions details retrieved"),
+        (status = 404, description = "Actions ID not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
 #[get("/{id}")]
-async fn get_api_service_by_id(
+async fn get_action_by_id(
     db: web::Data<database::Database>,
     id: web::Path<i32>,
 ) -> impl Responder {
-    match query::get_api_service_by_id_query(&db, id.into_inner()) {
-        Ok(Some(api_service)) => HttpResponse::Ok().json(api_service),
-        Ok(None) => ErrorResponse::NotFound("Api service not found".to_string())
+    match query::get_action_by_id_query(&db, id.into_inner()) {
+        Ok(Some(action)) => HttpResponse::Ok().json(action),
+        Ok(None) => ErrorResponse::NotFound("Authentification not found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
         Err(err) => {
-            eprintln!("Error getting api service: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to get api service".to_string())
+            eprintln!("Error getting action: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get action".to_string())
                 .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -89,8 +88,8 @@ async fn get_api_service_by_id(
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/api-services")
-            .service(list_api_services_by_authentification_id)
-            .service(get_api_service_by_id),
+        web::scope("/actions")
+            .service(list_actions_by_api_service_id)
+            .service(get_action_by_id),
     );
 }

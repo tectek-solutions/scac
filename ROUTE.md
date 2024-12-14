@@ -101,12 +101,6 @@
 
 ### **Base Path**: `/api-services`
 
-- **GET** `/`  
-  - **Access**: Public  
-  - **Responses**:  
-    - `200 OK`: List of API services retrieved.  
-    - `500 Internal Server Error`: Error fetching services.
-
 - **GET** `/:id`
   - **Access**: Public  
   - **Responses**:  
@@ -127,18 +121,18 @@
 
 ### **Base Path**: `/actions`
 
-- **GET** `/`  
-  - **Access**: Public  
-  - **Responses**:  
-    - `200 OK`: List of actions retrieved.  
-    - `500 Internal Server Error`: Error fetching actions.
-
 - **GET** `/:id`
   - **Access**: Public  
   - **Responses**:  
     - `200 OK`: Action retrieved.  
     - `404 Not Found`: Action ID not found.  
     - `500 Internal Server Error`: Error fetching action.
+
+- **GET** `/api-services/:id`
+  - **Access**: Public  
+  - **Responses**:  
+    - `200 OK`: List of actions retrieved.  
+    - `500 Internal Server Error`: Error fetching actions.
 
 ---
 
