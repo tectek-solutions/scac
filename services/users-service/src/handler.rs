@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use utoipa::ToSchema;
 use chrono::{Utc, Duration};
+use redis::Commands;
 
 use cache;
 use database;
@@ -64,14 +65,11 @@ fn is_valid_password(password: &str) -> bool {
 }
 
 fn signing_jwt(cache: &web::Data<cache::Cache>, user_id: i32) -> Result<String, String> {
-    let cache_connection = cache.get_connection();
+    let mut cache_connection = cache.get_connection();
 
-    let jwt_secret = match env::var("JWT_SECRET") {
-        Ok(secret) => secret,
-        Err(err) => return Err("JWT_SECRET not set".to_string()),
-    };
-    
-    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_ref()).expect("HMAC creation failed");
+    let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set".to_string())?;
+    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_ref())
+        .map_err(|_| "HMAC creation failed".to_string())?;
     
     let mut claims = BTreeMap::new();
     claims.insert("id".to_string(), user_id.to_string());
@@ -80,22 +78,32 @@ fn signing_jwt(cache: &web::Data<cache::Cache>, user_id: i32) -> Result<String, 
         (Utc::now() + Duration::days(1)).timestamp().to_string(),
     );
 
-    claims.sign_with_key(&key).map_err(|_| "Failed to sign claims".to_string())
+    let token = claims
+        .sign_with_key(&key)
+        .map_err(|_| "Failed to sign claims".to_string())?;
+
+    // Store the token in Redis
+    let _: () = cache_connection
+        .set_ex(format!("token:{}", user_id), &token, 86400)
+        .map_err(|_| "Failed to store token in Redis".to_string())?;
+
+    Ok(token)
 }
 
+
 fn verify_jwt(cache: &web::Data<cache::Cache>, token: &str) -> bool {
-    let cache_connection = cache.get_connection();
+    let mut cache_connection = cache.get_connection();
 
     let jwt_secret = match env::var("JWT_SECRET") {
         Ok(secret) => secret,
         Err(_) => return false,
     };
-    
+
     let key: Hmac<Sha256> = match Hmac::new_from_slice(jwt_secret.as_ref()) {
-        Ok(k    ) => k,
+        Ok(k) => k,
         Err(_) => return false,
     };
-    
+
     let claims: BTreeMap<String, String> = match token.verify_with_key(&key) {
         Ok(c) => c,
         Err(_) => return false,
@@ -103,31 +111,40 @@ fn verify_jwt(cache: &web::Data<cache::Cache>, token: &str) -> bool {
 
     if let Some(expiration) = claims.get("expiration") {
         if let Ok(expiration_ts) = expiration.parse::<i64>() {
-            return expiration_ts >= Utc::now().timestamp();
+            if expiration_ts < Utc::now().timestamp() {
+                return false; // Token has expired
+            }
+        } else {
+            return false; // Invalid expiration timestamp
         }
     }
 
-    false
+    // Check if token exists in Redis
+    let redis_key = format!("token:{}", claims.get("id").unwrap_or(&"".to_string()));
+    match cache_connection.exists(&redis_key) {
+        Ok(true) => true,
+        _ => false,
+    }
 }
 
 fn get_user_id_by_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Result<Option<i32>, String> {
-    let cache_connection = cache.get_connection();
+    let mut cache_connection = cache.get_connection();
 
-    let jwt_secret = match env::var("JWT_SECRET") {
-        Ok(secret) => secret,
-        Err(_) => return Err("JWT_SECRET not set".to_string()),
-    };
+    let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set".to_string())?;
+    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_ref())
+        .map_err(|_| "HMAC creation failed".to_string())?;
 
-    let key: Hmac<Sha256> = match Hmac::new_from_slice(jwt_secret.as_ref()) {
-        Ok(k) => k,
-        Err(_) => return Err("HMAC creation failed".to_string()),
-    };
+    let claims: BTreeMap<String, String> = token
+        .verify_with_key(&key)
+        .map_err(|_| "Failed to verify token".to_string())?;
 
-    let claims: BTreeMap<String, String> = match token.verify_with_key(&key) {
-        Ok(c) => c,
-        Err(_) => return Err("Failed to verify token".to_string()),
-    };
+    // Check if token exists in Redis
+    let redis_key = format!("token:{}", claims.get("id").unwrap_or(&"".to_string()));
+    if !cache_connection.exists(&redis_key).map_err(|_| "Redis check failed".to_string())? {
+        return Ok(None);
+    }
 
+    // Extract user ID
     match claims.get("id") {
         Some(id) => match id.parse::<i32>() {
             Ok(id) => Ok(Some(id)),
@@ -136,6 +153,7 @@ fn get_user_id_by_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Result<Op
         None => Ok(None),
     }
 }
+
 
 // ----------------------------
 // Handlers
