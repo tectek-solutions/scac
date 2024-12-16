@@ -3,8 +3,8 @@ use diesel::r2d2::{ConnectionManager, PooledConnection};
 use diesel::result::Error;
 use crate::schema::*;
 use serde::{Deserialize, Serialize};
-use chrono::NaiveDateTime;
-use chrono::Utc;
+use chrono::{NaiveDateTime, Utc};
+use utoipa::ToSchema;
 
 // USERS
 #[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
@@ -18,7 +18,7 @@ pub struct User {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = users)]
 pub struct CreateUser {
     pub name: String,
@@ -26,7 +26,7 @@ pub struct CreateUser {
     pub password_hash: String,
 }
 
-#[derive(AsChangeset, Deserialize)]
+#[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = users)]
 pub struct UpdateUser {
     pub name: Option<String>,
@@ -78,7 +78,7 @@ pub struct Authentication {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = authentications)]
 pub struct CreateAuthentication {
     pub name: String,
@@ -88,7 +88,7 @@ pub struct CreateAuthentication {
     pub client_secret: String,
 }
 
-#[derive(AsChangeset, Deserialize)]
+#[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = authentications)]
 pub struct UpdateAuthentication {
     pub name: Option<String>,
@@ -142,7 +142,7 @@ pub struct UserToken {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = user_tokens)]
 pub struct CreateUserToken {
     pub users_id: i32,
@@ -152,7 +152,7 @@ pub struct CreateUserToken {
     pub expires_at: NaiveDateTime,
 }
 
-#[derive(AsChangeset, Deserialize)]
+#[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = user_tokens)]
 pub struct UpdateUserToken {
     pub access_token: Option<String>,
@@ -203,7 +203,7 @@ pub struct Api {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = apis)]
 pub struct CreateApi {
     pub authentication_id: i32,
@@ -211,7 +211,7 @@ pub struct CreateApi {
     pub base_url: String,
 }
 
-#[derive(AsChangeset, Deserialize)]
+#[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = apis)]
 pub struct UpdateApi {
     pub authentication_id: Option<i32>,
@@ -267,7 +267,7 @@ pub struct Action {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = actions)]
 pub struct CreateAction {
     pub api_id: i32,
@@ -280,7 +280,7 @@ pub struct CreateAction {
     pub http_body: Option<serde_json::Value>,
 }
 
-#[derive(AsChangeset, Deserialize)]
+#[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = actions)]
 pub struct UpdateAction {
     pub api_id: Option<i32>,
@@ -342,7 +342,7 @@ pub struct Reaction {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = reactions)]
 pub struct CreateReaction {
     pub api_id: i32,
@@ -355,7 +355,7 @@ pub struct CreateReaction {
     pub http_body: Option<serde_json::Value>,
 }
 
-#[derive(AsChangeset, Deserialize)]
+#[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = reactions)]
 pub struct UpdateReaction {
     pub api_id: Option<i32>,
@@ -414,7 +414,7 @@ pub struct Workflow {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = workflows)]
 pub struct CreateWorkflow {
     pub user_id: i32,
@@ -425,7 +425,7 @@ pub struct CreateWorkflow {
     pub data_transformation: Option<serde_json::Value>,
 }
 
-#[derive(AsChangeset, Deserialize)]
+#[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = workflows)]
 pub struct UpdateWorkflow {
     pub user_id: Option<i32>,
@@ -470,14 +470,14 @@ pub struct Trigger {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = triggers)]
 pub struct CreateTrigger {
     pub workflow_id: i32,
     pub data: Option<serde_json::Value>,
 }
 
-#[derive(AsChangeset, Deserialize)]
+#[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = triggers)]
 pub struct UpdateTrigger {
     pub workflow_id: Option<i32>,
