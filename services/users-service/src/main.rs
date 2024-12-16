@@ -9,6 +9,7 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
 use database;
+use cache;
 
 fn setup_logging_and_env() {
     if env::var_os("RUST_LOG").is_none() {
@@ -69,7 +70,10 @@ async fn main() -> std::io::Result<()> {
     let (address, port) = get_server_config();
 
     let database_url = env::var("POSTGRES_URL").expect("POSTGRES_URL must be set");
-    let db = web::Data::new(database::Database::new(&database_url));
+    let database = web::Data::new(database::Database::new(&database_url));
+
+    let cache_url = env::var("REDIS_URL").expect("REDIS_URL must be set");
+    let cache = web::Data::new(cache::Cache::new(&cache_url));
 
     HttpServer::new(move || {
         let cors = configure_cors();
@@ -79,7 +83,8 @@ async fn main() -> std::io::Result<()> {
              .config(config);
 
         App::new()
-            .app_data(db.clone())
+            .app_data(database.clone())
+            .app_data(cache.clone())
             .configure(handler::config)
             .wrap(cors)
             .wrap(Logger::default())
