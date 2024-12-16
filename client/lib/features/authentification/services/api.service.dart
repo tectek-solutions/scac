@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class ApiService {
+class ApiAccountService {
   final String baseUrl;
 
-  ApiService({required this.baseUrl});
+  ApiAccountService({required this.baseUrl});
 
   Future<Map<String, dynamic>> signIn(String email, String password) async {
     final url = Uri.parse('$baseUrl/signin');

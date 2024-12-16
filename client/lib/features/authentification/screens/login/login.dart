@@ -6,6 +6,7 @@ import '../../../../common/style/spacing_styles.dart';
 import '../../../../utils/constants/helper_functions.dart';
 import '../../../../utils/constants/sizes.dart';
 import '../main-screen/main-screen.dart';
+import 'package:client/features/authentification/services/api.service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,7 +18,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreen extends State<LoginScreen> {
   var _isObscured = true;
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final ApiAccountService _apiService = ApiAccountService(baseUrl: 'https://yourapi.com');
 
   @override
   Widget build(BuildContext context) {
@@ -51,78 +55,74 @@ class _LoginScreen extends State<LoginScreen> {
                       ),
                     ],
                   ),
-
                   Form(
+                    key: _formKey,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: TSizes.sapceBtwSections),
+                      padding: const EdgeInsets.symmetric(vertical: TSizes.sapceBtwSections),
                       child: Column(
                         children: [
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              prefixIcon: Icon(Icons.email),
-                              labelText: "Email",
-                            ),
-                          ),
+                          _buildInputField(controller: _emailController, label: "Email", icon: Icons.email),
                           const SizedBox(height: TSizes.spaceBtwItemsInputFields),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _isObscured,
-                            decoration: InputDecoration(
-                              labelText: "Password",
-                              prefixIcon: const Icon(Icons.password),
-                              suffixIcon: IconButton(
-                                icon: _isObscured
-                                    ? const Icon(Icons.visibility_off)
-                                    : const Icon(Icons.visibility),
-                                onPressed: () {
-                                  setState(() {
-                                    _isObscured = !_isObscured;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: TSizes.spaceBtwItemsInputFields),
-                          const SizedBox(height: TSizes.sapceBtwSections),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton(
-                              onPressed: () {Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const MainScreen(),
-                                ),
-                              );},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                              ),
-                              child: const Text("Sign in"),
-                            ),
-                          ),
-
-                          const SizedBox(height: TSizes.spaceBtwItems),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const Registration(),
-                                  ),
-                                );
-                              },
-                              child: const Text("Create an account"),
-                            ),
-                          ),
-                          const SizedBox(height: TSizes.sapceBtwSections),
+                          _buildPasswordInputField(controller: _passwordController),
                         ],
                       ),
                     ),
                   ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: OutlinedButton(
+                      //HERE
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          final email = _emailController.text;
+                          final password = _passwordController.text;
 
+                          print("Email: $email" + "Password: $password");
+
+                          // try {
+                          //   final response = await _apiService.signIn(email, password);
+                          //   if (response["isSuccessful"]) {
+                          //     // Handle successful sign-in
+                          //     ScaffoldMessenger.of(context).showSnackBar(
+                          //       SnackBar(content: Text('Sign-in successful!')),
+                          //     );
+                          //     // Navigate to another screen if needed
+                          //   } else {
+                          //     // Handle sign-in error
+                          //     ScaffoldMessenger.of(context).showSnackBar(
+                          //       SnackBar(content: Text('Sign-in failed: ${response["errorMessage"]}')),
+                          //     );
+                          //   }
+                          // } catch (e) {
+                          //   // Handle any other errors
+                          //   ScaffoldMessenger.of(context).showSnackBar(
+                          //     SnackBar(content: Text('An error occurred: $e')),
+                          //   );
+                          // }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                      ),
+                      child: const Text("Sign in"),
+                    ),
+                  ),
+                  const SizedBox(height: TSizes.spaceBtwItems),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Registration(),
+                          ),
+                        );
+                      },
+                      child: const Text("Create an account"),
+                    ),
+                  ),
+                  const SizedBox(height: TSizes.spaceBtwItems),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -187,12 +187,54 @@ class _LoginScreen extends State<LoginScreen> {
                       ),
                     ],
                   ),
+
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInputField({required TextEditingController controller, required String label, required IconData icon}) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter $label';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordInputField({required TextEditingController controller}) {
+    return TextFormField(
+      controller: controller,
+      obscureText: _isObscured,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        prefixIcon: Icon(Icons.lock),
+        suffixIcon: IconButton(
+          icon: Icon(_isObscured ? Icons.visibility : Icons.visibility_off),
+          onPressed: () {
+            setState(() {
+              _isObscured = !_isObscured;
+            });
+          },
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter password';
+        }
+        return null;
+      },
     );
   }
 }
