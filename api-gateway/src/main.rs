@@ -37,7 +37,7 @@ impl Context {
             "trigger",
             "user-tokens",
             "users",
-            "workflow",
+            "workflows",
         ];
 
         let services = service_names

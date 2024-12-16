@@ -54,7 +54,7 @@ pub fn create_trigger(
 
     let new_trigger = NewTriggers {
         workflow_id: _workflow_id,
-        data: _data,
+        data: _data.clone(),
         status: _status,
         created_at: _created_at,
     };

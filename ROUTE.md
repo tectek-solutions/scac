@@ -179,21 +179,6 @@
     - `404 Not Found`: Workflow ID not found.  
     - `500 Internal Server Error`: Error fetching workflow.
 
-- **PUT** `/:id`  
-  - **Access**: Admin or Authenticated User  
-  - **Responses**:  
-    - `200 OK`: Workflow updated successfully.  
-    - `400 Bad Request`: Invalid input.  
-    - `404 Not Found`: Workflow ID not found.  
-    - `500 Internal Server Error`: Error during update.
-
-- **DELETE** `/:id`  
-  - **Access**: Authenticated User  
-  - **Responses**:  
-    - `204 No Content`: Workflow deleted.  
-    - `404 Not Found`: Workflow ID not found.  
-    - `500 Internal Server Error`: Error during deletion.
-
 ## **Trigger API**
 
 - **GET** `/users/:id`  
