@@ -27,4 +27,5 @@ jwt = "0.16.0"
 regex = "1.11.1"
 hmac = "0.12.1"
 sha2 = "0.10.8"
-
+cache = { path = "../../shared/cache" }
+redis = "0.20.2"

@@ -4,12 +4,12 @@ use database::model::{NewUser, User};
 use diesel::prelude::*;
 
 pub fn get_users(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
 ) -> Result<Option<Vec<User>>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let mut connection = db.get_connection();
-    let result = users.load::<User>(&mut connection);
+    let mut database_connection = database.get_connection();
+    let result = users.load::<User>(&mut database_connection);
 
     match result {
         Ok(result) => Ok(Some(result)),
@@ -21,17 +21,17 @@ pub fn get_users(
 }
 
 pub fn get_user_by_id(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
     user_id: i32,
 ) -> Result<Option<User>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let mut connection = db.get_connection();
+    let mut database_connection = database.get_connection();
 
     match users
         .find(user_id)
         .select(User::as_select())
-        .first::<User>(&mut connection)
+        .first::<User>(&mut database_connection)
         .optional()
     {
         Ok(Some(user)) => Ok(Some(user)),
@@ -44,16 +44,16 @@ pub fn get_user_by_id(
 }
 
 pub fn get_user_by_email(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
     user_email: &String,
 ) -> Result<Option<User>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let mut connection = db.get_connection();
+    let mut database_connection = database.get_connection();
     match users
         .filter(email.eq(user_email.clone()))
         .select(User::as_select())
-        .first::<User>(&mut connection)
+        .first::<User>(&mut database_connection)
         .optional()
     {
         Ok(Some(user)) => Ok(Some(user)),
@@ -66,14 +66,14 @@ pub fn get_user_by_email(
 }
 
 pub fn add_user(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
     name: String,
     email: String,
     password_hash: String,
 ) -> Result<Option<User>, diesel::result::Error> {
     use database::schema::users;
 
-    let mut connection = db.get_connection();
+    let mut database_connection = database.get_connection();
 
     let new_user = NewUser {
         username: &name,
@@ -84,7 +84,7 @@ pub fn add_user(
     match diesel::insert_into(users::table)
         .values(&new_user)
         .returning(User::as_returning())
-        .get_result::<User>(&mut connection)
+        .get_result::<User>(&mut database_connection)
     {
         Ok(user) => Ok(Some(user)),
         Err(err) => {
@@ -95,7 +95,7 @@ pub fn add_user(
 }
 
 pub fn update_user(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
     user_id: i32,
     new_name: String,
     new_email: String,
@@ -103,7 +103,7 @@ pub fn update_user(
 ) -> Result<Option<User>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let mut connection = db.get_connection();
+    let mut database_connection = database.get_connection();
     match diesel::update(users.find(user_id))
         .set((
             username.eq(new_name.clone()),
@@ -111,7 +111,7 @@ pub fn update_user(
             password_hash.eq(new_password_hash.clone()),
         ))
         .returning(User::as_returning())
-        .get_result::<User>(&mut connection)
+        .get_result::<User>(&mut database_connection)
     {
         Ok(user) => Ok(Some(user)),
         Err(err) => {
@@ -122,13 +122,13 @@ pub fn update_user(
 }
 
 pub fn delete_user(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
     user_id: i32,
 ) -> Result<Option<User>, diesel::result::Error> {
     use database::schema::users::dsl::*;
 
-    let mut connection = db.get_connection();
-    match diesel::delete(users.find(user_id)).get_result::<User>(&mut connection) {
+    let mut database_connection = database.get_connection();
+    match diesel::delete(users.find(user_id)).get_result::<User>(&mut database_connection) {
         Ok(user) => Ok(Some(user)),
         Err(err) => {
             eprintln!("Error deleting user with ID {:?}: {:?}", user_id, err);
