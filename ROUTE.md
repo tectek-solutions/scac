@@ -97,9 +97,9 @@
 
 ---
 
-## **API Services API**
+## **APIs API**
 
-### **Base Path**: `/api-services`
+### **Base Path**: `/apis`
 
 - **GET** `/:id`
   - **Access**: Public  
@@ -128,7 +128,7 @@
     - `404 Not Found`: Action ID not found.  
     - `500 Internal Server Error`: Error fetching action.
 
-- **GET** `/api-services/:id`
+- **GET** `/apis/:id`
   - **Access**: Public  
   - **Responses**:  
     - `200 OK`: List of actions retrieved.  

@@ -52,7 +52,7 @@ fn configure_cors() -> Cors {
 
 #[derive(OpenApi)]
 #[openapi(
-    tags((name = "api-services", description = "API Services")),
+    tags((name = "apis", description = "APIs")),
     paths(
         handler::list_api_services_by_authentication_id,
         handler::get_api_service_by_id,
@@ -71,9 +71,9 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = configure_cors();
-        let config = Config::new(vec!["/api-services/api-docs/openapi.json"]);
-        let swagger = SwaggerUi::new("/api-services/swagger-ui/{_:.*}")
-             .url("/api-services/api-docs/openapi.json", ApiDoc::openapi())
+        let config = Config::new(vec!["/apis/api-docs/openapi.json"]);
+        let swagger = SwaggerUi::new("/apis/swagger-ui/{_:.*}")
+             .url("/apis/api-docs/openapi.json", ApiDoc::openapi())
              .config(config);
 
         App::new()

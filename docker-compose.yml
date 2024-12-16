@@ -42,10 +42,10 @@ services:
   #   networks:
   #     - internal
 
-  # api-services-service:
+  # apis-service:
   #   build:
   #     context: .
-  #     dockerfile: ./services/api-services-service/Dockerfile
+  #     dockerfile: ./services/apis-service/Dockerfile
   #   expose:
   #     - "8000"
   #   environment:
@@ -164,8 +164,8 @@ services:
       - RUST_LOG=info
       - ACTIONS_SERVICE_ADDRESS=actions-service
       - ACTIONS_SERVICE_PORT=8000
-      - API_SERVICES_SERVICE_ADDRESS=api-services-service
-      - API_SERVICES_SERVICE_PORT=8000
+      - APIS_SERVICE_ADDRESS=apis-service
+      - APIS_SERVICE_PORT=8000
       - AUTHENTICATIONS_SERVICE_ADDRESS=authentications-service
       - AUTHENTICATIONS_SERVICE_PORT=8000
       - REACTIONS_SERVICE_ADDRESS=reactions-service
@@ -184,7 +184,7 @@ services:
       - internal
     depends_on:
       # - actions-service
-      # - api-services-service
+      # - apis-service
       # - authentications-service
       # - reactions-service
       # - trigger-service

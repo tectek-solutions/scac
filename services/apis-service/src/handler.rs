@@ -35,9 +35,9 @@ impl ErrorResponse {
 #[utoipa::path(
     get,
     path = "/authentications/{id}",
-    tag = "api-services",
+    tag = "apis",
     responses(
-        (status = 200, description = "List of api-services retrieved"),
+        (status = 200, description = "List of apis retrieved"),
         (status = 403, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
@@ -59,7 +59,7 @@ async fn list_api_services_by_authentication_id(db: web::Data<database::Database
 #[utoipa::path(
     get,
     path = "/{id}",
-    tag = "api-services",
+    tag = "apis",
     responses(
         (status = 200, description = "Authentication details retrieved"),
         (status = 404, description = "Authentication ID not found", body = ErrorResponse),
@@ -89,7 +89,7 @@ async fn get_api_service_by_id(
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/api-services")
+        web::scope("/apis")
             .service(list_api_services_by_authentication_id)
             .service(get_api_service_by_id),
     );

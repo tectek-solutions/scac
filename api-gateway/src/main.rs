@@ -31,7 +31,7 @@ impl Context {
         info!("Initializing context...");
         let service_names = [
             "actions",
-            "api-services",
+            "apis",
             "authentications",
             "reactions",
             "trigger",

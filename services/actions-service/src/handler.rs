@@ -33,7 +33,7 @@ impl ErrorResponse {
 
 #[utoipa::path(
     get,
-    path = "/api-services/{id}",
+    path = "/apis/{id}",
     tag = "actions",
     responses(
         (status = 200, description = "List of actions retrieved"),
