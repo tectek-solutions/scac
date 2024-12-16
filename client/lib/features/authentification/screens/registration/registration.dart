@@ -17,12 +17,13 @@ class Registration extends StatefulWidget {
 
 class _RegistrationState extends State<Registration> {
   var _isObscured = true;
+  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _firstnameController = TextEditingController();
+  final _password_confirmationController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final ApiAccountService _apiService = ApiAccountService(baseUrl: 'https://yourapi.com');
+  final ApiAccountService _apiService = ApiAccountService(baseUrl: baseUrlString);
 
   @override
   Widget build(BuildContext context) {
@@ -62,11 +63,11 @@ class _RegistrationState extends State<Registration> {
                         children: [
                           _buildInputField(controller: _nameController, label: "Name", icon: Icons.person),
                           const SizedBox(height: TSizes.spaceBtwItemsInputFields),
-                          _buildInputField(controller: _firstnameController, label: "First Name", icon: Icons.person),
-                          const SizedBox(height: TSizes.spaceBtwItemsInputFields),
                           _buildInputField(controller: _emailController, label: "Email", icon: Icons.email),
                           const SizedBox(height: TSizes.spaceBtwItemsInputFields),
-                          _buildPasswordInputField(controller: _passwordController),
+                          _buildPasswordInputField(controller: _passwordController, label: "Password"),
+                          const SizedBox(height: TSizes.spaceBtwItemsInputFields),
+                          _buildPasswordInputField(controller: _password_confirmationController, label: "Password confirmation"),
                         ],
                       ),
                     ),
@@ -79,32 +80,30 @@ class _RegistrationState extends State<Registration> {
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           final name = _nameController.text;
-                          final firstName = _firstnameController.text;
                           final email = _emailController.text;
                           final password = _passwordController.text;
+                          final password_confirmation = _password_confirmationController.text;
 
-                          print("Name: " + name + "FirstName: " + firstName + "Email: " + email + "Password" + password);
-
-                          // try {
-                          //   final response = await _apiService.signUp(name, firstName, email, password);
-                          //   if (response["isSuccessful"]) {
-                          //     // Handle successful sign-up
-                          //     ScaffoldMessenger.of(context).showSnackBar(
-                          //       SnackBar(content: Text('Sign-up successful!')),
-                          //     );
-                          //     // Navigate to another screen if needed
-                          //   } else {
-                          //     // Handle sign-up error
-                          //     ScaffoldMessenger.of(context).showSnackBar(
-                          //       SnackBar(content: Text('Sign-up failed: ${response["errorMessage"]}')),
-                          //     );
-                          //   }
-                          // } catch (e) {
-                          //   // Handle any other errors
-                          //   ScaffoldMessenger.of(context).showSnackBar(
-                          //     SnackBar(content: Text('An error occurred: $e')),
-                          //   );
-                          // }
+                          try {
+                            final response = await _apiService.signUp(name, email, password, password_confirmation);
+                            if (response["isSuccessful"]) {
+                              // Handle successful sign-up
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Sign-up successful!')),
+                              );
+                              // Navigate to another screen if needed
+                            } else {
+                              // Handle sign-up error
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Sign-up failed: ${response["errorMessage"]}')),
+                              );
+                            }
+                          } catch (e) {
+                            // Handle any other errors
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('An error occurred: $e')),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -180,12 +179,12 @@ class _RegistrationState extends State<Registration> {
     );
   }
 
-  Widget _buildPasswordInputField({required TextEditingController controller}) {
+  Widget _buildPasswordInputField({required TextEditingController controller, required String label}) {
     return TextFormField(
       controller: controller,
       obscureText: _isObscured,
       decoration: InputDecoration(
-        labelText: 'Password',
+        labelText: label,
         prefixIcon: Icon(Icons.lock),
         suffixIcon: IconButton(
           icon: Icon(_isObscured ? Icons.visibility : Icons.visibility_off),

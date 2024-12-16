@@ -19,9 +19,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreen extends State<LoginScreen> {
   var _isObscured = true;
   final _formKey = GlobalKey<FormState>();
+  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final ApiAccountService _apiService = ApiAccountService(baseUrl: 'https://yourapi.com');
+  final ApiAccountService _apiService = ApiAccountService(baseUrl: baseUrlString);
 
   @override
   Widget build(BuildContext context) {
@@ -79,26 +80,26 @@ class _LoginScreen extends State<LoginScreen> {
 
                           print("Email: $email" + "Password: $password");
 
-                          // try {
-                          //   final response = await _apiService.signIn(email, password);
-                          //   if (response["isSuccessful"]) {
-                          //     // Handle successful sign-in
-                          //     ScaffoldMessenger.of(context).showSnackBar(
-                          //       SnackBar(content: Text('Sign-in successful!')),
-                          //     );
-                          //     // Navigate to another screen if needed
-                          //   } else {
-                          //     // Handle sign-in error
-                          //     ScaffoldMessenger.of(context).showSnackBar(
-                          //       SnackBar(content: Text('Sign-in failed: ${response["errorMessage"]}')),
-                          //     );
-                          //   }
-                          // } catch (e) {
-                          //   // Handle any other errors
-                          //   ScaffoldMessenger.of(context).showSnackBar(
-                          //     SnackBar(content: Text('An error occurred: $e')),
-                          //   );
-                          // }
+                          try {
+                            final response = await _apiService.signIn(email, password);
+                            if (response["isSuccessful"]) {
+                              // Handle successful sign-in
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Sign-in successful!')),
+                              );
+                              // Navigate to another screen if needed
+                            } else {
+                              // Handle sign-in error
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Sign-in failed: ${response["errorMessage"]}')),
+                              );
+                            }
+                          } catch (e) {
+                            // Handle any other errors
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('An error occurred: $e')),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -122,71 +123,71 @@ class _LoginScreen extends State<LoginScreen> {
                       child: const Text("Create an account"),
                     ),
                   ),
-                  const SizedBox(height: TSizes.spaceBtwItems),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Divider(
-                        color: dark
-                            ? Colors.grey.shade700
-                            : Colors.grey.shade300,
-                        thickness: 1.5,
-                        indent: 60,
-                        endIndent: 5,
-                      )),
-                      const Text(
-                        "Or Sign In With",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      Flexible(
-                          child: Divider(
-                        color: dark
-                            ? Colors.grey.shade700
-                            : Colors.grey.shade300,
-                        thickness: 1.5,
-                        indent: 5,
-                        endIndent: 60,
-                      )),
-                    ],
-                  ),
+                  // const SizedBox(height: TSizes.spaceBtwItems),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Flexible(
+                  //       child: Divider(
+                  //       color: dark
+                  //           ? Colors.grey.shade700
+                  //           : Colors.grey.shade300,
+                  //       thickness: 1.5,
+                  //       indent: 60,
+                  //       endIndent: 5,
+                  //     )),
+                  //     const Text(
+                  //       "Or Sign In With",
+                  //       style: TextStyle(color: Colors.grey),
+                  //     ),
+                  //     Flexible(
+                  //         child: Divider(
+                  //       color: dark
+                  //           ? Colors.grey.shade700
+                  //           : Colors.grey.shade300,
+                  //       thickness: 1.5,
+                  //       indent: 5,
+                  //       endIndent: 60,
+                  //     )),
+                  //   ],
+                  // ),
 
-                  const SizedBox(height: TSizes.sapceBtwSections),
+                  // const SizedBox(height: TSizes.sapceBtwSections),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Image(
-                            width: TSizes.iconMd,
-                            height: TSizes.iconMd,
-                            image: AssetImage(TImages.google),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: TSizes.spaceBtwItems),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Image(
-                            width: TSizes.iconMd,
-                            height: TSizes.iconMd,
-                            image: AssetImage(TImages.facebook),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     Container(
+                  //       decoration: BoxDecoration(
+                  //         border: Border.all(color: Colors.grey),
+                  //         borderRadius: BorderRadius.circular(100),
+                  //       ),
+                  //       child: IconButton(
+                  //         onPressed: () {},
+                  //         icon: const Image(
+                  //           width: TSizes.iconMd,
+                  //           height: TSizes.iconMd,
+                  //           image: AssetImage(TImages.google),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     const SizedBox(width: TSizes.spaceBtwItems),
+                  //     Container(
+                  //       decoration: BoxDecoration(
+                  //         border: Border.all(color: Colors.grey),
+                  //         borderRadius: BorderRadius.circular(100),
+                  //       ),
+                  //       child: IconButton(
+                  //         onPressed: () {},
+                  //         icon: const Image(
+                  //           width: TSizes.iconMd,
+                  //           height: TSizes.iconMd,
+                  //           image: AssetImage(TImages.facebook),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
 
                 ],
               ),
