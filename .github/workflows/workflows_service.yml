@@ -1,4 +1,4 @@
-name: Docker - Workflow Service
+name: Docker - Workflows Service
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
   call-template:
     uses: ./.github/workflows/docker-image-template.yml
     with:
-      dockerfile: ./services/workflow-service/Dockerfile
-      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:workflow-service-latest
+      dockerfile: ./services/workflows-service/Dockerfile
+      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:workflows-service-latest
       context: .
       push_on_main: true

@@ -126,10 +126,10 @@ services:
     depends_on:
       - database
 
-  # workflow-service:
+  # workflows-service:
   #   build:
   #     context: .
-  #     dockerfile: ./services/workflow-service/Dockerfile
+  #     dockerfile: ./services/workflows-service/Dockerfile
   #   expose:
   #     - "8000"
   #   environment:
@@ -163,8 +163,8 @@ services:
       - USER_TOKENS_SERVICE_PORT=8000
       - USERS_SERVICE_ADDRESS=users-service
       - USERS_SERVICE_PORT=8000
-      - WORKFLOW_SERVICE_ADDRESS=workflow-service
-      - WORKFLOW_SERVICE_PORT=8000
+      - WORKFLOWS_SERVICE_ADDRESS=workflows-service
+      - WORKFLOWS_SERVICE_PORT=8000
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
     networks:
@@ -177,7 +177,7 @@ services:
       # - trigger-service
       - user-tokens-service
       - users-service
-      # - workflow-service
+      # - workflows-service
 
   # client:
   #   build:

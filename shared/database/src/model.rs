@@ -1,14 +1,7 @@
 use diesel::prelude::*;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
-
-#[derive(Queryable)]
-pub struct YourModel {
-    pub headers: Option<Value>,
-    pub params: Option<Value>,
-}
-
+use serde_json;
 
 #[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::users)]
@@ -22,7 +15,7 @@ pub struct User {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::users)]
 pub struct NewUser<'a> {
     pub username: &'a str,
@@ -44,7 +37,7 @@ pub struct Authentification {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::authentification)]
 pub struct NewAuthentification<'a> {
     pub name: &'a str,
@@ -72,7 +65,7 @@ pub struct Actions {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::actions)]
 pub struct NewActions<'a> {
     pub api_service_id: i32,
@@ -80,8 +73,8 @@ pub struct NewActions<'a> {
     pub description: Option<&'a str>,
     pub endpoint: &'a str,
     pub method: String,
-    pub headers: Option<&'a serde_json::Value>,
-    pub params: Option<&'a serde_json::Value>,
+    pub headers: Option<serde_json::Value>,
+    pub params: Option<serde_json::Value>,
     pub json_path: Option<&'a str>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
@@ -99,7 +92,7 @@ pub struct ApiServices {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::api_services)]
 pub struct NewApiServices<'a> {
     pub auth_service_id: i32,
@@ -109,7 +102,7 @@ pub struct NewApiServices<'a> {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Queryable, Selectable,     Serialize, Deserialize)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::reactions)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Reactions {
@@ -126,7 +119,7 @@ pub struct Reactions {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::reactions)]
 pub struct NewReactions<'a> {
     pub api_service_id: i32,
@@ -134,8 +127,8 @@ pub struct NewReactions<'a> {
     pub description: Option<&'a str>,
     pub endpoint: &'a str,
     pub method: String,
-    pub headers: Option<&'a serde_json::Value>,
-    pub params: Option<&'a serde_json::Value>,
+    pub headers: Option<serde_json::Value>,
+    pub params: Option<serde_json::Value>,
     pub json_path: Option<&'a str>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
@@ -156,7 +149,7 @@ pub struct UserTokens {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::user_tokens)]
 pub struct NewUserTokens<'a> {
     pub user_id: i32,
@@ -168,7 +161,7 @@ pub struct NewUserTokens<'a> {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Serialize, Deserialize, AsChangeset    )]
+#[derive(Serialize, Deserialize, AsChangeset)]
 #[diesel(table_name = crate::schema::user_tokens)]
 pub struct UpdateUserTokens<'a> {
     pub user_id: Option<i32>,
@@ -180,7 +173,7 @@ pub struct UpdateUserTokens<'a> {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::workflows)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Workflows {
@@ -195,7 +188,7 @@ pub struct Workflows {
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::workflows)]
 pub struct NewWorkflows<'a> {
     pub user_id: i32,
@@ -203,12 +196,12 @@ pub struct NewWorkflows<'a> {
     pub description: Option<&'a str>,
     pub action_id: i32,
     pub reaction_id: i32,
-    pub data_transformation: Option<&'a serde_json::Value>,
+    pub data_transformation: Option<serde_json::Value>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
 
-#[derive(Queryable, Selectable)]
+#[derive(Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::triggers)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Triggers {
@@ -219,11 +212,11 @@ pub struct Triggers {
     pub created_at: Option<NaiveDateTime>,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Serialize, Deserialize)]
 #[diesel(table_name = crate::schema::triggers)]
-pub struct NewTriggers<'a> {
+pub struct NewTriggers {
     pub workflow_id: i32,
-    pub data: &'a serde_json::Value,
+    pub data: serde_json::Value,
     pub status: bool,
     pub created_at: Option<NaiveDateTime>,
 }

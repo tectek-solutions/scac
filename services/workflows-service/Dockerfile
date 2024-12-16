@@ -13,11 +13,11 @@ WORKDIR /usr/src/scac
 
 # Copy dependencies and build in two steps to leverage caching
 COPY shared/ shared/
-COPY services/workflow-service/Cargo.toml services/workflow-service/Cargo.lock services/workflow-service/
-RUN cd services/workflow-service && cargo fetch
+COPY services/workflows-service/Cargo.toml services/workflows-service/Cargo.lock services/workflows-service/
+RUN cd services/workflows-service && cargo fetch
 
-COPY services/workflow-service/src/ services/workflow-service/src/
-RUN cd services/workflow-service && cargo build
+COPY services/workflows-service/src/ services/workflows-service/src/
+RUN cd services/workflows-service && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm AS runtime
@@ -27,12 +27,12 @@ RUN apt-get update
 RUN apt-get install -y libpq5
 
 # Add non-root user and group
-RUN groupadd workflow-service
-RUN useradd -m -g workflow-service workflow-service
-USER workflow-service
+RUN groupadd workflows-service
+RUN useradd -m -g workflows-service workflows-service
+USER workflows-service
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=workflow-service:workflow-service /usr/src/scac/services/workflow-service/target/debug/workflow-service /usr/local/bin/workflow-service
+COPY --from=builder --chown=workflows-service:workflows-service /usr/src/scac/services/workflows-service/target/debug/workflows-service /usr/local/bin/workflows-service
 
 # Start the service
-CMD ["/usr/local/bin/workflow-service"]
+CMD ["/usr/local/bin/workflows-service"]
