@@ -33,7 +33,7 @@ impl ErrorResponse {
 
 #[utoipa::path(
     get,
-    path = "/api-services/{id}",
+    path = "/apis/{id}",
     tag = "actions",
     responses(
         (status = 200, description = "List of actions retrieved"),
@@ -72,7 +72,7 @@ async fn get_action_by_id(
 ) -> impl Responder {
     match query::get_action_by_id_query(&db, id.into_inner()) {
         Ok(Some(action)) => HttpResponse::Ok().json(action),
-        Ok(None) => ErrorResponse::NotFound("Authentification not found".to_string())
+        Ok(None) => ErrorResponse::NotFound("Authentication not found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
         Err(err) => {
             eprintln!("Error getting action: {:?}", err);
