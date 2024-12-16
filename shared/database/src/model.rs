@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use diesel::pg::PgConnection;
+use diesel::r2d2::{ConnectionManager, PooledConnection};
 use diesel::result::Error;
 use crate::schema::*;
 use serde::{Deserialize, Serialize};
@@ -7,7 +7,7 @@ use chrono::NaiveDateTime;
 use chrono::Utc;
 
 // USERS
-#[derive(Queryable, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: i32,
@@ -35,7 +35,7 @@ pub struct UpdateUser {
 }
 
 impl User {
-    pub fn create(database_connection: &mut PgConnection, new_user: CreateUser) -> Result<User, Error> {
+    pub fn create(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, new_user: CreateUser) -> Result<User, Error> {
         let now = Utc::now().naive_utc();
         diesel::insert_into(users::table)
             .values((
@@ -45,11 +45,11 @@ impl User {
             .get_result(database_connection)
     }
 
-    pub fn read(database_connection: &mut PgConnection, user_id: i32) -> Result<User, Error> {
+    pub fn read(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, user_id: i32) -> Result<User, Error> {
         users::table.find(user_id).get_result(database_connection)
     }
 
-    pub fn update(database_connection: &mut PgConnection, user_id: i32, changes: UpdateUser) -> Result<User, Error> {
+    pub fn update(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, user_id: i32, changes: UpdateUser) -> Result<User, Error> {
         let now = Utc::now().naive_utc();
         diesel::update(users::table.find(user_id))
             .set((
@@ -59,13 +59,13 @@ impl User {
             .get_result(database_connection)
     }
 
-    pub fn delete(database_connection: &mut PgConnection, user_id: i32) -> Result<usize, Error> {
+    pub fn delete(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, user_id: i32) -> Result<usize, Error> {
         diesel::delete(users::table.find(user_id)).execute(database_connection)
     }
 }
 
 // AUTHENTICATIONS
-#[derive(Queryable, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = authentications)]
 pub struct Authentication {
     pub id: i32,
@@ -99,7 +99,7 @@ pub struct UpdateAuthentication {
 }
 
 impl Authentication {
-    pub fn create(database_connection: &mut PgConnection, new_auth: CreateAuthentication) -> Result<Authentication, Error> {
+    pub fn create(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, new_auth: CreateAuthentication) -> Result<Authentication, Error> {
         let now = Utc::now().naive_utc();
         diesel::insert_into(authentications::table)
             .values((
@@ -109,11 +109,11 @@ impl Authentication {
             .get_result(database_connection)
     }
 
-    pub fn read(database_connection: &mut PgConnection, auth_id: i32) -> Result<Authentication, Error> {
+    pub fn read(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, auth_id: i32) -> Result<Authentication, Error> {
         authentications::table.find(auth_id).get_result(database_connection)
     }
 
-    pub fn update(database_connection: &mut PgConnection, auth_id: i32, changes: UpdateAuthentication) -> Result<Authentication, Error> {
+    pub fn update(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, auth_id: i32, changes: UpdateAuthentication) -> Result<Authentication, Error> {
         let now = Utc::now().naive_utc();
         diesel::update(authentications::table.find(auth_id))
             .set((
@@ -123,13 +123,13 @@ impl Authentication {
             .get_result(database_connection)
     }
 
-    pub fn delete(database_connection: &mut PgConnection, auth_id: i32) -> Result<usize, Error> {
+    pub fn delete(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, auth_id: i32) -> Result<usize, Error> {
         diesel::delete(authentications::table.find(auth_id)).execute(database_connection)
     }
 }
 
 // USER TOKENS
-#[derive(Queryable, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = user_tokens)]
 pub struct UserToken {
     pub id: i32,
@@ -161,7 +161,7 @@ pub struct UpdateUserToken {
 }
 
 impl UserToken {
-    pub fn create(database_connection: &mut PgConnection, new_token: CreateUserToken) -> Result<UserToken, Error> {
+    pub fn create(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, new_token: CreateUserToken) -> Result<UserToken, Error> {
         let now = Utc::now().naive_utc();
         diesel::insert_into(user_tokens::table)
             .values((
@@ -171,11 +171,11 @@ impl UserToken {
             .get_result(database_connection)
     }
 
-    pub fn read(database_connection: &mut PgConnection, token_id: i32) -> Result<UserToken, Error> {
+    pub fn read(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, token_id: i32) -> Result<UserToken, Error> {
         user_tokens::table.find(token_id).get_result(database_connection)
     }
 
-    pub fn update(database_connection: &mut PgConnection, token_id: i32, changes: UpdateUserToken) -> Result<UserToken, Error> {
+    pub fn update(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, token_id: i32, changes: UpdateUserToken) -> Result<UserToken, Error> {
         let now = Utc::now().naive_utc();
         diesel::update(user_tokens::table.find(token_id))
             .set((
@@ -185,14 +185,14 @@ impl UserToken {
             .get_result(database_connection)
     }
 
-    pub fn delete(database_connection: &mut PgConnection, token_id: i32) -> Result<usize, Error> {
+    pub fn delete(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, token_id: i32) -> Result<usize, Error> {
         diesel::delete(user_tokens::table.find(token_id)).execute(database_connection)
     }
 }
 
 // APIS
 
-#[derive(Queryable, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = apis)]
 pub struct Api {
     pub id: i32,
@@ -220,7 +220,7 @@ pub struct UpdateApi {
 }
 
 impl Api {
-    pub fn create(database_connection: &mut PgConnection, new_api: CreateApi) -> Result<Api, Error> {
+    pub fn create(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, new_api: CreateApi) -> Result<Api, Error> {
         let now = Utc::now().naive_utc();
         diesel::insert_into(apis::table)
             .values((
@@ -230,11 +230,11 @@ impl Api {
             .get_result(database_connection)
     }
 
-    pub fn read(database_connection: &mut PgConnection, api_id: i32) -> Result<Api, Error> {
+    pub fn read(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, api_id: i32) -> Result<Api, Error> {
         apis::table.find(api_id).get_result(database_connection)
     }
 
-    pub fn update(database_connection: &mut PgConnection, api_id: i32, changes: UpdateApi) -> Result<Api, Error> {
+    pub fn update(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, api_id: i32, changes: UpdateApi) -> Result<Api, Error> {
         let now = Utc::now().naive_utc();
         diesel::update(apis::table.find(api_id))
             .set((
@@ -244,14 +244,14 @@ impl Api {
             .get_result(database_connection)
     }
 
-    pub fn delete(database_connection: &mut PgConnection, api_id: i32) -> Result<usize, Error> {
+    pub fn delete(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, api_id: i32) -> Result<usize, Error> {
         diesel::delete(apis::table.find(api_id)).execute(database_connection)
     }
 }
 
 // ACTIONS
 
-#[derive(Queryable, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = actions)]
 pub struct Action {
     pub id: i32,
@@ -294,7 +294,7 @@ pub struct UpdateAction {
 }
 
 impl Action {
-    pub fn create(database_connection: &mut PgConnection, new_action: CreateAction) -> Result<Action, Error> {
+    pub fn create(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, new_action: CreateAction) -> Result<Action, Error> {
         let now = Utc::now().naive_utc();
         diesel::insert_into(actions::table)
             .values((
@@ -304,11 +304,11 @@ impl Action {
             .get_result(database_connection)
     }
 
-    pub fn read(database_connection: &mut PgConnection, action_id: i32) -> Result<Action, Error> {
+    pub fn read(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, action_id: i32) -> Result<Action, Error> {
         actions::table.find(action_id).get_result(database_connection)
     }
 
-    pub fn update(database_connection: &mut PgConnection, action_id: i32, changes: UpdateAction) -> Result<Action, Error> {
+    pub fn update(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, action_id: i32, changes: UpdateAction) -> Result<Action, Error> {
         let now = Utc::now().naive_utc();
         diesel::update(actions::table.find(action_id))
             .set((
@@ -318,14 +318,14 @@ impl Action {
             .get_result(database_connection)
     }
 
-    pub fn delete(database_connection: &mut PgConnection, action_id: i32) -> Result<usize, Error> {
+    pub fn delete(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, action_id: i32) -> Result<usize, Error> {
         diesel::delete(actions::table.find(action_id)).execute(database_connection)
     }
 }
 
 // REACTIONS
 
-#[derive(Queryable, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = reactions)]
 
 pub struct Reaction {
@@ -369,7 +369,7 @@ pub struct UpdateReaction {
 }
 
 impl Reaction {
-    pub fn create(database_connection: &mut PgConnection, new_reaction: CreateReaction) -> Result<Reaction, Error> {
+    pub fn create(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, new_reaction: CreateReaction) -> Result<Reaction, Error> {
         let now = Utc::now().naive_utc();
         diesel::insert_into(reactions::table)
             .values((
@@ -379,11 +379,11 @@ impl Reaction {
             .get_result(database_connection)
     }
 
-    pub fn read(database_connection: &mut PgConnection, reaction_id: i32) -> Result<Reaction, Error> {
+    pub fn read(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, reaction_id: i32) -> Result<Reaction, Error> {
         reactions::table.find(reaction_id).get_result(database_connection)
     }
 
-    pub fn update(database_connection: &mut PgConnection, reaction_id: i32, changes: UpdateReaction) -> Result<Reaction, Error> {
+    pub fn update(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, reaction_id: i32, changes: UpdateReaction) -> Result<Reaction, Error> {
         let now = Utc::now().naive_utc();
         diesel::update(reactions::table.find(reaction_id))
             .set((
@@ -393,14 +393,14 @@ impl Reaction {
             .get_result(database_connection)
     }
 
-    pub fn delete(database_connection: &mut PgConnection, reaction_id: i32) -> Result<usize, Error> {
+    pub fn delete(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, reaction_id: i32) -> Result<usize, Error> {
         diesel::delete(reactions::table.find(reaction_id)).execute(database_connection)
     }
 }
 
 // WORKFLOWS
 
-#[derive(Queryable, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = workflows)]
 pub struct Workflow {
     pub id: i32,
@@ -437,30 +437,30 @@ pub struct UpdateWorkflow {
 }
 
 impl Workflow {
-    pub fn create(database_connection: &mut PgConnection, new_workflow: CreateWorkflow) -> Result<Workflow, Error> {
+    pub fn create(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, new_workflow: CreateWorkflow) -> Result<Workflow, Error> {
         diesel::insert_into(workflows::table)
             .values(&new_workflow)
             .get_result(database_connection)
     }
 
-    pub fn read(database_connection: &mut PgConnection, workflow_id: i32) -> Result<Workflow, Error> {
+    pub fn read(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, workflow_id: i32) -> Result<Workflow, Error> {
         workflows::table.find(workflow_id).get_result(database_connection)
     }
 
-    pub fn update(database_connection: &mut PgConnection, workflow_id: i32, changes: UpdateWorkflow) -> Result<Workflow, Error> {
+    pub fn update(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, workflow_id: i32, changes: UpdateWorkflow) -> Result<Workflow, Error> {
         diesel::update(workflows::table.find(workflow_id))
             .set(&changes)
             .get_result(database_connection)
     }
 
-    pub fn delete(database_connection: &mut PgConnection, workflow_id: i32) -> Result<usize, Error> {
+    pub fn delete(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, workflow_id: i32) -> Result<usize, Error> {
         diesel::delete(workflows::table.find(workflow_id)).execute(database_connection)
     }
 }
 
 // TRIGGERS
 
-#[derive(Queryable, Identifiable, Serialize, Deserialize)]
+#[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = triggers)]
 pub struct Trigger {
     pub id: i32,
@@ -485,23 +485,23 @@ pub struct UpdateTrigger {
 }
 
 impl Trigger {
-    pub fn create(database_connection: &mut PgConnection, new_trigger: CreateTrigger) -> Result<Trigger, Error> {
+    pub fn create(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, new_trigger: CreateTrigger) -> Result<Trigger, Error> {
         diesel::insert_into(triggers::table)
             .values(&new_trigger)
             .get_result(database_connection)
     }
 
-    pub fn read(database_connection: &mut PgConnection, trigger_id: i32) -> Result<Trigger, Error> {
+    pub fn read(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, trigger_id: i32) -> Result<Trigger, Error> {
         triggers::table.find(trigger_id).get_result(database_connection)
     }
 
-    pub fn update(database_connection: &mut PgConnection, trigger_id: i32, changes: UpdateTrigger) -> Result<Trigger, Error> {
+    pub fn update(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, trigger_id: i32, changes: UpdateTrigger) -> Result<Trigger, Error> {
         diesel::update(triggers::table.find(trigger_id))
             .set(&changes)
             .get_result(database_connection)
     }
 
-    pub fn delete(database_connection: &mut PgConnection, trigger_id: i32) -> Result<usize, Error> {
+    pub fn delete(database_connection: &mut PooledConnection<ConnectionManager<PgConnection>>, trigger_id: i32) -> Result<usize, Error> {
         diesel::delete(triggers::table.find(trigger_id)).execute(database_connection)
     }
 }
