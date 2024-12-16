@@ -69,8 +69,8 @@ async fn list_workflows_by_users_id(db: web::Data<database::Database>, id: web::
     path = "/{id}",
     tag = "workflows",
     responses(
-        (status = 200, description = "Authentification details retrieved"),
-        (status = 404, description = "Authentification ID not found", body = ErrorResponse),
+        (status = 200, description = "Authentication details retrieved"),
+        (status = 404, description = "Authentication ID not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]

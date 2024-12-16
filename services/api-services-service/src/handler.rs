@@ -34,7 +34,7 @@ impl ErrorResponse {
 
 #[utoipa::path(
     get,
-    path = "/authentification/{id}",
+    path = "/authentications/{id}",
     tag = "api-services",
     responses(
         (status = 200, description = "List of api-services retrieved"),
@@ -42,9 +42,9 @@ impl ErrorResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
-#[get("/authentification/{id}")]
-async fn list_api_services_by_authentification_id(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
-    match query::list_api_services_by_authentification_id_query(&db, id.into_inner()) {
+#[get("/authentications/{id}")]
+async fn list_api_services_by_authentication_id(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
+    match query::list_api_services_by_authentication_id_query(&db, id.into_inner()) {
         Ok(Some(api_services)) => HttpResponse::Ok().json(api_services),
         Ok(None) => ErrorResponse::NotFound("No api services found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
@@ -61,8 +61,8 @@ async fn list_api_services_by_authentification_id(db: web::Data<database::Databa
     path = "/{id}",
     tag = "api-services",
     responses(
-        (status = 200, description = "Authentification details retrieved"),
-        (status = 404, description = "Authentification ID not found", body = ErrorResponse),
+        (status = 200, description = "Authentication details retrieved"),
+        (status = 404, description = "Authentication ID not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
@@ -90,7 +90,7 @@ async fn get_api_service_by_id(
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/api-services")
-            .service(list_api_services_by_authentification_id)
+            .service(list_api_services_by_authentication_id)
             .service(get_api_service_by_id),
     );
 }

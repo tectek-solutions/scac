@@ -34,22 +34,22 @@ impl ErrorResponse {
 #[utoipa::path(
     get,
     path = "/",
-    tag = "authentifications",
+    tag = "authentications",
     responses(
-        (status = 200, description = "List of authentifications retrieved"),
+        (status = 200, description = "List of authentications retrieved"),
         (status = 403, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
 #[get("/")]
-async fn list_authentifications(db: web::Data<database::Database>) -> impl Responder {
-    match query::list_authentifications_query(&db) {
-        Ok(Some(authentifications)) => HttpResponse::Ok().json(authentifications),
-        Ok(None) => ErrorResponse::NotFound("No authentifications found".to_string())
+async fn list_authentications(db: web::Data<database::Database>) -> impl Responder {
+    match query::list_authentications_query(&db) {
+        Ok(Some(authentications)) => HttpResponse::Ok().json(authentications),
+        Ok(None) => ErrorResponse::NotFound("No authentications found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
         Err(err) => {
-            eprintln!("Error getting authentifications: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to get authentifications".to_string())
+            eprintln!("Error getting authentications: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get authentications".to_string())
                 .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -58,25 +58,25 @@ async fn list_authentifications(db: web::Data<database::Database>) -> impl Respo
 #[utoipa::path(
     get,
     path = "/{id}",
-    tag = "authentifications",
+    tag = "authentications",
     responses(
-        (status = 200, description = "Authentification details retrieved"),
-        (status = 404, description = "Authentification ID not found", body = ErrorResponse),
+        (status = 200, description = "Authentication details retrieved"),
+        (status = 404, description = "Authentication ID not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
 #[get("/{id}")]
-async fn get_authentification_by_id(
+async fn get_authentication_by_id(
     db: web::Data<database::Database>,
     id: web::Path<i32>,
 ) -> impl Responder {
-    match query::get_authentification_by_id_query(&db, id.into_inner()) {
-        Ok(Some(authentification)) => HttpResponse::Ok().json(authentification),
-        Ok(None) => ErrorResponse::NotFound("Authentification not found".to_string())
+    match query::get_authentication_by_id_query(&db, id.into_inner()) {
+        Ok(Some(authentication)) => HttpResponse::Ok().json(authentication),
+        Ok(None) => ErrorResponse::NotFound("Authentication not found".to_string())
             .to_response(actix_web::http::StatusCode::NOT_FOUND),
         Err(err) => {
-            eprintln!("Error getting authentification: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to get authentification".to_string())
+            eprintln!("Error getting authentication: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get authentication".to_string())
                 .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
@@ -88,8 +88,8 @@ async fn get_authentification_by_id(
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/authentifications")
-            .service(list_authentifications)
-            .service(get_authentification_by_id)
+        web::scope("/authentications")
+            .service(list_authentications)
+            .service(get_authentication_by_id)
     );
 }

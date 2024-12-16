@@ -3,7 +3,7 @@ use database::model::{ApiServices};
 use database;
 use diesel::prelude::*;
 
-pub fn list_api_services_by_authentification_id_query(
+pub fn list_api_services_by_authentication_id_query(
     db: &web::Data<database::Database>,
     search_id: i32,
 ) -> Result<Option<Vec<ApiServices>>, diesel::result::Error> {

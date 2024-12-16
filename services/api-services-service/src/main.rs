@@ -54,7 +54,7 @@ fn configure_cors() -> Cors {
 #[openapi(
     tags((name = "api-services", description = "API Services")),
     paths(
-        handler::list_api_services_by_authentification_id,
+        handler::list_api_services_by_authentication_id,
         handler::get_api_service_by_id,
     ),
 )]

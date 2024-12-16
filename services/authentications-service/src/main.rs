@@ -52,10 +52,10 @@ fn configure_cors() -> Cors {
 
 #[derive(OpenApi)]
 #[openapi(
-    tags((name = "authentifications", description = "Authentifications")),
+    tags((name = "authentications", description = "Authentications")),
     paths(
-        handler::list_authentifications,
-        handler::get_authentification_by_id,
+        handler::list_authentications,
+        handler::get_authentication_by_id,
     ),
 )]
 struct ApiDoc;
@@ -71,9 +71,9 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         let cors = configure_cors();
-        let config = Config::new(vec!["/authentifications/api-docs/openapi.json"]);
-        let swagger = SwaggerUi::new("/authentifications/swagger-ui/{_:.*}")
-             .url("/authentifications/api-docs/openapi.json", ApiDoc::openapi())
+        let config = Config::new(vec!["/authentications/api-docs/openapi.json"]);
+        let swagger = SwaggerUi::new("/authentications/swagger-ui/{_:.*}")
+             .url("/authentications/api-docs/openapi.json", ApiDoc::openapi())
              .config(config);
 
         App::new()

@@ -57,10 +57,10 @@ services:
   #   networks:
   #     - internal
 
-  # authentifications-service:
+  # authentications-service:
   #   build:
   #     context: .
-  #     dockerfile: ./services/authentifications-service/Dockerfile
+  #     dockerfile: ./services/authentications-service/Dockerfile
   #   expose:
   #     - "8000"
   #   environment:
@@ -166,8 +166,8 @@ services:
       - ACTIONS_SERVICE_PORT=8000
       - API_SERVICES_SERVICE_ADDRESS=api-services-service
       - API_SERVICES_SERVICE_PORT=8000
-      - AUTHENTIFICATIONS_SERVICE_ADDRESS=authentifications-service
-      - AUTHENTIFICATIONS_SERVICE_PORT=8000
+      - AUTHENTICATIONS_SERVICE_ADDRESS=authentications-service
+      - AUTHENTICATIONS_SERVICE_PORT=8000
       - REACTIONS_SERVICE_ADDRESS=reactions-service
       - REACTIONS_SERVICE_PORT=8000
       - TRIGGER_SERVICE_ADDRESS=trigger-service
@@ -185,7 +185,7 @@ services:
     depends_on:
       # - actions-service
       # - api-services-service
-      # - authentifications-service
+      # - authentications-service
       # - reactions-service
       # - trigger-service
       # - user-tokens-service

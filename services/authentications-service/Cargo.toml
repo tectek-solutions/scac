@@ -1,10 +1,10 @@
 [package]
-name = "authentifications-service"
+name = "authentications-service"
 version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "authentifications-service"
+name = "authentications-service"
 path = "src/main.rs"
 
 [dependencies]

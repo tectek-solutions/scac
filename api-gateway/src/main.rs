@@ -32,7 +32,7 @@ impl Context {
         let service_names = [
             "actions",
             "api-services",
-            "authentifications",
+            "authentications",
             "reactions",
             "trigger",
             "user-tokens",
