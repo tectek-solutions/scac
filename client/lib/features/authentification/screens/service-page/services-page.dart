@@ -25,6 +25,41 @@ class _ServicesPageState extends State<ServicesPage> {
       'description': 'Service 3 Description',
       'action': ['Action 1', 'Action 2'],
     },
+    {
+      'title': 'Service 4',
+      'description': 'Service 4 Description',
+      'action': ['Action 1', 'Action 2'],
+    },
+    {
+      'title': 'Service 5',
+      'description': 'Service 5 Description',
+      'action': ['Action 1', 'Action 2'],
+    },
+    {
+      'title': 'Service 6',
+      'description': 'Service 6 Description',
+      'action': ['Action 1', 'Action 2'],
+    },
+    {
+      'title': 'Service 7',
+      'description': 'Service 7 Description',
+      'action': ['Action 1', 'Action 2'],
+    },
+    {
+      'title': 'Service 8',
+      'description': 'Service 8 Description',
+      'action': ['Action 1', 'Action 2'],
+    },
+    {
+      'title': 'Service 9',
+      'description': 'Service 9 Description',
+      'action': ['Action 1', 'Action 2'],
+    },
+    {
+      'title': 'Service 10',
+      'description': 'Service 10 Description',
+      'action': ['Action 1', 'Action 2'],
+    }
   ];
   // Initialisation du service API
   final ApiService apiService = ApiService();
