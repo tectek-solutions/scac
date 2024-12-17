@@ -1,11 +1,23 @@
 import './App.css';
+import React, { useState } from 'react';
 import NavBar from './components/NavBar';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Users from './components/pages/tables/users';
+
 
 function App() {
+  const [isOpen, setIsOpen] = useState(true);
   return (
-    <div className="flex">
-      <NavBar />
-    </div>
+    <Router>
+      <div className="flex w-full">
+        <NavBar isOpen={isOpen} setIsOpen={setIsOpen} />
+        <div className={`mt-2 ${isOpen ? "ml-10" : "ml-6"} w-full transition-all duration-300`}>
+          <Routes>
+            <Route path="/tables/users" element={<Users />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
 }
 
