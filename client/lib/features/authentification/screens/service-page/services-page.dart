@@ -9,60 +9,11 @@ class ServicesPage extends StatefulWidget {
 
 class _ServicesPageState extends State<ServicesPage> {
   // Exemple de comment doivent etre les donnees
-  List<dynamic> cards = [
-    {
-      'title': 'Service 1',
-      'description': 'Service 1 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 2',
-      'description': 'Service 2 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 3',
-      'description': 'Service 3 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 4',
-      'description': 'Service 4 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 5',
-      'description': 'Service 5 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 6',
-      'description': 'Service 6 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 7',
-      'description': 'Service 7 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 8',
-      'description': 'Service 8 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 9',
-      'description': 'Service 9 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 10',
-      'description': 'Service 10 Description',
-      'action': ['Action 1', 'Action 2'],
-    }
-  ];
+  List<dynamic> cards = [];
+
+  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
   // Initialisation du service API
-  final ApiService apiService = ApiService();
+  final ApiService apiService = ApiService(baseUrl: baseUrlString);
 
   @override
   void initState() {
@@ -73,7 +24,7 @@ class _ServicesPageState extends State<ServicesPage> {
   //fonction pour recuperer les cartes
   Future<void> fetchCards() async {
     try {
-      final fetchedCards = await apiService.fetchCards();
+      final fetchedCards = await apiService.fetchCards(0); // need to pass the current authentication service id
       setState(() {
         cards = fetchedCards;
       });
