@@ -14,43 +14,40 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    command: ["postgres", "-c", "log_statement=all"]
+    expose:
+      - "5432"
     networks:
       - internal
 
-  # actions-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/actions-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - RUST_LOG=info
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-  #   networks:
-  #     - internal
-
-  # api-services-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/api-services-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - RUST_LOG=info
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-  #   networks:
-  #     - internal
-
-  authentifications-service:
+  migration:
     build:
       context: .
-      dockerfile: ./services/authentifications-service/Dockerfile
+      dockerfile: ./shared/database/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@database:5432/scac
+    networks:
+      - internal
+    depends_on:
+      database:
+        condition: service_healthy
+
+  cache:
+    image: redis:7.4.1-bookworm
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "6379"
+    networks:
+      - internal
+
+  actions-service:
+    build:
+      context: .
+      dockerfile: ./services/actions-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -61,36 +58,81 @@ services:
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
+    depends_on:
+      - migration
+      - cache
 
-  # reactions-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/reactions-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - RUST_LOG=info
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-  #   networks:
-  #     - internal
+  apis-service:
+    build:
+      context: .
+      dockerfile: ./services/apis-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - RUST_LOG=info
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
 
-  # trigger-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/trigger-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - RUST_LOG=info
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-  #   networks:
-  #     - internal
+  authentications-service:
+    build:
+      context: .
+      dockerfile: ./services/authentications-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - RUST_LOG=info
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+
+  reactions-service:
+    build:
+      context: .
+      dockerfile: ./services/reactions-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - RUST_LOG=info
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+
+  trigger-service:
+    build:
+      context: .
+      dockerfile: ./services/trigger-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - RUST_LOG=info
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
 
   user-tokens-service:
     build:
@@ -106,6 +148,9 @@ services:
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
+    depends_on:
+      - migration
+      - cache
 
   users-service:
     build:
@@ -118,28 +163,33 @@ services:
       - BINDING_ADDRESS=0.0.0.0
       - BINDING_PORT=8000
       - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - REDIS_URL=redis://cache:6379  
       - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
     networks:
       - internal
     ports:
       - "9000:8000"
     depends_on:
-      - database
+      - migration
+      - cache
 
-  # workflows-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/workflows-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     - RUST_LOG=info
-  #     - BINDING_ADDRESS=0.0.0.0
-  #     - BINDING_PORT=8000
-  #     - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
-  #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
-  #   networks:
-  #     - internal
+  workflows-service:
+    build:
+      context: .
+      dockerfile: ./services/workflows-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      - RUST_LOG=info
+      - BINDING_ADDRESS=0.0.0.0
+      - BINDING_PORT=8000
+      - POSTGRES_URL=postgres://postgres:postgres@database:5432/scac
+      - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
 
   api-gateway:
     build:
@@ -151,10 +201,10 @@ services:
       - RUST_LOG=info
       - ACTIONS_SERVICE_ADDRESS=actions-service
       - ACTIONS_SERVICE_PORT=8000
-      - API_SERVICES_SERVICE_ADDRESS=api-services-service
-      - API_SERVICES_SERVICE_PORT=8000
-      - AUTHENTIFICATIONS_SERVICE_ADDRESS=authentifications-service
-      - AUTHENTIFICATIONS_SERVICE_PORT=8000
+      - APIS_SERVICE_ADDRESS=apis-service
+      - APIS_SERVICE_PORT=8000
+      - AUTHENTICATIONS_SERVICE_ADDRESS=authentications-service
+      - AUTHENTICATIONS_SERVICE_PORT=8000
       - REACTIONS_SERVICE_ADDRESS=reactions-service
       - REACTIONS_SERVICE_PORT=8000
       - TRIGGER_SERVICE_ADDRESS=trigger-service
@@ -170,25 +220,24 @@ services:
     networks:
       - internal
     depends_on:
-      # - actions-service
-      # - api-services-service
-      - authentifications-service
-      # - reactions-service
-      # - trigger-service
+      - actions-service
+      - apis-service
+      - authentications-service
+      - reactions-service
+      - trigger-service
       - user-tokens-service
       - users-service
-      # - workflows-service
+      - workflows-service
 
-  # client:
-  #   build:
-  #     context: .
-  #     dockerfile: ./client/Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - API_GATEWAY_ADDRESS=api-gateway
-  #     - API_GATEWAY_PORT=8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - api-gateway
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://api-gateway:8000
+    networks:
+      - internal
+    depends_on:
+      - api-gateway
