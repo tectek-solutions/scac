@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use database;
+use database::model::{CreateWorkflow};
 
 use crate::query;
 
@@ -69,8 +70,8 @@ async fn list_workflows_by_users_id(db: web::Data<database::Database>, id: web::
     path = "/{id}",
     tag = "workflows",
     responses(
-        (status = 200, description = "Authentification details retrieved"),
-        (status = 404, description = "Authentification ID not found", body = ErrorResponse),
+        (status = 200, description = "Authentication details retrieved"),
+        (status = 404, description = "Authentication ID not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
@@ -95,7 +96,7 @@ async fn get_workflow_by_id(
     post,
     path = "/",
     tag = "workflows",
-    request_body = query::CreateWorkflow,
+    request_body = CreateWorkflow,
     responses(
         (status = 200, description = "Workflow created"),
         (status = 403, description = "Unauthorized", body = ErrorResponse),
@@ -105,7 +106,7 @@ async fn get_workflow_by_id(
 #[post("/")]
 async fn create_workflow(
     db: web::Data<database::Database>,
-    workflow: web::Json<query::CreateWorkflow>,
+    workflow: web::Json<CreateWorkflow>,
 ) -> impl Responder {
     match query::create_workflow_query(&db, workflow.into_inner()) {
         Ok(workflow) => HttpResponse::Ok().json(workflow),
@@ -133,7 +134,9 @@ async fn delete_workflow_by_id(
     id: web::Path<i32>,
 ) -> impl Responder {
     match query::delete_workflow_by_id_query(&db, id.into_inner()) {
-        Ok(workflow) => HttpResponse::Ok().json(workflow),
+        Ok(Some(())) => HttpResponse::Ok().finish(),
+        Ok(None) => ErrorResponse::NotFound("Workflow not found".to_string())
+            .to_response(actix_web::http::StatusCode::NOT_FOUND),
         Err(err) => {
             eprintln!("Error deleting workflow: {:?}", err);
             ErrorResponse::InternalServerError("Failed to delete workflow".to_string())

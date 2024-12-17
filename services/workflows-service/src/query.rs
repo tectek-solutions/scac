@@ -1,33 +1,19 @@
 use actix_web::web;
 use database;
-use database::model::{NewWorkflows, Workflows};
+use database::model::{Workflow, CreateWorkflow};
 use diesel::prelude::*;
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
-use serde_json::Value;
-use chrono::Utc;
-
-#[derive(Serialize, Deserialize, ToSchema)]
-pub struct CreateWorkflow {
-    user_id: i32,
-    name: String,
-    description: Option<String>,
-    action_id: i32,
-    reaction_id: i32,
-    data_transformation: Option<Value>,
-}
 
 pub fn list_workflows_by_user_id_query(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
     search_id: i32,
-) -> Result<Option<Vec<Workflows>>, diesel::result::Error> {
+) -> Result<Option<Vec<Workflow>>, diesel::result::Error> {
     use database::schema::workflows::dsl::*;
 
-    let mut connection = db.get_connection();
+    let mut database_connection = database.get_connection();
     let result = workflows
         .filter(user_id.eq(search_id))
-        .select(Workflows::as_select())
-        .load::<Workflows>(&mut connection)
+        .select(Workflow::as_select())
+        .load::<Workflow>(&mut database_connection)
         .optional();
 
     match result {
@@ -44,21 +30,12 @@ pub fn list_workflows_by_user_id_query(
 }
 
 pub fn get_workflow_by_id_query(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
     search_id: i32,
-) -> Result<Option<Workflows>, diesel::result::Error> {
-    use database::schema::workflows::dsl::*;
-
-    let mut connection = db.get_connection();
-
-    match workflows
-        .find(search_id)
-        .select(Workflows::as_select())
-        .first::<Workflows>(&mut connection)
-        .optional()
-    {
-        Ok(Some(workflow)) => Ok(Some(workflow)),
-        Ok(None) => Ok(None),
+) -> Result<Option<Workflow>, diesel::result::Error> {
+    let mut database_connection = database.get_connection();
+    match Workflow::read(&mut database_connection, search_id) {
+        Ok(workflows) => Ok(Some(workflows)),
         Err(err) => {
             eprintln!("Error getting workflow with ID {:?}: {:?}", search_id, err);
             Err(err)
@@ -67,46 +44,36 @@ pub fn get_workflow_by_id_query(
 }
 
 pub fn create_workflow_query(
-    db: &web::Data<database::Database>,
+    database: &web::Data<database::Database>,
     new_workflow: CreateWorkflow,
-) -> Result<Option<Workflows>, diesel::result::Error> {
-    use database::schema::workflows;
-
-    let mut connection = db.get_connection();
-    diesel::insert_into(workflows::table)
-        .values(&NewWorkflows {
-            user_id: new_workflow.user_id,
-            name: &new_workflow.name,
-            description: new_workflow.description.as_deref(),
-            action_id: new_workflow.action_id,
-            reaction_id: new_workflow.reaction_id,
-            data_transformation: new_workflow.data_transformation,
-            created_at: Some(Utc::now().naive_utc()),
-            updated_at: Some(Utc::now().naive_utc()),
-        })
-        .execute(&mut connection)?;
-
-    let workflow = workflows::table
-        .order(workflows::id.desc())
-        .first::<Workflows>(&mut connection)?;
-
-    Ok(Some(workflow))
+) -> Result<Option<Workflow>, diesel::result::Error> {
+    let mut database_connection = database.get_connection();
+    
+    match Workflow::create(&mut database_connection, new_workflow) {
+        Ok(workflow) => Ok(Some(workflow)),
+        Err(err) => {
+            eprintln!("Error creating workflow: {:?}", err);
+            Err(err)
+        }
+    }
 }
 
 pub fn delete_workflow_by_id_query(
-    db: &web::Data<database::Database>,
-    search_id: i32,
-) -> Result<Option<Workflows>, diesel::result::Error> {
-    use database::schema::workflows::dsl::*;
+    database: &web::Data<database::Database>,
+    delete_id: i32,
+) -> Result<Option<()>, diesel::result::Error> {
+    let mut database_connection = database.get_connection();
 
-    let mut connection = db.get_connection();
-    match diesel::delete(workflows.filter(id.eq(search_id)))
-        .execute(&mut connection)
-        .optional()
-    {
-        Ok(_) => Ok(None),
+    match Workflow::delete(&mut database_connection, delete_id) {
+        Ok(size) => {
+            if size == 0 {
+                Ok(None)
+            } else {
+                Ok(Some(()))
+            }
+        }
         Err(err) => {
-            eprintln!("Error deleting workflow with ID {:?}: {:?}", search_id, err);
+            eprintln!("Error deleting workflow with ID {:?}: {:?}", delete_id, err);
             Err(err)
         }
     }

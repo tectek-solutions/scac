@@ -212,11 +212,13 @@ async fn sign_up(
     }
 
     let password_hash = hash(&user.password, DEFAULT_COST).expect("Password hashing failed");
-    match query::add_user(
+    match query::create_user(
         &database,
-        user.name.clone(),
-        user.email.clone(),
-        password_hash,
+        database::model::CreateUser {
+            name: user.name.clone(),
+            email: user.email.clone(),
+            password_hash,
+        },
     ) {
         Ok(Some(new_user)) => {
             let token = signing_jwt(&cache, new_user.id);

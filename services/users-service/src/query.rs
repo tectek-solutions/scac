@@ -1,24 +1,7 @@
 use actix_web::web;
 use database;
-use database::model::{NewUser, User};
+use database::model::{User, CreateUser, UpdateUser};
 use diesel::prelude::*;
-
-pub fn get_users(
-    database: &web::Data<database::Database>,
-) -> Result<Option<Vec<User>>, diesel::result::Error> {
-    use database::schema::users::dsl::*;
-
-    let mut database_connection = database.get_connection();
-    let result = users.load::<User>(&mut database_connection);
-
-    match result {
-        Ok(result) => Ok(Some(result)),
-        Err(err) => {
-            eprintln!("Error getting users: {:?}", err);
-            Err(err)
-        }
-    }
-}
 
 pub fn get_user_by_id(
     database: &web::Data<database::Database>,
@@ -60,35 +43,21 @@ pub fn get_user_by_email(
         Ok(None) => Ok(None),
         Err(err) => {
             eprintln!("Error getting user with email {:?}: {:?}", user_email, err);
-            Ok(None)
+            Err(err)
         }
     }
 }
 
-pub fn add_user(
+pub fn create_user(
     database: &web::Data<database::Database>,
-    name: String,
-    email: String,
-    password_hash: String,
+    new_user: CreateUser,
 ) -> Result<Option<User>, diesel::result::Error> {
-    use database::schema::users;
-
     let mut database_connection = database.get_connection();
 
-    let new_user = NewUser {
-        username: &name,
-        email: &email,
-        password_hash: &password_hash,
-    };
-
-    match diesel::insert_into(users::table)
-        .values(&new_user)
-        .returning(User::as_returning())
-        .get_result::<User>(&mut database_connection)
-    {
+    match User::create(&mut database_connection, new_user) {
         Ok(user) => Ok(Some(user)),
         Err(err) => {
-            eprintln!("Error adding user: {:?}", err);
+            eprintln!("Error creating user: {:?}", err);
             Err(err)
         }
     }
@@ -96,27 +65,16 @@ pub fn add_user(
 
 pub fn update_user(
     database: &web::Data<database::Database>,
-    user_id: i32,
-    new_name: String,
-    new_email: String,
-    new_password_hash: String,
+    update_id: i32,
+    update_user: UpdateUser,
 ) -> Result<Option<User>, diesel::result::Error> {
-    use database::schema::users::dsl::*;
-
     let mut database_connection = database.get_connection();
-    match diesel::update(users.find(user_id))
-        .set((
-            username.eq(new_name.clone()),
-            email.eq(new_email.clone()),
-            password_hash.eq(new_password_hash.clone()),
-        ))
-        .returning(User::as_returning())
-        .get_result::<User>(&mut database_connection)
-    {
+
+    match User::update(&mut database_connection, update_id, update_user) {
         Ok(user) => Ok(Some(user)),
         Err(err) => {
-            eprintln!("Error updating user with ID {:?}: {:?}", user_id, err);
-            Ok(None)
+            eprintln!("Error updating user: {:?}", err);
+            Err(err)
         }
     }
 }
@@ -124,14 +82,19 @@ pub fn update_user(
 pub fn delete_user(
     database: &web::Data<database::Database>,
     user_id: i32,
-) -> Result<Option<User>, diesel::result::Error> {
-    use database::schema::users::dsl::*;
-
+) -> Result<Option<()>, diesel::result::Error> {
     let mut database_connection = database.get_connection();
-    match diesel::delete(users.find(user_id)).get_result::<User>(&mut database_connection) {
-        Ok(user) => Ok(Some(user)),
+   
+    match User::delete(&mut database_connection, user_id) {
+        Ok(size) => {
+            if size == 0 {
+                Ok(None)
+            } else {
+                Ok(Some(()))
+            }
+        }
         Err(err) => {
-            eprintln!("Error deleting user with ID {:?}: {:?}", user_id, err);
+            eprintln!("Error deleting user: {:?}", err);
             Err(err)
         }
     }
