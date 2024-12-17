@@ -14,8 +14,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    command: ["postgres", "-c", "log_statement=all"]
+    expose:
+      - "5432"
     networks:
       - internal
+
+  migration:
+    build:
+      context: .
+      dockerfile: ./shared/database/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@database:5432/scac
+    networks:
+      - internal
+    depends_on:
+      database:
+        condition: service_healthy
 
   cache:
     image: redis:7.4.1-bookworm
@@ -24,6 +39,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    expose:
+      - "6379"
     networks:
       - internal
 
@@ -41,6 +58,9 @@ services:
   #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
   #   networks:
   #     - internal
+  #   depends_on:
+  #     - migration
+  #     - cache
 
   # apis-service:
   #   build:
@@ -56,6 +76,9 @@ services:
   #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
   #   networks:
   #     - internal
+  #   depends_on:
+  #     - migration
+  #     - cache
 
   # authentications-service:
   #   build:
@@ -71,6 +94,9 @@ services:
   #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
   #   networks:
   #     - internal
+  #   depends_on:
+  #     - migration
+  #     - cache
 
   # reactions-service:
   #   build:
@@ -86,6 +112,9 @@ services:
   #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
   #   networks:
   #     - internal
+  #   depends_on:
+  #     - migration
+  #     - cache
 
   # trigger-service:
   #   build:
@@ -101,6 +130,9 @@ services:
   #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
   #   networks:
   #     - internal
+  #   depends_on:
+  #     - migration
+  #     - cache
 
   # user-tokens-service:
   #   build:
@@ -116,6 +148,9 @@ services:
   #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
   #   networks:
   #     - internal
+  #   depends_on:
+  #     - migration
+  #     - cache
 
   users-service:
     build:
@@ -135,9 +170,8 @@ services:
     ports:
       - "9000:8000"
     depends_on:
-      - database
+      - migration
       - cache
-
 
   # workflows-service:
   #   build:
@@ -153,6 +187,9 @@ services:
   #     - JWT_SECRET="_3i6*yf&P+9^!;=;M*&vz5SOxE#EINj-j'N%_8SR]uBJ?[4KAoV=9Q^zRoS_)&o"
   #   networks:
   #     - internal
+  #   depends_on:
+  #     - migration
+  #     - cache
 
   api-gateway:
     build:
