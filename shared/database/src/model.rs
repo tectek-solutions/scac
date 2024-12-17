@@ -63,6 +63,7 @@ impl User {
         diesel::delete(users::table.find(user_id)).execute(database_connection)
     }
 }
+
 // AUTHENTICATIONS
 #[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = authentications)]
@@ -70,9 +71,9 @@ pub struct Authentication {
     pub id: i32,
     pub name: String,
     pub authentication_url: String,
-    pub authentication_url_json_path: String,
     pub refresh_token_url: String,
-    pub refresh_token_url_json_path: String,
+    pub access_token_json_path: String,
+    pub refresh_token_json_path: String,
     pub access_token_expires_at_json_path: String,
     pub refresh_token_expires_at_json_path: String,
     pub is_expires_at_relative: Bool,
@@ -87,9 +88,9 @@ pub struct Authentication {
 pub struct CreateAuthentication {
     pub name: String,
     pub authentication_url: String,
-    pub authentication_url_json_path: String,
     pub refresh_token_url: String,
-    pub refresh_token_url_json_path: String,
+    pub access_token_json_path: String,
+    pub refresh_token_json_path: String,
     pub access_token_expires_at_json_path: String,
     pub refresh_token_expires_at_json_path: String,
     pub is_expires_at_relative: Bool,
@@ -102,9 +103,9 @@ pub struct CreateAuthentication {
 pub struct UpdateAuthentication {
     pub name: String,
     pub authentication_url: String,
-    pub authentication_url_json_path: String,
     pub refresh_token_url: String,
-    pub refresh_token_url_json_path: String,
+    pub access_token_json_path: String,
+    pub refresh_token_json_path: String,
     pub access_token_expires_at_json_path: String,
     pub refresh_token_expires_at_json_path: String,
     pub is_expires_at_relative: Bool,
@@ -270,7 +271,6 @@ impl Api {
 }
 
 // ACTIONS
-
 #[derive(Queryable, Identifiable, Serialize, Deserialize, Selectable)]
 #[diesel(table_name = actions)]
 pub struct Action {
@@ -283,8 +283,8 @@ pub struct Action {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
-    pub trigger_data_json_path: String,
-    pub trigger_data_conversion: String,
+    pub trigger_date_json_path: String,
+    pub trigger_date_format: String,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -300,8 +300,8 @@ pub struct CreateAction {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
-    pub trigger_data_json_path: String,
-    pub trigger_data_conversion: String,
+    pub trigger_date_json_path: String,
+    pub trigger_date_format: String,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
@@ -315,8 +315,8 @@ pub struct UpdateAction {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
-    pub trigger_data_json_path: String,
-    pub trigger_data_conversion: String,
+    pub trigger_date_json_path: String,
+    pub trigger_date_format: String,
 }
 
 impl Action {

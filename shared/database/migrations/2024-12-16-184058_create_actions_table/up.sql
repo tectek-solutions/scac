@@ -9,8 +9,8 @@ CREATE TABLE actions (
     http_parameters JSONB, -- Parameters
     http_headers JSONB, -- Headers
     http_body JSONB, -- Body
-    trigger_data_json_path TEXT NOT NULL, -- JSON path to the trigger data
-    trigger_data_conversion TEXT NOT NULL, -- Conversion string for datetime
+    trigger_date_json_path TEXT NOT NULL, -- JSON path to the trigger data
+    trigger_date_format TEXT NOT NULL, -- Conversion string for datetime
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Creation timestamp
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Last update timestamp
     FOREIGN KEY (api_id) REFERENCES apis (id)

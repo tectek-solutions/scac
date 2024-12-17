@@ -3,8 +3,8 @@ CREATE TABLE authentications (
     id SERIAL PRIMARY KEY, -- Unique ID
     name VARCHAR(32) UNIQUE NOT NULL, -- Name of the authentication service (e.g., Google, Microsoft)
     authentication_url TEXT NOT NULL, -- OAuth2 authorization URL
-    authentication_url_json_path TEXT NOT NULL, -- JSON path to the authorization URL
     refresh_token_url TEXT NOT NULL, -- Refresh token URL
+    access_token_json_path TEXT NOT NULL, -- JSON path to the access token URL
     refresh_token_json_path TEXT NOT NULL, -- JSON path to the refresh token URL
     access_token_expires_at_json_path TEXT NOT NULL, -- JSON path to the access token expiration timestamp
     refresh_token_expires_at_json_path TEXT NOT NULL, -- JSON path to the refresh token expiration timestamp
