@@ -76,7 +76,7 @@ pub struct Authentication {
     pub refresh_token_json_path: String,
     pub access_token_expires_at_json_path: String,
     pub refresh_token_expires_at_json_path: String,
-    pub is_expires_at_relative: Bool,
+    pub is_expires_at_relative: bool,
     pub client_id: String,
     pub client_secret: String,
     pub created_at: Option<NaiveDateTime>,
@@ -93,7 +93,7 @@ pub struct CreateAuthentication {
     pub refresh_token_json_path: String,
     pub access_token_expires_at_json_path: String,
     pub refresh_token_expires_at_json_path: String,
-    pub is_expires_at_relative: Bool,
+    pub is_expires_at_relative: bool,
     pub client_id: String,
     pub client_secret: String,
 }
@@ -108,7 +108,7 @@ pub struct UpdateAuthentication {
     pub refresh_token_json_path: String,
     pub access_token_expires_at_json_path: String,
     pub refresh_token_expires_at_json_path: String,
-    pub is_expires_at_relative: Bool,
+    pub is_expires_at_relative: bool,
     pub client_id: String,
     pub client_secret: String,
 }
@@ -167,7 +167,6 @@ pub struct CreateUserToken {
     pub access_token_expires_at: NaiveDateTime,
     pub refresh_token: Option<String>,
     pub refresh_token_expires_at: Option<NaiveDateTime>,
-    pub expires_at: NaiveDateTime,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
@@ -178,7 +177,6 @@ pub struct UpdateUserToken {
     pub access_token_expires_at: NaiveDateTime,
     pub refresh_token: Option<String>,
     pub refresh_token_expires_at: Option<NaiveDateTime>,
-    pub expires_at: Option<NaiveDateTime>,
 }
 
 impl UserToken {
