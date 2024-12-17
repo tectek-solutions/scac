@@ -71,15 +71,15 @@ export default function NavBar() {
                     ))}
                 </ul>
 
-                <div className="w-48 h-px bg-gray-600 my-4 mx-auto"></div>
+                <div className="w-56 h-px bg-gray-600 my-4 mx-auto"></div>
             </nav>
 
             <button
                 onClick={toggleNav}
                 className="absolute top-1/2 transform -translate-y-1/2 w-8 h-16 text-white z-20 border-2 bg-gray-600 rounded-r-lg items-center justify-center flex"
                 style={{
-                    transition: 'transform 300ms',
-                    left: isOpen ? '15rem' : '0',
+                    transform: (isOpen ? 'translateX(15rem)' : 'translateX(0)'),
+                    transition: 'transform 300ms'
                 }}
             >
                 {isOpen ? (
