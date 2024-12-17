@@ -7,7 +7,9 @@ INSERT INTO actions (
         http_endpoint,
         http_parameters,
         http_headers,
-        http_body
+        http_body,
+        trigger_date_json_path,
+        trigger_date_format
     )
 VALUES (
         (
@@ -21,7 +23,9 @@ VALUES (
         '/gmail/v1/users/me/messages',
         '{"maxResults": 1}',
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{}',
+        'messages[0].internalDate',
+        '%Y-%m-%d %H:%M:%S'
     ),
     (
         (
@@ -35,5 +39,7 @@ VALUES (
         '/me/messages',
         '{"$top": 1, "$select": "receivedDateTime"}',
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{}',
+        'value[0].receivedDateTime',
+        '%Y-%m-%dT%H:%M:%S.%fZ'
     );
