@@ -1,4 +1,4 @@
-name: Docker - API Services Service
+name: Docker - APIs Service
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
   call-template:
     uses: ./.github/workflows/docker-image-template.yml
     with:
-      dockerfile: ./services/api-services-service/Dockerfile
-      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:api-services-service-latest
+      dockerfile: ./services/apis-service/Dockerfile
+      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:apis-service-latest
       context: .
       push_on_main: true

@@ -25,7 +25,7 @@ class TColors {
   static const Color warningColor = Color(0xFFFFC107);
   static const Color infoColor = Color(0xFF2196F3);
   static const Color lightColor = Color(0xFFFFFFFF);
-  static const Color darkColor = Color(0xFF000000);
+  static const Color darkColor = Color.fromARGB(255, 30, 30, 30);
   static const Color transparent = Color(0x00000000);
   static const Color black = Color(0xFF000000);
 }

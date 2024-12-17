@@ -1,4 +1,6 @@
 
+import 'package:flutter/material.dart';
+
 class TSizes {
   // Padding and margin sizes
   static const double xs = 4.0;
@@ -60,4 +62,10 @@ class TSizes {
 
   // Grid view spacing
   static const double gridViewSpacing = 16.0;
+
+  //Screen sizes
+  static double screenWidth = MediaQuery.of(context!).size.width;
+  static double screenHeight = MediaQuery.of(context!).size.height;
+  
+  static BuildContext? get context => null;
 }

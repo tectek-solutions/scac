@@ -17,7 +17,7 @@ COPY services/users-service/Cargo.toml services/users-service/Cargo.lock service
 RUN cd services/users-service && cargo fetch
 
 COPY services/users-service/src/ services/users-service/src/
-RUN cd services/users-service && cargo build --release
+RUN cd services/users-service && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm AS runtime
@@ -32,7 +32,7 @@ RUN useradd -m -g users-service users-service
 USER users-service
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=users-service:users-service /usr/src/scac/services/users-service/target/release/users-service /usr/local/bin/users-service
+COPY --from=builder --chown=users-service:users-service /usr/src/scac/services/users-service/target/debug/users-service /usr/local/bin/users-service
 
 # Start the service
 CMD ["/usr/local/bin/users-service"]

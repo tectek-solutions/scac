@@ -1,0 +1,22 @@
+name: Docker - Workflows Service
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  call-template:
+    uses: ./.github/workflows/docker-image-template.yml
+    with:
+      dockerfile: ./services/workflows-service/Dockerfile
+      image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:workflows-service-latest
+      context: .
+      push_on_main: true

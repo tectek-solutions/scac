@@ -17,7 +17,7 @@ COPY services/user-tokens-service/Cargo.toml services/user-tokens-service/Cargo.
 RUN cd services/user-tokens-service && cargo fetch
 
 COPY services/user-tokens-service/src/ services/user-tokens-service/src/
-RUN cd services/user-tokens-service && cargo build --release
+RUN cd services/user-tokens-service && cargo build
 
 # Stage 2: Final Image
 FROM debian:bookworm AS runtime
@@ -32,7 +32,7 @@ RUN useradd -m -g user-tokens-service user-tokens-service
 USER user-tokens-service
 
 # Copy compiled binary from builder
-COPY --from=builder --chown=user-tokens-service:user-tokens-service /usr/src/scac/services/user-tokens-service/target/release/user-tokens-service /usr/local/bin/user-tokens-service
+COPY --from=builder --chown=user-tokens-service:user-tokens-service /usr/src/scac/services/user-tokens-service/target/debug/user-tokens-service /usr/local/bin/user-tokens-service
 
 # Start the service
 CMD ["/usr/local/bin/user-tokens-service"]
