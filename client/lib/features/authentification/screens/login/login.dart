@@ -73,35 +73,43 @@ class _LoginScreen extends State<LoginScreen> {
                     width: MediaQuery.of(context).size.width,
                     child: OutlinedButton(
                       //HERE
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          final email = _emailController.text;
-                          final password = _passwordController.text;
-
-                          print("Email: $email" + "Password: $password");
-
-                          try {
-                            final response = await _apiService.signIn(email, password);
-                            if (response["isSuccessful"]) {
-                              // Handle successful sign-in
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Sign-in successful!')),
-                              );
-                              // Navigate to another screen if needed
-                            } else {
-                              // Handle sign-in error
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Sign-in failed: ${response["errorMessage"]}')),
-                              );
-                            }
-                          } catch (e) {
-                            // Handle any other errors
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('An error occurred: $e')),
-                            );
-                          }
-                        }
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MainScreen(),
+                          ),
+                        );
                       },
+                      // onPressed: () async {
+                      //   if (_formKey.currentState!.validate()) {
+                      //     final email = _emailController.text;
+                      //     final password = _passwordController.text;
+
+                      //     print("Email: $email" + "Password: $password");
+
+                      //     try {
+                      //       final response = await _apiService.signIn(email, password);
+                      //       if (response["isSuccessful"]) {
+                      //         // Handle successful sign-in
+                      //         ScaffoldMessenger.of(context).showSnackBar(
+                      //           SnackBar(content: Text('Sign-in successful!')),
+                      //         );
+                      //         // Navigate to another screen if needed
+                      //       } else {
+                      //         // Handle sign-in error
+                      //         ScaffoldMessenger.of(context).showSnackBar(
+                      //           SnackBar(content: Text('Sign-in failed: ${response["errorMessage"]}')),
+                      //         );
+                      //       }
+                      //     } catch (e) {
+                      //       // Handle any other errors
+                      //       ScaffoldMessenger.of(context).showSnackBar(
+                      //         SnackBar(content: Text('An error occurred: $e')),
+                      //       );
+                      //     }
+                      //   }
+                      // },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                       ),
