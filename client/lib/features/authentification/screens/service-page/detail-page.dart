@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 class DetailPage extends StatefulWidget {
   final int itemIndex;
+  int id;
   final dynamic card;
 
-  const DetailPage({required this.itemIndex, required this.card, Key? key}) : super(key: key);
+  DetailPage({required this.itemIndex, required this.id, required this.card, super.key});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -14,10 +15,12 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
 
-  final ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/actions/1');
-  List<dynamic> actions = [];
+  late final ApiService apiService;
 
-  _DetailPageState() {
+  @override
+  void initState() {
+    super.initState();
+    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/actions/${widget.id}');
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
         value = [value];
@@ -33,6 +36,7 @@ class _DetailPageState extends State<DetailPage> {
       });
     });
   }
+  List<dynamic> actions = [];
 
   @override
   Widget build(BuildContext context) {
