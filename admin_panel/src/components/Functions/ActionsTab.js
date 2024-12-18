@@ -43,7 +43,7 @@ export default function ActionsTab({ValueText, search, setSearch, selected, setS
               type="text"
               id="search"
               name="search"
-              placeholder={`Rechercher un ${ValueText}`}
+              placeholder={`Search ${ValueText}`}
               className="input input-bordered w-full max-w-xs flex-grow"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -53,7 +53,7 @@ export default function ActionsTab({ValueText, search, setSearch, selected, setS
                 className="btn btn-success"
                 onClick={handleRedirect}
               >
-                Ajouter un {ValueText}
+                Add {ValueText}
               </button>
 
               <button
@@ -63,13 +63,13 @@ export default function ActionsTab({ValueText, search, setSearch, selected, setS
                 }
                 disabled={selected.length === 0}
               >
-                Supprimer un {ValueText}
+                Remove {ValueText}
               </button>
               <dialog id="remove_coach_modal" className="modal justify-center text-center">
                 <div className="modal-box">
                   <h3 className="font-bold text-lg">Confirmer la suppression:</h3>
                   <p className="py-4">
-                    Êtes-vous sûr de vouloir effacer ce {ValueText} ?
+                    Are you sûre you want to remove {ValueText} ?
                   </p>
                     <form method="dialog">
                       <div className="flex justify-center gap-10">
@@ -77,10 +77,10 @@ export default function ActionsTab({ValueText, search, setSearch, selected, setS
                           className="btn btn-error"
                           onClick={handleRemove}
                         >
-                          Supprimer
+                          Remove
                         </button>
                         <button className="btn btn-warning" onClick={handleClose}>
-                          Annuler
+                          Cancel
                         </button>
                       </div>
                     </form>

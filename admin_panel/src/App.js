@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import NavBar from './components/NavBar';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Users from './components/pages/tables/users';
+import Authentications from './components/pages/tables/authentications';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <div className={`mt-2 ${isOpen ? "ml-10" : "ml-6"} w-full transition-all duration-300`}>
           <Routes>
             <Route path="/tables/users" element={<Users />} />
+            <Route path="/tables/authentications" element={<Authentications />} />
           </Routes>
         </div>
       </div>

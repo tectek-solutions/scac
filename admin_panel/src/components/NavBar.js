@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRightIcon, ChevronLeftIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/outline';
+import { useLocation } from 'react-router-dom';
 
 export default function NavBar({ isOpen, setIsOpen }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [tablesOpen, setTablesOpen] = useState(false);
+    const location = useLocation();
 
     const items = [
         { title: 'Settings', link: '/settings' },
@@ -20,8 +23,6 @@ export default function NavBar({ isOpen, setIsOpen }) {
         { title: 'Triggers', link: '/tables/triggers' }
     ];
 
-    const [tablesOpen, setTablesOpen] = useState(false);
-
     const toggleNav = () => {
         setIsOpen(!isOpen);
     };
@@ -30,11 +31,25 @@ export default function NavBar({ isOpen, setIsOpen }) {
         setIsDropdownOpen(!isDropdownOpen);
     };
 
-
     const toggleTables = () => {
         setTablesOpen(!tablesOpen);
-    }
+    };
 
+    const isActive = (path) => location.pathname === path ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white';
+
+    useEffect(() => {
+        if (location.pathname.startsWith('/dashboard')) {
+            setIsDropdownOpen(true);
+        } else {
+            setIsDropdownOpen(false);
+        }
+
+        if (location.pathname.startsWith('/tables')) {
+            setTablesOpen(true);
+        } else {
+            setTablesOpen(false);
+        }
+    }, [location]);
 
     return (
         <div className={`flex ${isOpen ? 'w-64' : 'w-0'} h-full transition-all duration-300`}>
@@ -58,7 +73,7 @@ export default function NavBar({ isOpen, setIsOpen }) {
                             <ul className="space-y-2 pl-6 mt-2">
                                 <li>
                                     <a
-                                        className="block py-2 px-4 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition"
+                                        className={`block py-2 px-4 ${isActive('/dashboard/overview')}`}
                                         href="/dashboard/overview"
                                     >
                                         Overview
@@ -66,7 +81,7 @@ export default function NavBar({ isOpen, setIsOpen }) {
                                 </li>
                                 <li>
                                     <a
-                                        className="block py-2 px-4 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition"
+                                        className={`block py-2 px-4 ${isActive('/dashboard/stats')}`}
                                         href="/dashboard/stats"
                                     >
                                         Stats
@@ -79,7 +94,7 @@ export default function NavBar({ isOpen, setIsOpen }) {
                     {items.map((item, index) => (
                         <li key={index}>
                             <a
-                                className="block py-2 px-4 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition"
+                                className={`block py-2 px-4 ${isActive(item.link)} rounded-lg transition`}
                                 href={item.link}
                             >
                                 {item.title}
@@ -92,7 +107,7 @@ export default function NavBar({ isOpen, setIsOpen }) {
 
                 <ul className="space-y-4">
                     <li>
-                    <p
+                        <p
                             onClick={toggleTables}
                             className="block py-2 px-4 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition cursor-pointer"
                         >
@@ -103,7 +118,7 @@ export default function NavBar({ isOpen, setIsOpen }) {
                                 {tables.map((table, index) => (
                                     <li key={index}>
                                         <a
-                                            className="block py-2 px-4 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition"
+                                            className={`block py-2 px-4 ${isActive(table.link)} rounded-lg transition`}
                                             href={table.link}
                                         >
                                             {table.title}
@@ -114,8 +129,6 @@ export default function NavBar({ isOpen, setIsOpen }) {
                         )}
                     </li>
                 </ul>
-                
-                
             </nav>
 
             <button
