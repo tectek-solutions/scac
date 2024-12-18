@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRightIcon, ChevronLeftIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/outline';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export default function NavBar({ isOpen, setIsOpen }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [tablesOpen, setTablesOpen] = useState(false);
     const location = useLocation();
+    const token = localStorage.getItem('token');
 
     const items = [
         { title: 'Settings', link: '/settings' },
@@ -33,6 +35,14 @@ export default function NavBar({ isOpen, setIsOpen }) {
 
     const toggleTables = () => {
         setTablesOpen(!tablesOpen);
+    };
+
+    const handleLogout = async () => {
+        try {
+            const response = await axios.post('http://localhost:8000/sign_out', token);
+        } catch (error) {
+            console.error('Error logging out', error);
+        }
     };
 
     const isActive = (path) => location.pathname === path ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white';
@@ -129,6 +139,10 @@ export default function NavBar({ isOpen, setIsOpen }) {
                         )}
                     </li>
                 </ul>
+
+                <div className="w-56 h-px bg-gray-600 my-4 mx-auto"></div>
+
+                <p className="block py-2 px-4 text-red-500 hover:bg-gray-700 rounded-lg transition cursor-pointer" onClick={handleLogout} >Logout</p>
             </nav>
 
             <button
