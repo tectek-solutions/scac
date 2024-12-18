@@ -43,7 +43,7 @@ class _CreatePageState extends State<CreatePage> {
               onTap: () async {
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ServicesPage()),
+                  MaterialPageRoute(builder: (context) => ServicePage()),
                 );
                 if (result != null && result['title'] != null && result['description'] != null && result['action'] != null) {
                   setState(() {
