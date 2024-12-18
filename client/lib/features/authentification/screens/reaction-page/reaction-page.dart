@@ -24,7 +24,7 @@ class _ReactionPageState extends State<ReactionPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => IntermediatePage(itemIndex: index),
+        builder: (context) => IntermediatePage(itemIndex: index, id: 1,),
       ),
     );
   }

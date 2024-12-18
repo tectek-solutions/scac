@@ -7,19 +7,21 @@ class IntermediatePage extends StatefulWidget {
 
   static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://10.49.84.152:8000');
   int itemIndex;
+  int id;
 
-  IntermediatePage({required this.itemIndex, super.key});
+  IntermediatePage({required this.itemIndex, required this.id, super.key});
 
   @override
   State<IntermediatePage> createState() => _IntermediatePageState();
 }
 
 class _IntermediatePageState extends State<IntermediatePage> {
-  final ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/1');
+  late final ApiService apiService;
 
-  List<dynamic> cards = [];
-
-  _IntermediatePageState() {
+  @override
+  void initState() {
+    super.initState();
+    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/${widget.id}');
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
         value = [value];
@@ -36,12 +38,13 @@ class _IntermediatePageState extends State<IntermediatePage> {
     });
   }
 
+  List<dynamic> cards = [];
 
   void navigateToDetailPage(BuildContext context, dynamic card, int index) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DetailPage(itemIndex: index, card: cards[index]),
+        builder: (context) => DetailPage(itemIndex: index, id: widget.id, card: cards[index]),
       ),
     );
   }

@@ -23,17 +23,18 @@ class _ServicePageState extends State<ServicePage> {
       }
       setState(() {
         for (var i = 0; i < value.length; i++) {
-          services.add({'title': value[i]['name'], 'description': 'Use a ${value[i]['name']}\'s service.'});
+          services.add({'id': value[i]['id'], 'title': value[i]['name'], 'description': 'Use a ${value[i]['name']}\'s service.'});
         }
       });
     });
   }
 
   void navigateToIntermediatePage(BuildContext context, dynamic card, int index) {
+    print("Navigating to IntermediatePage with id: ${services[index]['id']}");
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => IntermediatePage(itemIndex: index),
+        builder: (context) => IntermediatePage(itemIndex: index, id: services[index]['id']),
       ),
     );
   }
