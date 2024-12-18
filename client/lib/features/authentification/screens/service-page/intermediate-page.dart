@@ -6,52 +6,45 @@ import 'package:flutter/material.dart';
 class IntermediatePage extends StatefulWidget {
 
   static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
-  final int itemIndex;
+  int itemIndex;
+  int id;
 
-  IntermediatePage({required this.itemIndex, super.key});
+  IntermediatePage({required this.itemIndex, required this.id, super.key});
 
   @override
   State<IntermediatePage> createState() => _IntermediatePageState();
 }
 
 class _IntermediatePageState extends State<IntermediatePage> {
-  final ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString);
-
-  List<dynamic> cards = [
-    {
-      'title': 'Service 1',
-      'description': 'Service 1 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 2',
-      'description': 'Service 2 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-  ];
+  late final ApiService apiService;
 
   @override
   void initState() {
     super.initState();
-    fetchCards();
+    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/${widget.id}');
+    apiService.fetchCards().then((value) {
+      if (value is Map<String, dynamic>) {
+        value = [value];
+        print("HERE IS THE VALUE $value");
+      }
+      print("Passed value: $value");
+      setState(() {
+        for (var i = 0; i < value.length; i++) {
+          print("Value: ${value[i]['name']}");
+          cards.add({'title': value[i]['name']});
+          print("Cards: $cards");
+        }
+      });
+    });
   }
 
-  Future<void> fetchCards() async {
-    try {
-      final fetchedCards = await apiService.fetchCards(0);
-      setState(() {
-        cards = fetchedCards;
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
+  List<dynamic> cards = [];
 
   void navigateToDetailPage(BuildContext context, dynamic card, int index) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DetailPage(itemIndex: index, card: cards[index]),
+        builder: (context) => DetailPage(itemIndex: index, id: widget.id, card: cards[index]),
       ),
     );
   }

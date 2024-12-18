@@ -15,6 +15,7 @@ dependencies:
   http: ^1.2.2
   material_design_icons_flutter: 7.0.7296
   flutter_dotenv: ^5.0.2
+  url_launcher: ^6.1.7
 
 dev_dependencies:
   flutter_test:

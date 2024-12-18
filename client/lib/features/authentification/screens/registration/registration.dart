@@ -83,7 +83,10 @@ class _RegistrationState extends State<Registration> {
                           final email = _emailController.text;
                           final password = _passwordController.text;
                           final password_confirmation = _password_confirmationController.text;
-
+                          print(name);
+                          print(email);
+                          print(password);
+                          print(password_confirmation);
                           try {
                             final response = await _apiService.signUp(name, email, password, password_confirmation);
                             if (response["isSuccessful"]) {

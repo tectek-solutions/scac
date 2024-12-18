@@ -2,6 +2,7 @@ use actix_web::web;
 use database;
 use database::model::{User, CreateUser, UpdateUser};
 use diesel::prelude::*;
+use log;
 
 pub fn get_user_by_id(
     database: &web::Data<database::Database>,
@@ -20,7 +21,7 @@ pub fn get_user_by_id(
         Ok(Some(user)) => Ok(Some(user)),
         Ok(None) => Ok(None),
         Err(err) => {
-            eprintln!("Error getting user with ID {:?}: {:?}", user_id, err);
+            log::error!("Error getting user with ID {:?}: {:?}", user_id, err);
             Err(err)
         }
     }
@@ -42,7 +43,7 @@ pub fn get_user_by_email(
         Ok(Some(user)) => Ok(Some(user)),
         Ok(None) => Ok(None),
         Err(err) => {
-            eprintln!("Error getting user with email {:?}: {:?}", user_email, err);
+            log::error!("Error getting user with email {:?}: {:?}", user_email, err);
             Err(err)
         }
     }
@@ -57,7 +58,7 @@ pub fn create_user(
     match User::create(&mut database_connection, new_user) {
         Ok(user) => Ok(Some(user)),
         Err(err) => {
-            eprintln!("Error creating user: {:?}", err);
+            log::error!("Error creating user: {:?}", err);
             Err(err)
         }
     }
@@ -73,7 +74,7 @@ pub fn update_user(
     match User::update(&mut database_connection, update_id, update_user) {
         Ok(user) => Ok(Some(user)),
         Err(err) => {
-            eprintln!("Error updating user: {:?}", err);
+            log::error!("Error updating user: {:?}", err);
             Err(err)
         }
     }
@@ -94,7 +95,7 @@ pub fn delete_user(
             }
         }
         Err(err) => {
-            eprintln!("Error deleting user: {:?}", err);
+            log::error!("Error deleting user: {:?}", err);
             Err(err)
         }
     }

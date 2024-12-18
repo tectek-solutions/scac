@@ -1,10 +1,42 @@
+import 'package:client/features/authentification/screens/service-page/api-page-services.dart';
+import 'package:client/features/authentification/screens/service-page/intermediate-page.dart';
 import 'package:flutter/material.dart';
 
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
   final int itemIndex;
+  int id;
   final dynamic card;
 
-  const DetailPage({required this.itemIndex, required this.card, Key? key}) : super(key: key);
+  DetailPage({required this.itemIndex, required this.id, required this.card, super.key});
+
+  @override
+  State<DetailPage> createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+
+  late final ApiService apiService;
+
+  @override
+  void initState() {
+    super.initState();
+    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/actions/${widget.id}');
+    apiService.fetchCards().then((value) {
+      if (value is Map<String, dynamic>) {
+        value = [value];
+        print("HERE IS THE VALUE $value");
+      }
+      print("Passed value: $value");
+      setState(() {
+        for (var i = 0; i < value.length; i++) {
+          print("Value: ${value[i]['name']}");
+          actions.add(value[i]['name']);
+          print("Actions: $actions");
+        }
+      });
+    });
+  }
+  List<dynamic> actions = [];
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +60,13 @@ class DetailPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      card['title'] ?? 'No Title',
+                      actions[widget.itemIndex],
                       style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10.0),
-                    Text(
-                      card['description'] ?? 'No Description',
-                      style: const TextStyle(fontSize: 16.0),
+                    const Text(
+                      'No Description',
+                      style: TextStyle(fontSize: 16.0),
                     ),
                   ],
                 ),
@@ -44,29 +76,27 @@ class DetailPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: (card['action'] as List).map<Widget>((action) {
-                    return ElevatedButton(
-                      onPressed: () {
-                        int count = 0;
-                        Navigator.of(context).popUntil((route) {
-                          count++;
-                          if (count == 3) { 
-                            //Voila la data qui est envoyée
-                            Navigator.pop(context, {
-                              'title': card['title'],
-                              'description': card['description'],
-                              'action': action,
-                            });
-                            return true;
-                          }
-                          return false;
-                        });
-                        //Debug
-                        print('$action button pressed');
-                      },
-                      child: Text(action),
-                    );
-                  }).toList(),
+                  children: actions.map<Widget>((action) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      int count = 0;
+                      Navigator.of(context).popUntil((route) {
+                        count++;
+                        if (count == 3) { 
+                          //Voila la data qui est envoyée
+                          Navigator.pop(context, {
+                            'action': action,
+                          });
+                          return true;
+                        }
+                        return false;
+                      });
+                      //Debug
+                      print('$action button pressed');
+                    },
+                    child: Text(action),
+                  );
+                }).toList(),
                 ),
               ),
             ],

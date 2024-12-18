@@ -2412,6 +2412,7 @@ dependencies = [
  "env_logger",
  "hmac",
  "jwt",
+ "log",
  "redis",
  "regex",
  "reqwest",

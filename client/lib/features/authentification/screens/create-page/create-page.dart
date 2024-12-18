@@ -45,10 +45,8 @@ class _CreatePageState extends State<CreatePage> {
                   context,
                   MaterialPageRoute(builder: (context) => ServicePage()),
                 );
-                if (result != null && result['title'] != null && result['description'] != null && result['action'] != null) {
+                if (result != null && result['action'] != null) {
                   setState(() {
-                    resultTitleService = result['title'];
-                    resultDescriptionService = result['description'];
                     resultActionService = result['action'];
                   });
                   print('Data received from Widget B: $result');
