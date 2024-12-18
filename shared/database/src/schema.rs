@@ -92,7 +92,7 @@ diesel::table! {
         name -> Varchar,
         #[max_length = 128]
         email -> Varchar,
-        #[max_length = 32]
+        #[max_length = 256]
         password_hash -> Varchar,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
