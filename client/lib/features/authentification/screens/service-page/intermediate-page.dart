@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 class IntermediatePage extends StatefulWidget {
 
-  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
-  final int itemIndex;
+  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://10.49.84.152:8000');
+  int itemIndex;
 
   IntermediatePage({required this.itemIndex, super.key});
 
@@ -15,37 +15,27 @@ class IntermediatePage extends StatefulWidget {
 }
 
 class _IntermediatePageState extends State<IntermediatePage> {
-  final ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString);
+  final ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/1');
 
-  List<dynamic> cards = [
-    {
-      'title': 'Service 1',
-      'description': 'Service 1 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-    {
-      'title': 'Service 2',
-      'description': 'Service 2 Description',
-      'action': ['Action 1', 'Action 2'],
-    },
-  ];
+  List<dynamic> cards = [];
 
-  @override
-  void initState() {
-    super.initState();
-    fetchCards();
-  }
-
-  Future<void> fetchCards() async {
-    try {
-      final fetchedCards = await apiService.fetchCards(0);
+  _IntermediatePageState() {
+    apiService.fetchCards().then((value) {
+      if (value is Map<String, dynamic>) {
+        value = [value];
+        print("HERE IS THE VALUE $value");
+      }
+      print("Passed value: $value");
       setState(() {
-        cards = fetchedCards;
+        for (var i = 0; i < value.length; i++) {
+          print("Value: ${value[i]['name']}");
+          cards.add({'title': value[i]['name']});
+          print("Cards: $cards");
+        }
       });
-    } catch (e) {
-      print(e);
-    }
+    });
   }
+
 
   void navigateToDetailPage(BuildContext context, dynamic card, int index) {
     Navigator.push(

@@ -3,19 +3,20 @@ import 'dart:convert';
 
 class ApiService {
   final String baseUrl;
-  // final String token;
+  final String route;
 
-  ApiService({required this.baseUrl});
+  ApiService({required this.baseUrl, required this.route});
 
-  Future<List<dynamic>> fetchCards(int id) async {
-    final url = Uri.parse('$baseUrl/authentications/$id');
+  Future<dynamic> fetchCards() async {
+    print("Fetching cards from $baseUrl$route");
+    final url = Uri.parse('$baseUrl$route');
     final response = await http.get(
       url,
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode == 200) {
-      final List<dynamic> cards = jsonDecode(response.body);
-      return cards;
+      final dynamic data = jsonDecode(response.body);
+      return data;
     } else {
       throw Exception('Failed to load cards');
     }
