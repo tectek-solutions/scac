@@ -52,6 +52,10 @@ class CardGrid extends StatelessWidget {
                             card['title'] ?? '',
                             style: const TextStyle(fontSize: 15.0),
                           ),
+                          Text(
+                            card['description'] ?? '',
+                            style: const TextStyle(fontSize: 12.0),
+                          ),
                         ],
                       ),
                     ),
