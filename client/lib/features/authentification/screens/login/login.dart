@@ -7,6 +7,7 @@ import '../../../../utils/constants/helper_functions.dart';
 import '../../../../utils/constants/sizes.dart';
 import '../main-screen/main-screen.dart';
 import 'package:client/features/authentification/services/api.service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,6 +24,8 @@ class _LoginScreen extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final ApiAccountService _apiService = ApiAccountService(baseUrl: baseUrlString);
+
+  final String _url_google = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=936038757007-d2vvj4kjm98vcod9e9ek9ilvoeij1fcr.apps.googleusercontent.com&redirect_uri=$baseUrlString/oauth2/authorize/google&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar https://mail.google.com/&state=test_state";
 
   @override
   Widget build(BuildContext context) {
@@ -73,43 +76,44 @@ class _LoginScreen extends State<LoginScreen> {
                     width: MediaQuery.of(context).size.width,
                     child: OutlinedButton(
                       //HERE
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
-                          ),
-                        );
-                      },
-                      // onPressed: () async {
-                      //   if (_formKey.currentState!.validate()) {
-                      //     final email = _emailController.text;
-                      //     final password = _passwordController.text;
-
-                      //     print("Email: $email" + "Password: $password");
-
-                      //     try {
-                      //       final response = await _apiService.signIn(email, password);
-                      //       if (response["isSuccessful"]) {
-                      //         // Handle successful sign-in
-                      //         ScaffoldMessenger.of(context).showSnackBar(
-                      //           SnackBar(content: Text('Sign-in successful!')),
-                      //         );
-                      //         // Navigate to another screen if needed
-                      //       } else {
-                      //         // Handle sign-in error
-                      //         ScaffoldMessenger.of(context).showSnackBar(
-                      //           SnackBar(content: Text('Sign-in failed: ${response["errorMessage"]}')),
-                      //         );
-                      //       }
-                      //     } catch (e) {
-                      //       // Handle any other errors
-                      //       ScaffoldMessenger.of(context).showSnackBar(
-                      //         SnackBar(content: Text('An error occurred: $e')),
-                      //       );
-                      //     }
-                      //   }
+                      // onPressed: () {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => const MainScreen(),
+                      //     ),
+                      //   );
                       // },
+                     onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          final email = _emailController.text;
+                          final password = _passwordController.text;
+
+                          print("Email: $email" + "Password: $password");
+
+                          try {
+                            final response = await _apiService.signIn(email, password);
+                            print(response);
+                            if (response is String) {
+                              // Assuming the response is a JWT token
+                              final token = response;
+                              // Handle the token (e.g., save it, navigate to another screen)
+                              print("Token: $token");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainScreen(),
+                                ),
+                              );
+                            } else {
+                              // Handle unexpected response type
+                              print("Unexpected response type: ${response.runtimeType}");
+                            }
+                          } catch (e) {
+                            print("Error: $e");
+                          }
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                       ),
@@ -131,71 +135,77 @@ class _LoginScreen extends State<LoginScreen> {
                       child: const Text("Create an account"),
                     ),
                   ),
-                  // const SizedBox(height: TSizes.spaceBtwItems),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     Flexible(
-                  //       child: Divider(
-                  //       color: dark
-                  //           ? Colors.grey.shade700
-                  //           : Colors.grey.shade300,
-                  //       thickness: 1.5,
-                  //       indent: 60,
-                  //       endIndent: 5,
-                  //     )),
-                  //     const Text(
-                  //       "Or Sign In With",
-                  //       style: TextStyle(color: Colors.grey),
-                  //     ),
-                  //     Flexible(
-                  //         child: Divider(
-                  //       color: dark
-                  //           ? Colors.grey.shade700
-                  //           : Colors.grey.shade300,
-                  //       thickness: 1.5,
-                  //       indent: 5,
-                  //       endIndent: 60,
-                  //     )),
-                  //   ],
-                  // ),
+                  const SizedBox(height: TSizes.spaceBtwItems),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Divider(
+                        color: dark
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade300,
+                        thickness: 1.5,
+                        indent: 60,
+                        endIndent: 5,
+                      )),
+                      const Text(
+                        "Or Sign In With",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      Flexible(
+                          child: Divider(
+                        color: dark
+                            ? Colors.grey.shade700
+                            : Colors.grey.shade300,
+                        thickness: 1.5,
+                        indent: 5,
+                        endIndent: 60,
+                      )),
+                    ],
+                  ),
 
-                  // const SizedBox(height: TSizes.sapceBtwSections),
+                  const SizedBox(height: TSizes.sapceBtwSections),
 
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     Container(
-                  //       decoration: BoxDecoration(
-                  //         border: Border.all(color: Colors.grey),
-                  //         borderRadius: BorderRadius.circular(100),
-                  //       ),
-                  //       child: IconButton(
-                  //         onPressed: () {},
-                  //         icon: const Image(
-                  //           width: TSizes.iconMd,
-                  //           height: TSizes.iconMd,
-                  //           image: AssetImage(TImages.google),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     const SizedBox(width: TSizes.spaceBtwItems),
-                  //     Container(
-                  //       decoration: BoxDecoration(
-                  //         border: Border.all(color: Colors.grey),
-                  //         borderRadius: BorderRadius.circular(100),
-                  //       ),
-                  //       child: IconButton(
-                  //         onPressed: () {},
-                  //         icon: const Image(
-                  //           width: TSizes.iconMd,
-                  //           height: TSizes.iconMd,
-                  //           image: AssetImage(TImages.facebook),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: IconButton(
+                          onPressed: () async {
+                            try {
+                              await launchUrl(Uri.parse(_url_google));
+                            } catch (e) {
+                              print('Erreur lors de l\'ouverture du lien: $e');
+                            }
+                          },
+                          icon: const Image(
+                            width: TSizes.iconMd,
+                            height: TSizes.iconMd,
+                            image: AssetImage(TImages.google),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: TSizes.spaceBtwItems),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Image(
+                            width: TSizes.iconMd,
+                            height: TSizes.iconMd,
+                            image: AssetImage(TImages.facebook),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
 
                 ],
               ),

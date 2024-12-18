@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class IntermediatePage extends StatefulWidget {
 
-  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://10.49.84.152:8000');
+  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
   int itemIndex;
 
   IntermediatePage({required this.itemIndex, super.key});
