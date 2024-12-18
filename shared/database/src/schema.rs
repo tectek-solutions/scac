@@ -88,9 +88,9 @@ diesel::table! {
 diesel::table! {
     users (id) {
         id -> Int4,
-        #[max_length = 32]
+        #[max_length = 256]
         name -> Varchar,
-        #[max_length = 128]
+        #[max_length = 256]
         email -> Varchar,
         #[max_length = 256]
         password_hash -> Varchar,
