@@ -6,7 +6,7 @@ class ApiAccountService {
 
   ApiAccountService({required this.baseUrl});
 
-  Future<Map<String, dynamic>> signIn(String email, String password) async {
+  Future<String> signIn(String email, String password) async {
     final url = Uri.parse('$baseUrl/users/sign_in');
     final response = await http.post(
       url,

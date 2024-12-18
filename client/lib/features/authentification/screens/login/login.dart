@@ -84,7 +84,7 @@ class _LoginScreen extends State<LoginScreen> {
                       //     ),
                       //   );
                       // },
-                      onPressed: () async {
+                     onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           final email = _emailController.text;
                           final password = _passwordController.text;
@@ -93,23 +93,24 @@ class _LoginScreen extends State<LoginScreen> {
 
                           try {
                             final response = await _apiService.signIn(email, password);
-                            if (response["isSuccessful"]) {
-                              // Handle successful sign-in
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Sign-in successful!')),
+                            print(response);
+                            if (response is String) {
+                              // Assuming the response is a JWT token
+                              final token = response;
+                              // Handle the token (e.g., save it, navigate to another screen)
+                              print("Token: $token");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainScreen(),
+                                ),
                               );
-                              // Navigate to another screen if needed
                             } else {
-                              // Handle sign-in error
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Sign-in failed: ${response["errorMessage"]}')),
-                              );
+                              // Handle unexpected response type
+                              print("Unexpected response type: ${response.runtimeType}");
                             }
                           } catch (e) {
-                            // Handle any other errors
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('An error occurred: $e')),
-                            );
+                            print("Error: $e");
                           }
                         }
                       },
