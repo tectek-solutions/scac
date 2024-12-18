@@ -83,28 +83,17 @@ class _RegistrationState extends State<Registration> {
                           final email = _emailController.text;
                           final password = _passwordController.text;
                           final password_confirmation = _password_confirmationController.text;
-                          print(name);
-                          print(email);
-                          print(password);
-                          print(password_confirmation);
                           try {
-                            final response = await _apiService.signUp(name, email, password, password_confirmation);
-                            if (response["isSuccessful"]) {
-                              // Handle successful sign-up
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Sign-up successful!')),
-                              );
-                              // Navigate to another screen if needed
-                            } else {
-                              // Handle sign-up error
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Sign-up failed: ${response["errorMessage"]}')),
-                              );
-                            }
+                            await _apiService.signUp(name, email, password, password_confirmation);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const LoginScreen()),
+                            );
                           } catch (e) {
-                            // Handle any other errors
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('An error occurred: $e')),
+                              SnackBar(
+                                content: Text(e.toString()),
+                              ),
                             );
                           }
                         }

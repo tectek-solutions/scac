@@ -25,7 +25,7 @@ class ApiAccountService {
     }
   }
 
-  Future<Map<String, dynamic>> signUp(String name, String email, String password, String passwordConfirmation) async {
+  Future<String> signUp(String name, String email, String password, String passwordConfirmation) async {
     final url = Uri.parse('$baseUrl/users/sign_up');
     final response = await http.post(
       url,
