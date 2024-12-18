@@ -6,6 +6,7 @@ import '../../../../utils/constants/helper_functions.dart';
 import 'package:client/utils/constants/image_strings.dart';
 import '../../../../utils/constants/sizes.dart';
 import 'package:client/utils/constants/text_string.dart';
+import '../main-screen/main-screen.dart';
 
 class Registration extends StatefulWidget {
   const Registration({super.key});
@@ -76,7 +77,6 @@ class _RegistrationState extends State<Registration> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: OutlinedButton(
-                      //HERE
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           final name = _nameController.text;
@@ -84,16 +84,18 @@ class _RegistrationState extends State<Registration> {
                           final password = _passwordController.text;
                           final password_confirmation = _password_confirmationController.text;
                           try {
-                            await _apiService.signUp(name, email, password, password_confirmation);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const LoginScreen()),
-                            );
+                            final response = await _apiService.signUp(name, email, password, password_confirmation);
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainScreen(),
+                                ),
+                              );
                           } catch (e) {
+                            print("Error: $e");
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(e.toString()),
-                              ),
+                              SnackBar(content: Text("An error occurred: $e")),
                             );
                           }
                         }
