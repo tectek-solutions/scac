@@ -75,30 +75,15 @@ class _LoginScreen extends State<LoginScreen> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: OutlinedButton(
-                      //HERE
-                      // onPressed: () {
-                      //   Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => const MainScreen(),
-                      //     ),
-                      //   );
-                      // },
                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           final email = _emailController.text;
                           final password = _passwordController.text;
 
-                          print("Email: $email" + "Password: $password");
-
                           try {
                             final response = await _apiService.signIn(email, password);
-                            print(response);
                             if (response is String) {
-                              // Assuming the response is a JWT token
                               final token = response;
-                              // Handle the token (e.g., save it, navigate to another screen)
-                              print("Token: $token");
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -106,7 +91,6 @@ class _LoginScreen extends State<LoginScreen> {
                                 ),
                               );
                             } else {
-                              // Handle unexpected response type
                               print("Unexpected response type: ${response.runtimeType}");
                             }
                           } catch (e) {

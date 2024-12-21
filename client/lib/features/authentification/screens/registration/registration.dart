@@ -6,6 +6,7 @@ import '../../../../utils/constants/helper_functions.dart';
 import 'package:client/utils/constants/image_strings.dart';
 import '../../../../utils/constants/sizes.dart';
 import 'package:client/utils/constants/text_string.dart';
+import '../main-screen/main-screen.dart';
 
 class Registration extends StatefulWidget {
   const Registration({super.key});
@@ -76,35 +77,25 @@ class _RegistrationState extends State<Registration> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: OutlinedButton(
-                      //HERE
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           final name = _nameController.text;
                           final email = _emailController.text;
                           final password = _passwordController.text;
                           final password_confirmation = _password_confirmationController.text;
-                          print(name);
-                          print(email);
-                          print(password);
-                          print(password_confirmation);
                           try {
                             final response = await _apiService.signUp(name, email, password, password_confirmation);
-                            if (response["isSuccessful"]) {
-                              // Handle successful sign-up
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Sign-up successful!')),
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainScreen(),
+                                ),
                               );
-                              // Navigate to another screen if needed
-                            } else {
-                              // Handle sign-up error
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Sign-up failed: ${response["errorMessage"]}')),
-                              );
-                            }
                           } catch (e) {
-                            // Handle any other errors
+                            print("Error: $e");
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('An error occurred: $e')),
+                              SnackBar(content: Text("An error occurred: $e")),
                             );
                           }
                         }

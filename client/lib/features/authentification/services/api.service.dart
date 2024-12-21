@@ -40,10 +40,8 @@ class ApiAccountService {
 
     if (response.statusCode == 201) {
       return jsonDecode(response.body);
-    } else if (response.statusCode == 409) {
-      throw Exception('User already exists');
-    } else if (response.statusCode == 400) {
-      throw Exception('Invalid information');
+    } else if (response.statusCode == 401) {
+      throw Exception('Unauthorized');
     } else if (response.statusCode == 500) {
       throw Exception('Internal server error');
     } else {
