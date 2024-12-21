@@ -18,7 +18,7 @@ on:
       platforms:
         description: "Comma-separated list of target architectures (e.g., linux/amd64,linux/arm64,linux/arm/v7)"
         required: false
-        default: "linux/amd64"
+        default: "linux/arm64"
         type: string
       push_on_main:
         description: "Whether to push the image when changes are merged to main"
