@@ -16,9 +16,9 @@ on:
         required: true
         type: string
       platforms:
-        description: "Comma-separated list of target architectures (e.g., linux/amd64,linux/arm64)"
+        description: "Comma-separated list of target architectures (e.g., linux/amd64,linux/arm64,linux/arm/v7)"
         required: false
-        default: "linux/amd64,linux/arm64"
+        default: "linux/amd64"
         type: string
       push_on_main:
         description: "Whether to push the image when changes are merged to main"
@@ -54,6 +54,6 @@ jobs:
           docker buildx build \
             --file ${{ inputs.dockerfile }} \
             --tag ${{ inputs.image_name }} \
-            --platform ${{ inputs.platforms }} \
+            --platform "${{ inputs.platforms }}" \
             ${{ env.mode }} \
             ${{ inputs.context }}
