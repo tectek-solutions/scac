@@ -15,11 +15,6 @@ on:
         description: "The context to use for the build"
         required: true
         type: string
-      platforms:
-        description: "Comma-separated list of target architectures (e.g., linux/amd64,linux/arm64,linux/arm/v7)"
-        required: false
-        default: "linux/arm64"
-        type: string
       push_on_main:
         description: "Whether to push the image when changes are merged to main"
         required: false
@@ -33,7 +28,11 @@ permissions:
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
-
+    
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
