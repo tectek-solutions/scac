@@ -96,12 +96,9 @@ diesel::table! {
 diesel::table! {
     users (id) {
         id -> Int4,
-        #[max_length = 32]
-        name -> Varchar,
-        #[max_length = 128]
-        email -> Varchar,
-        #[max_length = 32]
-        password_hash -> Varchar,
+        name -> Text,
+        email -> Text,
+        password_hash -> Text,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }
