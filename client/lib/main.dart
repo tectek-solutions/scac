@@ -11,9 +11,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // String? myEnvVar = Platform.environment['SOME_VAR'];
-    const SOME_VAR = String.fromEnvironment('SOME_VAR', defaultValue: 'SOME_DEFAULT_VALUE');
-    print('MY_ENV_VAR: $SOME_VAR');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
