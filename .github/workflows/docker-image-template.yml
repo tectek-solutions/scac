@@ -28,22 +28,44 @@ permissions:
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
-
+    
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.7.1
+        with:
+          buildkitd-flags: --allow-insecure-entitlement security.insecure
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.ref }}-${{ matrix.platform }}
+          restore-keys: |
+            ${{ runner.os }}-docker-${{ github.ref }}
+            ${{ runner.os }}-docker
 
       - name: Login to GitHub Container Registry
-        if : ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' }}
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build and Push Docker image and
+      - name: Set Build Mode
+        id: build_mode
+        run: echo "mode=$([[ '${{ github.event_name }}' == 'pull_request' ]] && echo '--load' || echo '--push')" >> $GITHUB_ENV
+
+      - name: Build and Push Multi-Architecture Docker Image
         run: |
           docker buildx build \
             --file ${{ inputs.dockerfile }} \
             --tag ${{ inputs.image_name }} \
-            ${{ github.event_name == 'pull_request' && ' --load ' || ' --push ' }} \
+            --platform "${{ matrix.platform }}" \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
+            ${{ env.mode }} \
             ${{ inputs.context }}
