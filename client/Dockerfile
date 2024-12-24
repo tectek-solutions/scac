@@ -38,7 +38,7 @@ WORKDIR $APP
 # Build the web application
 RUN cd client && flutter clean
 RUN cd client && flutter pub get
-RUN cd client && flutter build web
+RUN cd client && flutter build web --dart-define=API_URL=${API_URL}
 
 # Deploy using NGINX
 FROM nginx:${NGINX_VERSION}-bookworm
