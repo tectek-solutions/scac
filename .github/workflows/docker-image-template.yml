@@ -53,6 +53,6 @@ jobs:
           docker buildx build \
             --file ${{ inputs.dockerfile }} \
             --tag ${{ inputs.image_name }} \
-            --platform "${{ inputs.platforms }}" \
+            --platform "${{ matrix.platform }}" \
             ${{ env.mode }} \
             ${{ inputs.context }}
