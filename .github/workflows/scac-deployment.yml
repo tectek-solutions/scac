@@ -1,0 +1,29 @@
+name: SCAC Deployment
+
+on:
+  workflow_run:
+    workflows: 
+        - "Docker - Actions Service"
+        - "Docker - API Gateway"
+        - "Docker - APIs Service"
+        - "Docker - Authentications Service"
+        - "Docker - Client"
+        - "Docker - Migration"
+        - "Docker - Reactions Service"
+        - "Docker - Trigger Service"
+        - "Docker - User Tokens Service"
+        - "Docker - Users Service"
+        - "Docker - Workflows Service"
+    branches: [main]
+    types: 
+      - completed
+
+jobs:
+  call-deploy-template:
+    uses: ./.github/workflows/deploy-helm-template.yml
+    secrets: inherit
+    with:
+      release-name: "scac"
+      namespace: "scac"
+      chart-path: "./deployments"
+      values-file: "./deployments/values.yaml"
