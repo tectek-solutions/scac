@@ -85,6 +85,35 @@ async fn get_user_token_by_id(
     }
 }
 
+// handler::get_user_token_url_by_authentication_id
+
+#[utoipa::path(
+    get,
+    path = "/url/authentications/{authentication_id}"
+    tag = "user-tokens",
+    responses(
+        (status = 200, description = "User token URL retrieved"),
+        (status = 404, description = "Authentification not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse)
+    )
+)]
+#[get("/url/authentications/{authentication_id}")]
+async fn get_user_token_url_by_authentication_id(
+    db: web::Data<database::Database>,
+    authentication_id: web::Path<i32>,
+) -> impl Responder {
+    match query::get_user_token_url_by_authentication_id_query(&db, authentication_id.into_inner()) {
+        Ok(Some(user_token)) => HttpResponse::Ok().json(user_token),
+        Ok(None) => ErrorResponse::NotFound("Authentification not found".to_string())
+            .to_response(actix_web::http::StatusCode::NOT_FOUND),
+        Err(err) => {
+            eprintln!("Error getting user token URL: {:?}", err);
+            ErrorResponse::InternalServerError("Failed to get user token URL".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
+        }
+    }
+}
+
 // ----------------------------
 // Service Configuration
 // ----------------------------
