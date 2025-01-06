@@ -1,0 +1,352 @@
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  database-data:
+    driver: local
+
+services:
+  database:
+    image: postgres:17.2-bookworm
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: ["postgres", "-c", "log_statement=all"]
+    expose:
+      - "5432"
+    networks:
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+    volumes:
+      - database-data:/var/lib/postgresql/data
+
+  cache:
+    image: redis:7.4.1-bookworm
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - "6379"
+    networks:
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "256M"
+
+  migration:
+    image: ghcr.io/tectek-solutions/scac:migration-latest
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+    networks:
+      - internal
+    depends_on:
+      database:
+        condition: service_healthy
+
+  actions-service:
+    image: ghcr.io/tectek-solutions/scac:actions-service-latest
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  apis-service:
+    image: ghcr.io/tectek-solutions/scac:apis-service-latest
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  authentications-service:
+    image: ghcr.io/tectek-solutions/scac:authentications-service-latest
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  reactions-service:
+    image: ghcr.io/tectek-solutions/scac:reactions-service-latest
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  trigger-service:
+    image: ghcr.io/tectek-solutions/scac:trigger-service-latest
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  user-tokens-service:
+    image: ghcr.io/tectek-solutions/scac:user-tokens-service-latest
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  users-service:
+    image: ghcr.io/tectek-solutions/scac:users-service-latest
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    ports:
+      - "9000:8000"
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  workflows-service:
+    image: ghcr.io/tectek-solutions/scac:workflows-service-latest
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
+
+  api-gateway:
+    image: ghcr.io/tectek-solutions/scac:api-gateway-latest
+    ports:
+      - "8000:8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      ACTIONS_SERVICE_ADDRESS: actions-service
+      ACTIONS_SERVICE_PORT: 8000
+      APIS_SERVICE_ADDRESS: apis-service
+      APIS_SERVICE_PORT: 8000
+      AUTHENTICATIONS_SERVICE_ADDRESS: authentications-service
+      AUTHENTICATIONS_SERVICE_PORT: 8000
+      REACTIONS_SERVICE_ADDRESS: reactions-service
+      REACTIONS_SERVICE_PORT: 8000
+      TRIGGER_SERVICE_ADDRESS: trigger-service
+      TRIGGER_SERVICE_PORT: 8000
+      USER_TOKENS_SERVICE_ADDRESS: user-tokens-service
+      USER_TOKENS_SERVICE_PORT: 8000
+      USERS_SERVICE_ADDRESS: users-service
+      USERS_SERVICE_PORT: 8000
+      WORKFLOWS_SERVICE_ADDRESS: workflows-service
+      WORKFLOWS_SERVICE_PORT: 8000
+    networks:
+      - internal
+    depends_on:
+      - actions-service
+      - apis-service
+      - authentications-service
+      - reactions-service
+      - trigger-service
+      - user-tokens-service
+      - users-service
+      - workflows-service
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.7"
+          memory: "768M"
+
+  client:
+    image: ghcr.io/tectek-solutions/scac:client-latest
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://api-gateway:8000
+    networks:
+      - internal
+    depends_on:
+      - api-gateway
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
