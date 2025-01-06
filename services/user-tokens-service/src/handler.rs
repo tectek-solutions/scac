@@ -1,8 +1,12 @@
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use std::env;
+use tinytemplate::TinyTemplate;
 
 use database;
+use cache;
+use jwt;
 
 use crate::query;
 
@@ -23,9 +27,56 @@ impl ErrorResponse {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+struct UserTokenAuthenticationContext {
+    client_id: String,
+    redirect_uri: String,
+}
+
+struct UserTokenRefreshContext {
+    client_id: String,
+    client_secret: String,
+    code: String,
+}
+
 // ----------------------------
 // Helper Functions
 // ----------------------------
+
+fn get_authentication_url(authentication: database::model::Authentication, user_id: i32) -> String {
+    let api_url = env::var("API_URL").expect("API_URL must be set");
+
+    let redirect_uri = format!(
+        "{}/user-tokens/authentications/{}/users/{}",
+        api_url,
+        user_id,
+        authentication.id,
+    );
+
+    let context = UserTokenAuthenticationContext {
+        client_id: authentication.client_id,
+        redirect_uri: redirect_uri,
+    };
+
+    let mut tt = TinyTemplate::new();
+    match tt.add_template("url", &authentication.authentication_url) {
+        Ok(_) => (),
+        Err(err) => {
+            eprintln!("Error adding template: {:?}", err);
+            return "".to_string();
+        }
+    }
+    
+    let result = match tt.render("url", &context) {
+        Ok(result) => result,
+        Err(err) => {
+            eprintln!("Error rendering template: {:?}", err);
+            return "".to_string();
+        }
+    };
+
+    result
+}
 
 // ----------------------------
 // Handlers
@@ -85,11 +136,9 @@ async fn get_user_token_by_id(
     }
 }
 
-// handler::get_user_token_url_by_authentication_id
-
 #[utoipa::path(
     get,
-    path = "/url/authentications/{authentication_id}"
+    path = "/url/authentications/{authentication_id}",
     tag = "user-tokens",
     responses(
         (status = 200, description = "User token URL retrieved"),
@@ -98,20 +147,51 @@ async fn get_user_token_by_id(
     )
 )]
 #[get("/url/authentications/{authentication_id}")]
-async fn get_user_token_url_by_authentication_id(
+async fn get_user_token_authentication_url_by_authentication_id(
     db: web::Data<database::Database>,
+    cache: web::Data<cache::Cache>,
     authentication_id: web::Path<i32>,
+    request: HttpRequest,
 ) -> impl Responder {
-    match query::get_user_token_url_by_authentication_id_query(&db, authentication_id.into_inner()) {
-        Ok(Some(user_token)) => HttpResponse::Ok().json(user_token),
-        Ok(None) => ErrorResponse::NotFound("Authentification not found".to_string())
-            .to_response(actix_web::http::StatusCode::NOT_FOUND),
-        Err(err) => {
-            eprintln!("Error getting user token URL: {:?}", err);
-            ErrorResponse::InternalServerError("Failed to get user token URL".to_string())
-                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR)
+    let jwt_token = match request.headers().get("Authorization") {
+        Some(value) => value.to_str().unwrap_or("").to_string(),
+        None => {
+            return ErrorResponse::Unauthorized("No token provided".to_string())
+                .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
         }
+    };
+
+    let jwt_token = jwt_token.replace("Bearer ", "");
+
+    if !jwt::verify_jwt(&cache, &jwt_token) {
+        return ErrorResponse::Unauthorized("Invalid token".to_string())
+            .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
     }
+
+    let user_id = match jwt::get_user_id_by_jwt(&cache, &jwt_token) {
+        Ok(Some(id)) => id,
+        Ok(None) => {
+            return ErrorResponse::Unauthorized("User not found".to_string())
+                .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+        }
+        Err(_) => {
+            return ErrorResponse::Unauthorized("Invalid token".to_string())
+                .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+        }
+    };
+
+    let authentication = match database::model::Authentication::read(&mut db.get_connection(), authentication_id.into_inner()) {
+        Ok(authentication) => authentication,
+        Err(err) => {
+            eprintln!("Error getting authentification: {:?}", err);
+            return ErrorResponse::InternalServerError("Failed to get authentification".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
+    };
+
+    let url = get_authentication_url(authentication, user_id);
+
+    HttpResponse::Ok().json(url)
 }
 
 // ----------------------------
@@ -123,5 +203,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("/user-tokens")
             .service(list_user_tokens_by_user_id)
             .service(get_user_token_by_id)
+            .service(get_user_token_authentication_url_by_authentication_id),
     );
 }

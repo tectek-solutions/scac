@@ -207,6 +207,7 @@ services:
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
     networks:
       - internal
