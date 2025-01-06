@@ -1,8 +1,10 @@
-version: "3.8"
-
 networks:
   internal:
     driver: bridge
+
+volumes:
+  database-data:
+    driver: local
 
 services:
   database:
@@ -31,6 +33,8 @@ services:
         limits:
           cpus: "0.5"
           memory: "512M"
+    volumes:
+      - database-data:/var/lib/postgresql/data
 
   cache:
     image: redis:7.4.1-bookworm
@@ -55,7 +59,9 @@ services:
           memory: "256M"
 
   migration:
-    image: ghcr.io/tectek-solutions/scac:migration-latest
+    build:
+      context: .
+      dockerfile: ./shared/database/Dockerfile
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
     networks:
@@ -65,7 +71,9 @@ services:
         condition: service_healthy
 
   actions-service:
-    image: ghcr.io/tectek-solutions/scac:actions-service-latest
+    build:
+      context: .
+      dockerfile: ./services/actions-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -91,7 +99,9 @@ services:
           memory: "512M"
 
   apis-service:
-    image: ghcr.io/tectek-solutions/scac:apis-service-latest
+    build:
+      context: .
+      dockerfile: ./services/apis-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -117,7 +127,9 @@ services:
           memory: "512M"
 
   authentications-service:
-    image: ghcr.io/tectek-solutions/scac:authentications-service-latest
+    build:
+      context: .
+      dockerfile: ./services/authentications-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -143,7 +155,9 @@ services:
           memory: "512M"
 
   reactions-service:
-    image: ghcr.io/tectek-solutions/scac:reactions-service-latest
+    build:
+      context: .
+      dockerfile: ./services/reactions-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -169,7 +183,9 @@ services:
           memory: "512M"
 
   trigger-service:
-    image: ghcr.io/tectek-solutions/scac:trigger-service-latest
+    build:
+      context: .
+      dockerfile: ./services/trigger-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -195,7 +211,9 @@ services:
           memory: "512M"
 
   user-tokens-service:
-    image: ghcr.io/tectek-solutions/scac:user-tokens-service-latest
+    build:
+      context: .
+      dockerfile: ./services/user-tokens-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -221,7 +239,9 @@ services:
           memory: "512M"
 
   users-service:
-    image: ghcr.io/tectek-solutions/scac:users-service-latest
+    build:
+      context: .
+      dockerfile: ./services/users-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -250,7 +270,9 @@ services:
           memory: "512M"
 
   workflows-service:
-    image: ghcr.io/tectek-solutions/scac:workflows-service-latest
+    build:
+      context: .
+      dockerfile: ./services/workflows-service/Dockerfile
     expose:
       - "8000"
     environment:
@@ -276,7 +298,9 @@ services:
           memory: "512M"
 
   api-gateway:
-    image: ghcr.io/tectek-solutions/scac:api-gateway-latest
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -327,7 +351,9 @@ services:
           memory: "768M"
 
   client:
-    image: ghcr.io/tectek-solutions/scac:client-latest
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
     ports:
       - "3000:3000"
     environment:
