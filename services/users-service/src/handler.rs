@@ -1,18 +1,11 @@
 use actix_web::{get, post, web, HttpResponse, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
-use hmac::{Hmac, Mac};
-use jwt::{SignWithKey, VerifyWithKey};
-use sha2::Sha256;
-use std::collections::BTreeMap;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::env;
 use utoipa::ToSchema;
-use chrono::{Utc, Duration};
-use redis::Commands;
 
 use cache;
 use database;
+use jwt;
 
 use crate::query;
 
@@ -55,117 +48,12 @@ impl ErrorResponse {
 fn is_valid_email(email: &str) -> bool {
     let _ = email;
     true
-
-    // match Regex::new(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
-    //     .is_match(email) {
-    //         Ok(true) => true,
-    //         Ok(false) => false,
-    //         Err(_) => false,
-    // }
 }
 
 fn is_valid_password(password: &str) -> bool {
     let _ = password;
     true
-    
-    // match Regex::new(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$")
-    //     .is_match(password) {
-    //         Ok(true) => true,
-    //         Ok(false) => false,
-    //         Err(_) => false,
-    // }
 }
-
-fn signing_jwt(cache: &web::Data<cache::Cache>, user_id: i32) -> Result<String, String> {
-    let mut cache_connection = cache.get_connection();
-
-    let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set".to_string())?;
-    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_ref())
-        .map_err(|_| "HMAC creation failed".to_string())?;
-    
-    let mut claims = BTreeMap::new();
-    claims.insert("id".to_string(), user_id.to_string());
-    claims.insert(
-        "expiration".to_string(),
-        (Utc::now() + Duration::days(1)).timestamp().to_string(),
-    );
-
-    let token = claims
-        .sign_with_key(&key)
-        .map_err(|_| "Failed to sign claims".to_string())?;
-
-    // Store the token in Redis
-    let _: () = cache_connection
-        .set_ex(format!("token:{}", user_id), &token, 86400)
-        .map_err(|_| "Failed to store token in Redis".to_string())?;
-
-    Ok(token)
-}
-
-
-fn verify_jwt(cache: &web::Data<cache::Cache>, token: &str) -> bool {
-    let mut cache_connection = cache.get_connection();
-
-    let jwt_secret = match env::var("JWT_SECRET") {
-        Ok(secret) => secret,
-        Err(_) => return false,
-    };
-
-    let key: Hmac<Sha256> = match Hmac::new_from_slice(jwt_secret.as_ref()) {
-        Ok(k) => k,
-        Err(_) => return false,
-    };
-
-    let claims: BTreeMap<String, String> = match token.verify_with_key(&key) {
-        Ok(c) => c,
-        Err(_) => return false,
-    };
-
-    if let Some(expiration) = claims.get("expiration") {
-        if let Ok(expiration_ts) = expiration.parse::<i64>() {
-            if expiration_ts < Utc::now().timestamp() {
-                return false; // Token has expired
-            }
-        } else {
-            return false; // Invalid expiration timestamp
-        }
-    }
-
-    // Check if token exists in Redis
-    let redis_key = format!("token:{}", claims.get("id").unwrap_or(&"".to_string()));
-    match cache_connection.exists(&redis_key) {
-        Ok(true) => true,
-        _ => false,
-    }
-}
-
-fn get_user_id_by_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Result<Option<i32>, String> {
-    let mut cache_connection = cache.get_connection();
-
-    let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set".to_string())?;
-    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_ref())
-        .map_err(|_| "HMAC creation failed".to_string())?;
-
-    let claims: BTreeMap<String, String> = token
-        .verify_with_key(&key)
-        .map_err(|_| "Failed to verify token".to_string())?;
-
-    // Check if token exists in Redis
-    let redis_key = format!("token:{}", claims.get("id").unwrap_or(&"".to_string()));
-    if !cache_connection.exists(&redis_key).map_err(|_| "Redis check failed".to_string())? {
-        return Ok(None);
-    }
-
-    // Extract user ID
-    match claims.get("id") {
-        Some(id) => match id.parse::<i32>() {
-            Ok(id) => Ok(Some(id)),
-            Err(_) => Err("Failed to parse user ID".to_string()),
-        },
-        None => Ok(None),
-    }
-}
-
 
 // ----------------------------
 // Handlers
@@ -233,7 +121,7 @@ async fn sign_up(
         },
     ) {
         Ok(Some(new_user)) => {
-            let token = signing_jwt(&cache, new_user.id);
+            let token = jwt::signing_jwt(&cache, new_user.id);
             HttpResponse::Created().json(token)
         }
         Ok(None) => ErrorResponse::InternalServerError("Failed to add user".to_string())
@@ -281,7 +169,7 @@ async fn sign_in(
             .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
     }
 
-    match signing_jwt(&cache, existing_user.id) {
+    match jwt::signing_jwt(&cache, existing_user.id) {
         Ok(token) => HttpResponse::Ok().json(token),
         Err(_) => ErrorResponse::InternalServerError("Failed to sign token".to_string())
             .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR),
@@ -300,7 +188,7 @@ async fn sign_in(
 )]
 #[post("/sign_out")]
 async fn sign_out(cache: web::Data<cache::Cache>, token: web::ReqData<String>) -> impl Responder {
-    if !verify_jwt(&cache, &token.into_inner()) {
+    if !jwt::verify_jwt(&cache, &token.into_inner()) {
         return ErrorResponse::Unauthorized("Invalid token".to_string())
             .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
     }
@@ -324,7 +212,7 @@ async fn me(
     cache: web::Data<cache::Cache>,
     token: web::ReqData<String>,
 ) -> impl Responder {
-    let user_id = match get_user_id_by_jwt(&cache, &token.into_inner()) {
+    let user_id = match jwt::get_user_id_by_jwt(&cache, &token.into_inner()) {
         Ok(Some(id)) => id,
         Ok(None) => {
             return ErrorResponse::Unauthorized("User not found".to_string())
