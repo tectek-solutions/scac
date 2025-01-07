@@ -12,7 +12,7 @@ class ServicePage extends StatefulWidget {
 }
 
 class _ServicePageState extends State<ServicePage> {
-  ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/authentications/');
+  ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/authentications');
   List<dynamic> services = [];
 
   _ServicePageState() {
