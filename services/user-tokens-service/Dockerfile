@@ -24,7 +24,7 @@ FROM debian:bookworm AS runtime
 
 # Install runtime dependencies if required
 RUN apt-get update
-RUN apt-get install -y libpq5
+RUN apt-get install -y libpq5 ca-certificates
 
 # Add non-root user and group
 RUN groupadd user-tokens-service

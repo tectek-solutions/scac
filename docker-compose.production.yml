@@ -336,7 +336,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      API_URL: http://api-gateway:8000
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:8000
     networks:
       - internal
     depends_on:
