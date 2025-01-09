@@ -404,7 +404,7 @@ impl Reaction {
 #[diesel(table_name = workflows)]
 pub struct Workflow {
     pub id: i32,
-    pub user_id: i32,
+    pub users_id: i32,
     pub name: String,
     pub description: Option<String>,
     pub action_id: i32,
@@ -417,7 +417,7 @@ pub struct Workflow {
 #[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = workflows)]
 pub struct CreateWorkflow {
-    pub user_id: i32,
+    pub users_id: i32,
     pub name: String,
     pub description: Option<String>,
     pub action_id: i32,
@@ -428,7 +428,7 @@ pub struct CreateWorkflow {
 #[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = workflows)]
 pub struct UpdateWorkflow {
-    pub user_id: Option<i32>,
+    pub users_id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub action_id: Option<i32>,

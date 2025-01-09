@@ -99,7 +99,7 @@ diesel::table! {
 diesel::table! {
     workflows (id) {
         id -> Int4,
-        user_id -> Int4,
+        users_id -> Int4,
         #[max_length = 32]
         name -> Varchar,
         description -> Nullable<Text>,
@@ -119,7 +119,7 @@ diesel::joinable!(user_tokens -> authentications (authentication_id));
 diesel::joinable!(user_tokens -> users (users_id));
 diesel::joinable!(workflows -> actions (action_id));
 diesel::joinable!(workflows -> reactions (reaction_id));
-diesel::joinable!(workflows -> users (user_id));
+diesel::joinable!(workflows -> users (users_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     actions,
