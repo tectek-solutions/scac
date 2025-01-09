@@ -85,7 +85,6 @@ class _RegistrationState extends State<Registration> {
                           final password_confirmation = _password_confirmationController.text;
                           try {
                             final response = await _apiService.signUp(name, email, password, password_confirmation);
-
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
