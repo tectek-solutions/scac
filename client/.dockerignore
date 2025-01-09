@@ -1,5 +1,8 @@
-/.dart_tool/
-/.idea/
-/.gitingore
-/.git/
-/README.md
+.dart_tool/*
+build/*
+.idea/()
+.gitingore
+.git/*
+README.md
+.flutter-plugins
+.flutter-plugins-dependencies

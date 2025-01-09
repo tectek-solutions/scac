@@ -209,6 +209,8 @@ services:
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:

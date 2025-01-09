@@ -58,7 +58,8 @@ fn configure_cors() -> Cors {
         handler::list_user_tokens_by_user_id,
         handler::get_user_token_by_id,
         handler::get_user_token_authentication_url_by_authentication_id,
-        handler::create_user_token
+        handler::create_user_token,
+        handler::get_user_token_by_authentication_id
     ),
 )]
 struct ApiDoc;
