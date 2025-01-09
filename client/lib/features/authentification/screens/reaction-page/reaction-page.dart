@@ -32,6 +32,7 @@ class _ReactionPageState extends State<ReactionPage> {
 
   Future<void> navigateToIntermediatePage(BuildContext context, dynamic card, int index) async {
     final service = services[index];
+    //remplacer par le bon call back url
     final response = await http.get(Uri.parse('$baseUrlString/api/check-token?service=${service['title']}'));
 
     if (response.statusCode == 200) {
