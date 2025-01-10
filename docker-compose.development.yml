@@ -70,121 +70,121 @@ services:
       database:
         condition: service_healthy
 
-  # actions-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/actions-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     RUST_LOG: info
-  #     BINDING_ADDRESS: 0.0.0.0
-  #     BINDING_PORT: 8000
-  #     POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
-  #     JWT_SECRET: ${JWT_SECRET}
-  #     API_URL: http://localhost:8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - migration
-  #     - cache
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
+  actions-service:
+    build:
+      context: .
+      dockerfile: ./services/actions-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
 
-  # apis-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/apis-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     RUST_LOG: info
-  #     BINDING_ADDRESS: 0.0.0.0
-  #     BINDING_PORT: 8000
-  #     POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
-  #     JWT_SECRET: ${JWT_SECRET}
-  #     API_URL: http://localhost:8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - migration
-  #     - cache
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
+  apis-service:
+    build:
+      context: .
+      dockerfile: ./services/apis-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
 
-  # authentications-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/authentications-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     RUST_LOG: info
-  #     BINDING_ADDRESS: 0.0.0.0
-  #     BINDING_PORT: 8000
-  #     POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
-  #     JWT_SECRET: ${JWT_SECRET}
-  #     API_URL: http://localhost:8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - migration
-  #     - cache
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
+  authentications-service:
+    build:
+      context: .
+      dockerfile: ./services/authentications-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
 
-  # reactions-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/reactions-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     RUST_LOG: info
-  #     BINDING_ADDRESS: 0.0.0.0
-  #     BINDING_PORT: 8000
-  #     POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
-  #     JWT_SECRET: ${JWT_SECRET}
-  #     API_URL: http://localhost:8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - migration
-  #     - cache
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
+  reactions-service:
+    build:
+      context: .
+      dockerfile: ./services/reactions-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
 
   # trigger-service:
   #   build:
@@ -278,34 +278,34 @@ services:
           cpus: "0.5"
           memory: "512M"
 
-  # workflows-service:
-  #   build:
-  #     context: .
-  #     dockerfile: ./services/workflows-service/Dockerfile
-  #   expose:
-  #     - "8000"
-  #   environment:
-  #     RUST_LOG: info
-  #     BINDING_ADDRESS: 0.0.0.0
-  #     BINDING_PORT: 8000
-  #     POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
-  #     JWT_SECRET: ${JWT_SECRET}
-  #     API_URL: http://localhost:8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - migration
-  #     - cache
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
+  workflows-service:
+    build:
+      context: .
+      dockerfile: ./services/workflows-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "512M"
 
   api-gateway:
     build:
@@ -336,14 +336,14 @@ services:
     networks:
       - internal
     depends_on:
-      # - actions-service
-      # - apis-service
-      # - authentications-service
-      # - reactions-service
+      - actions-service
+      - apis-service
+      - authentications-service
+      - reactions-service
       # - trigger-service
       - user-tokens-service
       - users-service
-      # - workflows-service
+      - workflows-service
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
       interval: 10s
