@@ -4,6 +4,7 @@ import 'package:client/features/authentification/services/api.service.dart';
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
+
   @override
   State<Profile> createState() => _ProfileState();
 }
@@ -18,7 +19,7 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    _apiService.fetchUserProfile(token).then((value) {
+    _apiService.fetchUserProfile().then((value) {
       setState(() {
         _isLoading = false;
         if (value is Map<String, dynamic>) {
