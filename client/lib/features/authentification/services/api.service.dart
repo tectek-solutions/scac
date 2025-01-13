@@ -51,7 +51,27 @@ class ApiAccountService {
 
   Future<void> signOut(String token) async {
     final url = Uri.parse('$baseUrl/users/sign_out');
-    final response = await http.post(
+    final response = await http.delete(
+      url,
+      headers: {
+        'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      return;
+    } else if (response.statusCode == 401) {
+      throw Exception('Unauthorized');
+    } else if (response.statusCode == 500) {
+      throw Exception('Internal server error');
+    } else {
+      throw Exception('Error');
+    }
+
+  }
+
+  Future<Map<String, dynamic>> fetchUserProfile(String token) async {
+    final url = Uri.parse('$baseUrl/users/me');
+    final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
@@ -59,8 +79,14 @@ class ApiAccountService {
       },
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to sign out');
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else if (response.statusCode == 401) {
+      throw Exception('Unauthorized');
+    } else if (response.statusCode == 500) {
+      throw Exception('Internal server error');
+    } else {
+      throw Exception('Error');
     }
   }
 }
