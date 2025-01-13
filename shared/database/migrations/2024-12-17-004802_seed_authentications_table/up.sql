@@ -21,9 +21,44 @@ VALUES (
         'jpK8Q~hhwAuZjrPU1t6IOVuEfZ5n6K6PaX0ptaiX'
     ),
     (
-        'Discord',
-        'https://discord.com/oauth2/authorize?client_id={ client_id }&response_type=code&redirect_uri={ redirect_uri }&scope=dm_channels.messages.write dm_channels.read dm_channels.messages.read',
-        'https://discord.com/api/oauth2/token',
-        '1326172743338561667',
-        '52VJGLl-l4iwxeHTjOuPhcse10Mmsi1E'
+        'Spotify',
+        'https://accounts.spotify.com/authorize?client_id={ client_id }&response_type=code&redirect_uri={ redirect_uri }&scope=user-read-private',
+        'https://accounts.spotify.com/api/token',
+        '03e70d87d1194dc5a9dbaeb69717dbf7',
+        'b30fee01dd0e4388b19386bd6c9e6423'
+    ),
+    (
+        'Reddit',
+        'https://www.reddit.com/api/v1/authorize?client_id={ client_id }&response_type=code&redirect_uri={ redirect_uri }&duration=permanent&scope=identity',
+        'https://www.reddit.com/api/v1/access_token',
+        'o0pakhk3vj0ExwxHAGQNsw',
+        'G6rQFY1oKJalTsyQTFFr71g47_6ofw'
+    ),
+    (
+        'Twitter',
+        'https://twitter.com/i/oauth2/authorize?client_id={ client_id }&response_type=code&redirect_uri={ redirect_uri }&scope=tweet.read users.read follows.read offline.access&state=state&code_challenge=challenge&code_challenge_method=plain',
+        'https://api.x.com/2/oauth2/token',
+        'TDBIUmgxeE5Qd3pfNmh2TlN3LTA6MTpjaQ',
+        'lmYGXBmEhD89tnqZlSwCwiGAXSIWB_ct5YKh5fZt4-c8mZnMVD'
+    ),
+    (
+        'Facebook',
+        'https://www.facebook.com/v21.0/dialog/oauth?client_id={ client_id }&redirect_uri={ redirect_uri }&scope=public_profile',
+        'https://graph.facebook.com/v21.0/oauth/access_token?client_id={ client_id }&redirect_uri={ redirect_uri }&client_secret={ client_secret }&code={ code }',
+        '1296112668301301',
+        '55f63103f67c32fe01a6fbbbe495e994'
+    ),
+    (
+        'Github',
+        'https://github.com/login/oauth/authorize?client_id={ client_id }&redirect_uri={ redirect_uri }&scope=user%20repo',
+        'https://github.com/login/oauth/access_token',
+        'Ov23li78H0Y0Sus4gKoe',
+        '8da9212dd0c0dea2cb454aa80db0459f4a3fd835'
+    ),
+    (
+        'SumUp',
+        'https://api.sumup.com/authorize?response_type=code&client_id={ client_id }&redirect_uri={ redirect_uri }&scope=email%20profile',
+        'https://api.sumup.com/token',
+        'cc_classic_SUh58NKFbNqnhPjG5bS5hWrmzGY0E',
+        'cc_sk_classic_XuIP1KOWmIiY6EZmtqFnq6cJ1amUhNk2wP6to5qGfM9PQH5gd5'
     )

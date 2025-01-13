@@ -306,9 +306,12 @@ async fn create_user_token(
 
     let client = reqwest::Client::new();
 
+    let authorization_header = format!("Basic {}", base64::encode(format!("{}:{}", authentication.client_id, authentication.client_secret)));
+
     let request = client
         .post(&url)
         .header("Content-Type", "application/x-www-form-urlencoded")
+        .header("Authorization", authorization_header)
         .form(&params);
 
     println!("Request: {:?}", request);
@@ -349,7 +352,7 @@ async fn create_user_token(
 
     let user_token = database::model::CreateUserToken {
         users_id: user_id,
-        authentication_id: authentication_id,
+        authentications_id: authentication_id,
         access_token: json["access_token"].as_str().unwrap().to_string(),
         refresh_token: Some(refresh_token.to_string()),
         expires_at: chrono::Utc::now().naive_utc() + chrono::Duration::seconds(json["expires_in"].as_i64().unwrap()),
@@ -375,7 +378,7 @@ async fn create_user_token(
         Err(_) => {
             let user_token = database::model::CreateUserToken {
                 users_id: user_id,
-                authentication_id: authentication_id,
+                authentications_id: authentication_id,
                 access_token: json["access_token"].as_str().unwrap().to_string(),
                 refresh_token: Some(refresh_token.to_string()),
                 expires_at: chrono::Utc::now().naive_utc() + chrono::Duration::seconds(json["expires_in"].as_i64().unwrap()),

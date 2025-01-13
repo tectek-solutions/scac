@@ -5,6 +5,8 @@ ARG NGINX_VERSION=1.27.3
 # Environment to install Flutter and build web
 FROM debian:bookworm-slim AS builder
 
+VOLUME [ "/home/flutter" ]
+
 # Install dependencies
 RUN apt-get update
 RUN apt-get install -y curl git unzip xz-utils zip libglu1-mesa
