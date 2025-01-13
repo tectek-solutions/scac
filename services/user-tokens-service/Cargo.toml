@@ -25,3 +25,4 @@ database = { path = "../../shared/database" }
 jwt = { path = "../../shared/jwt" }
 tinytemplate = "1.2.1"
 cache = { path = "../../shared/cache" }
+base64 = "0.22.1"

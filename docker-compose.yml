@@ -73,7 +73,7 @@ services:
     expose:
       - "8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -99,7 +99,7 @@ services:
     expose:
       - "8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -125,7 +125,7 @@ services:
     expose:
       - "8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -151,7 +151,7 @@ services:
     expose:
       - "8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -177,7 +177,7 @@ services:
     expose:
       - "8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -203,12 +203,14 @@ services:
     expose:
       - "8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -230,7 +232,7 @@ services:
     expose:
       - "8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -259,7 +261,7 @@ services:
     expose:
       - "8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -285,7 +287,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      RUST_LOG: info
+      RUST_LOG: debug
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       ACTIONS_SERVICE_ADDRESS: actions-service
@@ -336,7 +338,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      API_URL: http://api-gateway:8000
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:8000
     networks:
       - internal
     depends_on:

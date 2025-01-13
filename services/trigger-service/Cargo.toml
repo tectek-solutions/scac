@@ -22,3 +22,7 @@ utoipa-swagger-ui = { version = "8", features = ["actix-web"] }
 uuid = { version = "1.11.0", features = ["v4"] }
 diesel = { version = "2.0.0", features = ["postgres", "chrono", "serde_json"] }
 database = { path = "../../shared/database" }
+cache = { path = "../../shared/cache" }
+jwt = { path = "../../shared/jwt" }
+tokio = { version = "1.43.0" }
+log = "0.4.24"

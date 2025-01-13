@@ -1,5 +1,6 @@
 use actix_web::web;
 use database::model::{UserToken, CreateUserToken, UpdateUserToken};
+use database::schema;
 use diesel::prelude::*;
 
 pub fn list_user_tokens_by_user_id_query(
@@ -39,7 +40,7 @@ pub fn get_user_token_by_id_query(
     }
 }
 
-pub fn create_user_token(
+pub fn create_user_token_query(
     database: &web::Data<database::Database>,
     new_user: CreateUserToken,
 ) -> Result<Option<UserToken>, diesel::result::Error> {
@@ -55,7 +56,7 @@ pub fn create_user_token(
     }
 }
 
-pub fn update_user_token(
+pub fn update_user_token_query(
     database: &web::Data<database::Database>,
     update_id: i32,
     update_user_token: UpdateUserToken,
@@ -70,7 +71,7 @@ pub fn update_user_token(
     }
 }
 
-pub fn delete_user_token(
+pub fn delete_user_token_query(
     database: &web::Data<database::Database>,
     delete_id: i32,
 ) -> Result<Option<UserToken>, diesel::result::Error> {
@@ -89,4 +90,27 @@ pub fn delete_user_token(
             Err(err)
         }
     }
+}
+
+pub fn get_user_token_by_authentication_id_query(
+    database: &web::Data<database::Database>,
+    search_autthenication_id: i32,
+    search_user_id: i32,
+) -> Result<Option<UserToken>, diesel::result::Error> {
+    let mut database_connection = database.get_connection();
+
+    let result = match schema::user_tokens::table
+        .filter(schema::user_tokens::authentications_id.eq(search_autthenication_id))
+        .filter(schema::user_tokens::users_id.eq(search_user_id))
+        .first::<UserToken>(&mut database_connection)
+        .optional() {
+        Ok(Some(user)) => Ok(Some(user)),
+        Ok(None) => Ok(None),
+        Err(err) => {
+            eprintln!("Error getting user token: {:?}", err);
+            Err(err)
+        }
+    };
+
+    result
 }

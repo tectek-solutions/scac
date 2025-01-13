@@ -11,7 +11,7 @@ pub fn list_workflows_by_user_id_query(
 
     let mut database_connection = database.get_connection();
     let result = workflows
-        .filter(user_id.eq(search_id))
+        .filter(users_id.eq(search_id))
         .select(Workflow::as_select())
         .load::<Workflow>(&mut database_connection)
         .optional();
@@ -29,15 +29,29 @@ pub fn list_workflows_by_user_id_query(
     }
 }
 
-pub fn get_workflow_by_id_query(
+pub fn get_workflow_by_id_by_user_id_query(
     database: &web::Data<database::Database>,
-    search_id: i32,
+    search_workflow_id: i32,
+    search_user_id: i32,
 ) -> Result<Option<Workflow>, diesel::result::Error> {
+    use database::schema::workflows::dsl::*;
+
     let mut database_connection = database.get_connection();
-    match Workflow::read(&mut database_connection, search_id) {
-        Ok(workflows) => Ok(Some(workflows)),
+    let result = workflows
+        .filter(users_id.eq(search_user_id))
+        .filter(id.eq(search_workflow_id))
+        .select(Workflow::as_select()) 
+        .first::<Workflow>(&mut database_connection)
+        .optional();
+
+    match result {
+        Ok(Some(result)) => Ok(Some(result)),
+        Ok(None) => Ok(None),
         Err(err) => {
-            eprintln!("Error getting workflow with ID {:?}: {:?}", search_id, err);
+            eprintln!(
+                "Error getting workflow with ID {:?} for user with ID {:?}: {:?}",
+                search_workflow_id, search_user_id, err
+            );
             Err(err)
         }
     }
