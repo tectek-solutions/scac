@@ -73,6 +73,26 @@ class ApiAccountService {
       throw Exception('Error');
     }
   }
+
+  Future<Map<String, dynamic>> fetchUserProfile() async {
+    final url = Uri.parse('$baseUrl/users/me');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else if (response.statusCode == 401) {
+      throw Exception('Unauthorized');
+    } else if (response.statusCode == 500) {
+      throw Exception('Internal server error');
+    } else {
+      throw Exception('Error');
+    }
+  }
 }
 
 void decodeJwt(String token) {
@@ -114,4 +134,12 @@ Future<bool> isTokenExpired() async {
     print("Erreur lors de la vérification du token : $e");
     return true;
   }
+}
+
+Future<String> getToken() async {
+  final token = await storage.read(key: 'jwt');
+  if (token == null) {
+    throw Exception('Token not found');
+  }
+  return token;
 }

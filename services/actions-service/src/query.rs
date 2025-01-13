@@ -11,7 +11,7 @@ pub fn list_actions_by_api_service_id_query(
 
     let mut database_connection = database.get_connection();
     let result = actions
-        .filter(api_id.eq(search_id))
+        .filter(apis_id.eq(search_id))
         .select(Action::as_select())
         .load::<Action>(&mut database_connection);
 

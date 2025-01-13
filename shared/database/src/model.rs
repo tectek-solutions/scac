@@ -134,7 +134,7 @@ impl Authentication {
 pub struct UserToken {
     pub id: i32,
     pub users_id: i32,
-    pub authentication_id: i32,
+    pub authentications_id: i32,
     pub access_token: String,
     pub refresh_token: Option<String>,
     pub expires_at: NaiveDateTime,
@@ -146,7 +146,7 @@ pub struct UserToken {
 #[diesel(table_name = user_tokens)]
 pub struct CreateUserToken {
     pub users_id: i32,
-    pub authentication_id: i32,
+    pub authentications_id: i32,
     pub access_token: String,
     pub refresh_token: Option<String>,
     pub expires_at: NaiveDateTime,
@@ -196,7 +196,7 @@ impl UserToken {
 #[diesel(table_name = apis)]
 pub struct Api {
     pub id: i32,
-    pub authentication_id: i32,
+    pub authentications_id: i32,
     pub name: String,
     pub base_url: String,
     pub created_at: Option<NaiveDateTime>,
@@ -206,7 +206,7 @@ pub struct Api {
 #[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = apis)]
 pub struct CreateApi {
-    pub authentication_id: i32,
+    pub authentications_id: i32,
     pub name: String,
     pub base_url: String,
 }
@@ -214,7 +214,7 @@ pub struct CreateApi {
 #[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = apis)]
 pub struct UpdateApi {
-    pub authentication_id: Option<i32>,
+    pub authentications_id: Option<i32>,
     pub name: Option<String>,
     pub base_url: Option<String>,
 }
@@ -255,7 +255,7 @@ impl Api {
 #[diesel(table_name = actions)]
 pub struct Action {
     pub id: i32,
-    pub api_id: i32,
+    pub apis_id: i32,
     pub name: String,
     pub description: Option<String>,
     pub http_method: String,
@@ -270,7 +270,7 @@ pub struct Action {
 #[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = actions)]
 pub struct CreateAction {
-    pub api_id: i32,
+    pub apis_id: i32,
     pub name: String,
     pub description: Option<String>,
     pub http_method: String,
@@ -283,7 +283,7 @@ pub struct CreateAction {
 #[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = actions)]
 pub struct UpdateAction {
-    pub api_id: Option<i32>,
+    pub apis_id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub http_method: Option<String>,
@@ -330,7 +330,7 @@ impl Action {
 
 pub struct Reaction {
     pub id: i32,
-    pub api_id: i32,
+    pub apis_id: i32,
     pub name: String,
     pub description: Option<String>,
     pub http_method: String,
@@ -345,7 +345,7 @@ pub struct Reaction {
 #[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = reactions)]
 pub struct CreateReaction {
-    pub api_id: i32,
+    pub apis_id: i32,
     pub name: String,
     pub description: Option<String>,
     pub http_method: String,
@@ -358,7 +358,7 @@ pub struct CreateReaction {
 #[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = reactions)]
 pub struct UpdateReaction {
-    pub api_id: Option<i32>,
+    pub apis_id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
     pub http_method: Option<String>,
@@ -404,11 +404,11 @@ impl Reaction {
 #[diesel(table_name = workflows)]
 pub struct Workflow {
     pub id: i32,
-    pub user_id: i32,
+    pub users_id: i32,
     pub name: String,
     pub description: Option<String>,
-    pub action_id: i32,
-    pub reaction_id: i32,
+    pub actions_id: i32,
+    pub reactions_id: i32,
     pub data_transformation: Option<serde_json::Value>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
@@ -417,22 +417,22 @@ pub struct Workflow {
 #[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = workflows)]
 pub struct CreateWorkflow {
-    pub user_id: i32,
+    pub users_id: i32,
     pub name: String,
     pub description: Option<String>,
-    pub action_id: i32,
-    pub reaction_id: i32,
+    pub actions_id: i32,
+    pub reactions_id: i32,
     pub data_transformation: Option<serde_json::Value>,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = workflows)]
 pub struct UpdateWorkflow {
-    pub user_id: Option<i32>,
+    pub users_id: Option<i32>,
     pub name: Option<String>,
     pub description: Option<String>,
-    pub action_id: Option<i32>,
-    pub reaction_id: Option<i32>,
+    pub actions_id: Option<i32>,
+    pub reactions_id: Option<i32>,
     pub data_transformation: Option<serde_json::Value>,
 }
 
@@ -464,7 +464,7 @@ impl Workflow {
 #[diesel(table_name = triggers)]
 pub struct Trigger {
     pub id: i32,
-    pub workflow_id: i32,
+    pub workflows_id: i32,
     pub data: Option<serde_json::Value>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
@@ -473,14 +473,14 @@ pub struct Trigger {
 #[derive(Insertable, Deserialize, ToSchema)]
 #[diesel(table_name = triggers)]
 pub struct CreateTrigger {
-    pub workflow_id: i32,
+    pub workflows_id: i32,
     pub data: Option<serde_json::Value>,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = triggers)]
 pub struct UpdateTrigger {
-    pub workflow_id: Option<i32>,
+    pub workflows_id: Option<i32>,
     pub data: Option<serde_json::Value>,
 }
 

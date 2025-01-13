@@ -26,7 +26,7 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: TAppTheme.lightTheme,
       darkTheme: TAppTheme.darkTheme,
-      home: isTokenExpired ? const LoginScreen() : const MainScreen(),
+      home: isTokenExpired ? LoginScreen(secureStorage:const FlutterSecureStorage()) : const MainScreen(),
     );
   }
 }

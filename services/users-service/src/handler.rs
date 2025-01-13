@@ -2,7 +2,7 @@ use actix_web::{get, post, web, HttpResponse, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-
+    
 use cache;
 use database;
 use jwt;

@@ -1,5 +1,5 @@
 -- Your SQL goes here
-INSERT INTO apis (authentication_id, name, base_url)
+INSERT INTO apis (authentications_id, name, base_url)
 VALUES (
         (
             SELECT id
