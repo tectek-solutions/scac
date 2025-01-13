@@ -4,7 +4,6 @@ import 'package:client/features/services/api.service.dart';
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
-
   @override
   State<Profile> createState() => _ProfileState();
 }
@@ -19,21 +18,23 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    _apiService.fetchUserProfile().then((value) {
-      setState(() {
-        _isLoading = false;
-        if (value is Map<String, dynamic>) {
-          _userProfile = value;
-        } else {
-          _hasError = true;
-        }
-      });
-    });
+    _fetchUserProfile();
   }
 
-  void _logout() {
-    // Implement your logout functionality here
-    print('User logged out');
+  Future<void> _fetchUserProfile() async {
+    try {
+      final profile = await _apiService.fetchUserProfile();
+      setState(() {
+        _userProfile = profile;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+      print('Error fetching user profile: $e');
+    }
   }
 
   @override
@@ -84,7 +85,9 @@ class _ProfileState extends State<Profile> {
                           width: 150,
                           height: 60,
                           child: ElevatedButton(
-                            onPressed: _logout,
+                            onPressed: () async {
+                              await _apiService.signOut();
+                            },
                             child: const Text('Logout'),
                           ),
                         ),

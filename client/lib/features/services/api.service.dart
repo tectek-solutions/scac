@@ -58,10 +58,14 @@ class ApiAccountService {
   }
 
   Future<void> signOut() async {
+    final token = await getToken();
     final url = Uri.parse('$baseUrl/users/sign_out');
     final response = await http.delete(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
     if (response.statusCode == 200) {
       await storage.delete(key: 'jwt');
@@ -75,11 +79,13 @@ class ApiAccountService {
   }
 
   Future<Map<String, dynamic>> fetchUserProfile() async {
+    final token = await getToken();
     final url = Uri.parse('$baseUrl/users/me');
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
     );
 
