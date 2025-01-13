@@ -79,8 +79,7 @@ void decodeJwt(String token) {
   List<String> parts = token.split('.');
   if (parts.length == 3) {
     String payload = parts[1];
-    String decoded = _base64UrlDecode(payload);
-    print("Decoded JWT Payload: $decoded");
+    _base64UrlDecode(payload);
   } else {
     print("Token mal formé");
   }
