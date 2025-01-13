@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse, HttpRequest, Responder};
+use actix_web::{get, post, delete, web, HttpResponse, HttpRequest, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -177,7 +177,7 @@ async fn sign_in(
 }
 
 #[utoipa::path(
-    post,
+    delete,
     path = "/users/sign_out",
     tag = "users",
     responses(
@@ -186,11 +186,29 @@ async fn sign_in(
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
-#[post("/sign_out")]
-async fn sign_out(cache: web::Data<cache::Cache>, token: web::ReqData<String>) -> impl Responder {
-    if !jwt::verify_jwt(&cache, &token.into_inner()) {
+#[delete("/sign_out")]
+async fn sign_out(cache: web::Data<cache::Cache>, request: HttpRequest) -> impl Responder {
+    let jwt_token = match request.headers().get("Authorization") {
+        Some(value) => value.to_str().unwrap_or("").to_string(),
+        None => {
+            return ErrorResponse::Unauthorized("No token provided".to_string())
+                .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+        }
+    };
+
+    let jwt_token = jwt_token.replace("Bearer ", "");
+
+    if !jwt::verify_jwt(&cache, &jwt_token) {
         return ErrorResponse::Unauthorized("Invalid token".to_string())
             .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+    }
+
+    match jwt::delete_jwt(&cache, &jwt_token) {
+        Ok(_) => {}
+        Err(_) => {
+            return ErrorResponse::InternalServerError("Failed to delete token".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
     }
 
     HttpResponse::Ok().finish()

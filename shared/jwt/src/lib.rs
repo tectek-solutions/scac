@@ -86,7 +86,7 @@ pub fn get_user_id_by_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Resul
     // Check if token exists in Redis
     let redis_key = format!("token:{}", claims.get("id").unwrap_or(&"".to_string()));
     if !cache_connection.exists(&redis_key).map_err(|_| "Redis check failed".to_string())? {
-        return Ok(None);
+        return Err("Token not found in Redis".to_string());
     }
 
     // Extract user ID
@@ -96,5 +96,29 @@ pub fn get_user_id_by_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Resul
             Err(_) => Err("Failed to parse user ID".to_string()),
         },
         None => Ok(None),
+    }
+}
+
+pub fn delete_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Result<(), String> {
+    let mut cache_connection = cache.get_connection();
+
+    let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set".to_string())?;
+    let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_ref())
+        .map_err(|_| "HMAC creation failed".to_string())?;
+
+    let claims: BTreeMap<String, String> = token
+        .verify_with_key(&key)
+        .map_err(|_| "Failed to verify token".to_string())?;
+
+    // Check if token exists in Redis
+    let redis_key = format!("token:{}", claims.get("id").unwrap_or(&"".to_string()));
+    if !cache_connection.exists(&redis_key).map_err(|_| "Redis check failed".to_string())? {
+        return Err("Token not found in Redis".to_string());
+    }
+
+    // Delete token from Redis
+    match cache_connection.del::<_, ()>(&redis_key) {
+        Ok(_) => Ok(()),
+        Err(_) => Err("Failed to delete token from Redis".to_string()),
     }
 }
