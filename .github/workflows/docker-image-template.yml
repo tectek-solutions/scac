@@ -29,10 +29,6 @@ jobs:
   build_and_push:
     runs-on: ubuntu-latest
     
-    strategy:
-      matrix:
-        platform: [linux/amd64, linux/arm64]
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
@@ -46,7 +42,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-docker-${{ github.ref }}-${{ matrix.platform }}
+          key: ${{ runner.os }}-docker-${{ github.ref }}
           restore-keys: |
             ${{ runner.os }}-docker-${{ github.ref }}
             ${{ runner.os }}-docker
@@ -64,7 +60,6 @@ jobs:
           docker buildx build \
             --file ${{ inputs.dockerfile }} \
             --tag ${{ inputs.image_name }} \
-            --platform "${{ matrix.platform }}" \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
             ${{ env.mode }} \
