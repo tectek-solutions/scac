@@ -1,5 +1,5 @@
-import 'package:client/features/authentification/services/api.area.service.dart';
-import 'package:client/features/authentification/screens/reaction-page/detail-page-reaction.dart';
+import 'package:client/features/services/api.area.service.dart';
+import 'package:client/features/area/screens/reaction-page/detail-page-reaction.dart';
 import 'package:client/widgets/card-grid.dart';
 import 'package:flutter/material.dart';
 

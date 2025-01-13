@@ -1,10 +1,10 @@
 import 'package:client/common/style/spacing_styles.dart';
-import 'package:client/features/authentification/screens/create-page/create-page.dart';
-import 'package:client/features/authentification/screens/service-page/services-page.dart';
-import 'package:client/features/authentification/screens/explore-page/explore-page.dart';
-import 'package:client/features/authentification/screens/home-page/home-page.dart';
+import 'package:client/features/app/screens/create-page/create-page.dart';
+import 'package:client/features/area/screens/service-page/services-page.dart';
+import 'package:client/features/app/screens/explore-page/explore-page.dart';
+import 'package:client/features/app/screens/home-page/home-page.dart';
 import 'package:client/features/authentification/screens/login/login.dart';
-import 'package:client/features/authentification/screens/profile/profile.dart';
+import 'package:client/features/app/screens/profile/profile.dart';
 import 'package:client/utils/constants/colors.dart';
 import 'package:client/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';

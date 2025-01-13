@@ -1,5 +1,5 @@
-import 'package:client/features/authentification/screens/reaction-page/reaction-page.dart';
-import 'package:client/features/authentification/screens/service-page/services-page.dart';
+import 'package:client/features/area/screens/reaction-page/reaction-page.dart';
+import 'package:client/features/area/screens/service-page/services-page.dart';
 import 'package:flutter/material.dart';
 
 class CreatePage extends StatefulWidget {

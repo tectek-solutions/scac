@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:client/features/authentification/services/api.area.service.dart';
+import 'package:client/features/services/api.area.service.dart';
 import 'package:client/widgets/card-grid.dart';
 import 'package:flutter/material.dart';
 import 'intermediate-page.dart';

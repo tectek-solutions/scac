@@ -1,12 +1,12 @@
 import 'package:client/common/style/spacing_styles.dart';
 import 'package:client/features/authentification/screens/login/login.dart';
-import 'package:client/features/authentification/services/api.service.dart';
+import 'package:client/features/services/api.service.dart';
 import 'package:flutter/material.dart';
 import '../../../../utils/constants/helper_functions.dart';
 import 'package:client/utils/constants/image_strings.dart';
 import '../../../../utils/constants/sizes.dart';
 import 'package:client/utils/constants/text_string.dart';
-import '../main-screen/main-screen.dart';
+import '../../../app/screens/main-screen/main-screen.dart';
 
 class Registration extends StatefulWidget {
 
