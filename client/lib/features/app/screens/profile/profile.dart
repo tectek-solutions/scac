@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:client/features/services/api.service.dart';
+import 'package:client/features/authentification/screens/login/login.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -91,6 +92,7 @@ class _ProfileState extends State<Profile> {
                           child: ElevatedButton(
                             onPressed: () async {
                               await _apiService.signOut();
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
                             },
                             child: const Text('Logout'),
                           ),

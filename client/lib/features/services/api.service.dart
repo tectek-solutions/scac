@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -72,6 +73,7 @@ class ApiAccountService {
     );
     if (response.statusCode == 200) {
       await storage.delete(key: 'jwt');
+      return;
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized');
     } else if (response.statusCode == 500) {
