@@ -1,9 +1,10 @@
 use async_trait::async_trait;
-use log::{error, info};
+use log::error;
 use pingora_core::upstreams::peer::HttpPeer;
 use pingora_core::{server::Server, Error, ErrorType, Result};
 use pingora_http::ResponseHeader;
 use pingora_proxy::{ProxyHttp, Session};
+use std::sync::LazyLock;
 
 pub struct Service {
     pub name: String,
@@ -13,11 +14,20 @@ pub struct Service {
 
 impl Service {
     pub fn new(name: &str, address: String, port: u16) -> Self {
-        info!("Creating service: {} at {}:{}", name, address, port);
         Self {
             name: name.to_string(),
             address,
             port,
+        }
+    }
+}
+
+impl Clone for Service {
+    fn clone(&self) -> Self {
+        Self {
+            name: self.name.clone(),
+            address: self.address.clone(),
+            port: self.port,
         }
     }
 }
@@ -28,7 +38,6 @@ pub struct Context {
 
 impl Context {
     pub fn new() -> Self {
-        info!("Initializing context...");
         let service_names = [
             "actions",
             "apis",
@@ -68,6 +77,15 @@ impl Context {
     }
 }
 
+impl Clone for Context {
+    fn clone(&self) -> Self {
+        Self {
+            services: self.services.clone(),
+        }
+    }
+}
+
+pub static CONTEXT: LazyLock<Context> = LazyLock::new(|| Context::new());
 pub struct Gateway;
 
 #[async_trait]
@@ -75,12 +93,10 @@ impl ProxyHttp for Gateway {
     type CTX = Context;
 
     fn new_ctx(&self) -> Self::CTX {
-        info!("Creating new context...");
-        Context::new()
+        CONTEXT.clone()
     }
 
     async fn request_filter(&self, _session: &mut Session, _ctx: &mut Self::CTX) -> Result<bool> {
-        info!("Executing request filter...");
         Ok(false)
     }
 
@@ -89,8 +105,6 @@ impl ProxyHttp for Gateway {
         session: &mut Session,
         ctx: &mut Self::CTX,
     ) -> Result<Box<HttpPeer>> {
-        info!("Determining upstream peer...");
-
         let service = ctx.services.iter().find(|service| {
             session
                 .req_header()
@@ -103,8 +117,6 @@ impl ProxyHttp for Gateway {
             Some(service) => {
                 let url = format!("{}:{}", service.address, service.port);
                 let sni = service.name.clone();
-                info!("Upstream peer: {}", url);
-                info!("SNI: {}", sni);
                 Ok(Box::new(HttpPeer::new(url, false, sni)))
             }
             None => {
@@ -118,22 +130,16 @@ impl ProxyHttp for Gateway {
         &self,
         session: &mut Session,
         _upstream_response: &mut ResponseHeader,
-        ctx: &mut Self::CTX,
+        _ctx: &mut Self::CTX,
     ) -> Result<()> {
-        info!("Executing response filter...");
-        let response_code = session
+        let _response_code = session
             .response_written()
             .map_or(0, |resp| resp.status.as_u16());
-        info!(
-            "{} response code: {response_code}",
-            self.request_summary(session, ctx)
-        );
 
         Ok(()) // Ensure the method returns a Result with Ok(())
     }
 
     async fn logging(&self, session: &mut Session, error: Option<&Error>, _ctx: &mut Self::CTX) {
-        info!("Logging request...");
         let _ = session;
         if let Some(err) = error {
             error!("Error encountered: {:?}", err);
@@ -153,8 +159,6 @@ fn main() {
         error!("BINDING_PORT environment variable is not set.");
         std::process::exit(1);
     });
-
-    info!("Starting server on {}:{}", binding_address, binding_port);
 
     let mut server = Server::new(None).expect("Failed to create server.");
     server.bootstrap();
