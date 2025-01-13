@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -58,13 +59,21 @@ class ApiAccountService {
   }
 
   Future<void> signOut() async {
+    final token = await storage.read(key: 'jwt');
+    if (token == null) {
+      throw Exception('Token not found');
+    }
     final url = Uri.parse('$baseUrl/users/sign_out');
     final response = await http.delete(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
     );
     if (response.statusCode == 200) {
       await storage.delete(key: 'jwt');
+      return;
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized');
     } else if (response.statusCode == 500) {
@@ -75,11 +84,17 @@ class ApiAccountService {
   }
 
   Future<Map<String, dynamic>> fetchUserProfile() async {
+    final token = await storage.read(key: 'jwt');
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
     final url = Uri.parse('$baseUrl/users/me');
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
     );
 
@@ -90,7 +105,7 @@ class ApiAccountService {
     } else if (response.statusCode == 500) {
       throw Exception('Internal server error');
     } else {
-      throw Exception('Error');
+      throw Exception('Error fetching user profile');
     }
   }
 }

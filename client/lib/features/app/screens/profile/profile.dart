@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:client/features/services/api.service.dart';
+import 'package:client/features/authentification/screens/login/login.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
-
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -19,21 +19,27 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    _apiService.fetchUserProfile().then((value) {
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final profile = await _apiService.fetchUserProfile();
       setState(() {
         _isLoading = false;
-        if (value is Map<String, dynamic>) {
-          _userProfile = value;
+        if (profile is Map<String, dynamic>) {
+          _userProfile = profile;
         } else {
           _hasError = true;
         }
       });
-    });
-  }
-
-  void _logout() {
-    // Implement your logout functionality here
-    print('User logged out');
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+      print('Error fetching user profile: $e');
+    }
   }
 
   @override
@@ -84,7 +90,10 @@ class _ProfileState extends State<Profile> {
                           width: 150,
                           height: 60,
                           child: ElevatedButton(
-                            onPressed: _logout,
+                            onPressed: () async {
+                              await _apiService.signOut();
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                            },
                             child: const Text('Logout'),
                           ),
                         ),
