@@ -17,6 +17,7 @@ dependencies:
   flutter_dotenv: ^5.0.2
   url_launcher: ^6.1.7
   flutter_secure_storage: ^9.2.4
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -26,5 +27,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    # - assets/icons/images/
     - assets/icons/logos/

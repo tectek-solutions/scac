@@ -11,7 +11,7 @@ pub fn list_reactions_by_api_service_id_query(
 
     let mut database_connection = database.get_connection();
     let result = reactions
-        .filter(api_id.eq(search_id))
+        .filter(apis_id.eq(search_id))
         .select(Reaction::as_select())
         .load::<Reaction>(&mut database_connection);
 

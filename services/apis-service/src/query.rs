@@ -11,7 +11,7 @@ pub fn list_api_services_by_authentication_id_query(
 
     let mut connection = database.get_connection();
     let result = apis
-        .filter(authentication_id.eq(search_id))
+        .filter(authentications_id.eq(search_id))
         .select(Api::as_select())
         .load::<Api>(&mut connection);
 

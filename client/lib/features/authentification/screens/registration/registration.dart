@@ -9,10 +9,10 @@ import 'package:client/utils/constants/text_string.dart';
 import '../../../app/screens/main-screen/main-screen.dart';
 
 class Registration extends StatefulWidget {
-
   const Registration({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _RegistrationState createState() => _RegistrationState();
 }
 
@@ -85,6 +85,7 @@ class _RegistrationState extends State<Registration> {
                           final password_confirmation = _password_confirmationController.text;
                           try {
                             final response = await _apiService.signUp(name, email, password, password_confirmation);
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

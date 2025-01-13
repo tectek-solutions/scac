@@ -153,7 +153,7 @@ async fn get_trigger_by_id(
 
     match query::get_trigger_by_id_query(&db, workflow_id) {
         Ok(Some(trigger)) => {
-            let workflow = database::model::Workflow::read(&mut db.get_connection(), trigger.workflow_id).unwrap();
+            let workflow = database::model::Workflow::read(&mut db.get_connection(), trigger.workflows_id).unwrap();
             if workflow.users_id != user_id {
                 return ErrorResponse::Unauthorized("Unauthorized".to_string())
                     .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
