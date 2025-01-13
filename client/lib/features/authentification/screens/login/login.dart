@@ -8,12 +8,10 @@ import '../../../../utils/constants/sizes.dart';
 import '../main-screen/main-screen.dart';
 import 'package:client/features/authentification/services/api.service.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
-  final FlutterSecureStorage secureStorage;
 
-  LoginScreen({required this.secureStorage});
+  const LoginScreen({super.key});
 
   @override
   _LoginScreen createState() => _LoginScreen();
@@ -86,9 +84,6 @@ class _LoginScreen extends State<LoginScreen> {
                             final response = await _apiService.signIn(email, password);
                             if (response is String) {
                               final token = response;
-                              await widget.secureStorage.write(key: 'auth_token', value: token);
-                              Map<String, String> allValues = await widget.secureStorage.readAll();
-                              print(allValues);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -114,12 +109,12 @@ class _LoginScreen extends State<LoginScreen> {
                     width: double.infinity,
                     child: OutlinedButton(
                       onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => const Registration(),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Registration(),
+                          ),
+                        );
                       },
                       child: const Text("Create an account"),
                     ),
