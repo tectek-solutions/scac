@@ -1,4 +1,4 @@
-import 'package:client/features/authentification/screens/service-page/api-page-services.dart';
+import 'package:client/features/authentification/services/api.area.service.dart';
 import 'package:client/features/authentification/screens/service-page/intermediate-page.dart';
 import 'package:flutter/material.dart';
 

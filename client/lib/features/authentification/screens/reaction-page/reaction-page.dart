@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:client/features/authentification/screens/reaction-page/api-reaction-page.dart';
+import 'package:client/features/authentification/services/api.area.service.dart';
 import 'package:client/features/authentification/screens/reaction-page/intermediate-page-reaction.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';

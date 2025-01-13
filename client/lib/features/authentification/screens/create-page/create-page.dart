@@ -119,12 +119,10 @@ class _CreatePageState extends State<CreatePage> {
               onTap: () async {
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ReactionPage()),
+                  MaterialPageRoute(builder: (context) => const ReactionPage()),
                 );
-                if (result != null && result['title'] != null && result['description'] != null && result['action'] != null) {
+                if (result != null && result['action'] != null) {
                   setState(() {
-                    resultTitleReaction = result['title'];
-                    resultDescriptionReaction = result['description'];
                     resultReaction = result['action'];
                   });
                   print('Data received from Widget B: $result');
@@ -167,7 +165,7 @@ class _CreatePageState extends State<CreatePage> {
                             Row(
                               children: [
                                 Text(
-                                  'Action: ',
+                                  'Reaction: ',
                                   style: TextStyle(
                                     fontSize: 14.0,
                                     color: Colors.grey[700],

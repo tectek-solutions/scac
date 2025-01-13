@@ -1,4 +1,4 @@
-import 'package:client/features/authentification/screens/reaction-page/api-reaction-page.dart';
+import 'package:client/features/authentification/services/api.area.service.dart';
 import 'package:client/features/authentification/screens/reaction-page/intermediate-page-reaction.dart';
 import 'package:flutter/material.dart';
 
@@ -87,6 +87,7 @@ class _DetailPageState extends State<DetailPage> {
                                 if (count == 3) {
                                   Navigator.pop(context, {
                                     'action': action,
+                                    
                                   });
                                   return true;
                                 }
