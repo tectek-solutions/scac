@@ -58,7 +58,7 @@ fn get_authentication_url(authentication: database::model::Authentication, user_
 
     let redirect_uri = format!("{}/user-tokens/token/new", api_url);
 
-    let state = format!("authentication_id={},user_id={}", authentication.id, user_id);
+    let state = format!("authentication_id={} user_id={}", authentication.id, user_id);
 
     let context = UserTokenAuthenticationContext {
         client_id: authentication.client_id,
@@ -223,23 +223,23 @@ async fn create_user_token(
     println!("Code: {:?}", code);
     println!("State: {:?}", state);
 
-    let authentication_id = match state.split(",").collect::<Vec<&str>>().get(0) {
+    let authentication_id = match state.split(" ").collect::<Vec<&str>>().get(0) {
         Some(value) => match value.split("=").collect::<Vec<&str>>().get(1) {
             Some(value) => match value.parse::<i32>() {
                 Ok(value) => value,
                 Err(err) => {
                     eprintln!("Error parsing authentication ID: {:?}", err);
-                    return ErrorResponse::Unauthorized("Invalid state".to_string())
+                    return ErrorResponse::Unauthorized("Can't parse authentication ID".to_string())
                         .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
                 }
             },
             None => {
-                return ErrorResponse::Unauthorized("Invalid state".to_string())
+                return ErrorResponse::Unauthorized("Can't split authentication ID".to_string())
                     .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
             }
         },
         None => {
-            return ErrorResponse::Unauthorized("Invalid state".to_string())
+            return ErrorResponse::Unauthorized("Can't split state".to_string())
                 .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
         }
     };
@@ -253,7 +253,7 @@ async fn create_user_token(
         }
     };
 
-    let user_id = match state.split(",").collect::<Vec<&str>>().get(1) {
+    let user_id = match state.split(";").collect::<Vec<&str>>().get(1) {
         Some(value) => match value.split("=").collect::<Vec<&str>>().get(1) {
             Some(value) => match value.parse::<i32>() {
                 Ok(value) => value,
@@ -302,6 +302,7 @@ async fn create_user_token(
         ("redirect_uri", redirect_uri.as_str()),
         ("access_type", "offline"),
         ("prompt", "consent"),
+        ("code_verifier", "challenge")
     ];
 
     let client = reqwest::Client::new();
