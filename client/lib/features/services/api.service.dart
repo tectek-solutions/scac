@@ -58,7 +58,10 @@ class ApiAccountService {
   }
 
   Future<void> signOut() async {
-    final token = await getToken();
+    final token = await storage.read(key: 'jwt');
+    if (token == null) {
+      throw Exception('Token not found');
+    }
     final url = Uri.parse('$baseUrl/users/sign_out');
     final response = await http.delete(
       url,
@@ -79,7 +82,11 @@ class ApiAccountService {
   }
 
   Future<Map<String, dynamic>> fetchUserProfile() async {
-    final token = await getToken();
+    final token = await storage.read(key: 'jwt');
+    if (token == null) {
+      throw Exception('Token not found');
+    }
+
     final url = Uri.parse('$baseUrl/users/me');
     final response = await http.get(
       url,
@@ -96,7 +103,7 @@ class ApiAccountService {
     } else if (response.statusCode == 500) {
       throw Exception('Internal server error');
     } else {
-      throw Exception('Error');
+      throw Exception('Error fetching user profile');
     }
   }
 }

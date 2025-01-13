@@ -25,13 +25,17 @@ class _ProfileState extends State<Profile> {
     try {
       final profile = await _apiService.fetchUserProfile();
       setState(() {
-        _userProfile = profile;
         _isLoading = false;
+        if (profile is Map<String, dynamic>) {
+          _userProfile = profile;
+        } else {
+          _hasError = true;
+        }
       });
     } catch (e) {
       setState(() {
-        _hasError = true;
         _isLoading = false;
+        _hasError = true;
       });
       print('Error fetching user profile: $e');
     }
