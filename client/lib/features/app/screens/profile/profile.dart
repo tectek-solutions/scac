@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:client/features/authentification/services/api.service.dart';
+import 'package:client/features/services/api.service.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});

@@ -1,5 +1,5 @@
-import 'package:client/features/authentification/screens/reaction-page/reaction-page.dart';
-import 'package:client/features/authentification/screens/service-page/services-page.dart';
+import 'package:client/features/area/screens/reaction-page/reaction-page.dart';
+import 'package:client/features/area/screens/service-page/services-page.dart';
 import 'package:flutter/material.dart';
 
 class CreatePage extends StatefulWidget {
@@ -11,13 +11,13 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  String resultTitleService = 'Services';
-  String resultDescriptionService = 'Go to Services Page';
-  String resultActionService = 'No action selected';
+  String resultTitleAction = 'Actions';
+  String resultDescriptionAction = 'Go to Action Page';
+  String resultAction = 'No action selected';
 
   String resultTitleReaction = 'Reactions';
   String resultDescriptionReaction = 'Go to Reaction Page';
-  String resultActionReaction = 'No action selected';
+  String resultReaction = 'No reaction selected';
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +43,11 @@ class _CreatePageState extends State<CreatePage> {
               onTap: () async {
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ServicePage()),
+                  MaterialPageRoute(builder: (context) => const ServicePage()),
                 );
                 if (result != null && result['action'] != null) {
                   setState(() {
-                    resultActionService = result['action'];
+                    resultAction = result['action'];
                   });
                   print('Data received from Widget B: $result');
                 } else {
@@ -71,7 +71,7 @@ class _CreatePageState extends State<CreatePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              resultTitleService,
+                              resultTitleAction,
                               style: const TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class _CreatePageState extends State<CreatePage> {
                             ),
                             const SizedBox(height: 8.0),
                             Text(
-                              resultDescriptionService,
+                              resultDescriptionAction,
                               style: TextStyle(
                                 fontSize: 14.0,
                                 color: Colors.grey[700]
@@ -96,7 +96,7 @@ class _CreatePageState extends State<CreatePage> {
                                   ),
                                 ),
                                 Text(
-                                  resultActionService,
+                                  resultAction,
                                   style: const TextStyle(
                                     fontSize: 14.0,
                                     color: Colors.blue,
@@ -119,13 +119,11 @@ class _CreatePageState extends State<CreatePage> {
               onTap: () async {
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ReactionPage()),
+                  MaterialPageRoute(builder: (context) => const ReactionPage()),
                 );
-                if (result != null && result['title'] != null && result['description'] != null && result['action'] != null) {
+                if (result != null && result['action'] != null) {
                   setState(() {
-                    resultTitleReaction = result['title'];
-                    resultDescriptionReaction = result['description'];
-                    resultActionReaction = result['action'];
+                    resultReaction = result['action'];
                   });
                   print('Data received from Widget B: $result');
                 } else {
@@ -167,14 +165,14 @@ class _CreatePageState extends State<CreatePage> {
                             Row(
                               children: [
                                 Text(
-                                  'Action: ',
+                                  'Reaction: ',
                                   style: TextStyle(
                                     fontSize: 14.0,
                                     color: Colors.grey[700],
                                   ),
                                 ),
                                 Text(
-                                  resultActionReaction,
+                                  resultReaction,
                                   style: const TextStyle(
                                     fontSize: 14.0,
                                     color: Colors.blue,

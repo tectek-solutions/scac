@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import '../../../../common/style/spacing_styles.dart';
 import '../../../../utils/constants/helper_functions.dart';
 import '../../../../utils/constants/sizes.dart';
-import '../main-screen/main-screen.dart';
-import 'package:client/features/authentification/services/api.service.dart';
+import '../../../app/screens/main-screen/main-screen.dart';
+import 'package:client/features/services/api.service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
