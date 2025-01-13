@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:client/features/authentification/screens/service-page/api-page-services.dart';
+import 'package:client/features/services/api.area.service.dart';
 import 'package:client/widgets/card-grid.dart';
 import 'package:flutter/material.dart';
 import 'intermediate-page.dart';
@@ -12,14 +12,13 @@ class ServicePage extends StatefulWidget {
 }
 
 class _ServicePageState extends State<ServicePage> {
-  ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/authentications');
+  ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/authentications/');
   List<dynamic> services = [];
 
   _ServicePageState() {
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
         value = [value];
-        print("HERE IS THE VALUE $value");
       }
       setState(() {
         for (var i = 0; i < value.length; i++) {
@@ -30,7 +29,6 @@ class _ServicePageState extends State<ServicePage> {
   }
 
   void navigateToIntermediatePage(BuildContext context, dynamic card, int index) {
-    print("Navigating to IntermediatePage with id: ${services[index]['id']}");
     Navigator.push(
       context,
       MaterialPageRoute(

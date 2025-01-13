@@ -1,27 +1,27 @@
-import 'package:client/features/authentification/screens/service-page/api-page-services.dart';
-import 'package:client/features/authentification/screens/service-page/detail-page.dart';
+import 'package:client/features/services/api.area.service.dart';
+import 'package:client/features/area/screens/reaction-page/detail-page-reaction.dart';
 import 'package:client/widgets/card-grid.dart';
 import 'package:flutter/material.dart';
 
-class IntermediatePage extends StatefulWidget {
+class IntermediatePageReaction extends StatefulWidget {
 
   static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
   int itemIndex;
   int id;
 
-  IntermediatePage({required this.itemIndex, required this.id, super.key});
+  IntermediatePageReaction({required this.itemIndex, required this.id, super.key});
 
   @override
-  State<IntermediatePage> createState() => _IntermediatePageState();
+  State<IntermediatePageReaction> createState() => _IntermediatePageReactionState();
 }
 
-class _IntermediatePageState extends State<IntermediatePage> {
+class _IntermediatePageReactionState extends State<IntermediatePageReaction> {
   late final ApiService apiService;
 
   @override
   void initState() {
     super.initState();
-    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/${widget.id}');
+    apiService = ApiService(baseUrl: IntermediatePageReaction.baseUrlString, route: '/apis/${widget.id}');
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
         value = [value];

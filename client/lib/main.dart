@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:client/features/authentification/screens/login/login.dart';
 import 'package:client/utils/theme/theme.dart';
-import 'package:client/features/authentification/screens/main-screen/main-screen.dart';
+import 'package:client/features/app/screens/main-screen/main-screen.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:client/features/authentification/services/api.service.dart';
+import 'package:client/features/services/api.service.dart';
 
 
 void main() async {
@@ -26,7 +26,7 @@ class App extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: TAppTheme.lightTheme,
       darkTheme: TAppTheme.darkTheme,
-      home: isTokenExpired ? LoginScreen(secureStorage:const FlutterSecureStorage()) : const MainScreen(),
+      home: isTokenExpired ? LoginScreen(secureStorage:FlutterSecureStorage()) : const MainScreen(),
     );
   }
 }
