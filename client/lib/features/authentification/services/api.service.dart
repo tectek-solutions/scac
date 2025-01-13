@@ -73,12 +73,46 @@ class ApiAccountService {
       throw Exception('Error');
     }
   }
+}
 
-  Future<bool> isTokenExpired() async {
-    final token = await storage.read(key: 'jwt');
-    if (token == null) {
-      return true;
+void decodeJwt(String token) {
+  List<String> parts = token.split('.');
+  if (parts.length == 3) {
+    String payload = parts[1];
+    String decoded = _base64UrlDecode(payload);
+    print("Decoded JWT Payload: $decoded");
+  } else {
+    print("Token mal formé");
+  }
+}
+
+String _base64UrlDecode(String input) {
+  String output = input.replaceAll('-', '+').replaceAll('_', '/');
+  return utf8.decode(base64Url.decode(output));
+}
+
+Future<bool> isTokenExpired() async {
+  final token = await storage.read(key: 'jwt');
+
+  if (token == null || token.isEmpty) {
+    return true;
+  }
+
+  decodeJwt(token);
+
+  try {
+    final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+
+    if (decodedToken.containsKey("expiration")) {
+      int expirationTime = int.parse(decodedToken["expiration"]);
+      int currentTime = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+      return expirationTime < currentTime;
     }
-    return JwtDecoder.isExpired(token);
+
+    return true;
+  } catch (e) {
+    print("Erreur lors de la vérification du token : $e");
+    return true;
   }
 }

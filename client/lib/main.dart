@@ -1,25 +1,33 @@
-import 'package:client/features/authentification/screens/login/login.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:client/features/authentification/screens/login/login.dart';
 import 'package:client/utils/theme/theme.dart';
+import 'package:client/features/authentification/screens/main-screen/main-screen.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:client/features/authentification/services/api.service.dart';
 
-Future<void> main() async {
-  runApp(const App());
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  bool isExpired = await isTokenExpired();
+  runApp(App(isTokenExpired: isExpired));
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final bool isTokenExpired;
+
+  const App({super.key, required this.isTokenExpired});
 
   @override
   Widget build(BuildContext context) {
-    // String? myEnvVar = Platform.environment['SOME_VAR'];
-    const SOME_VAR = String.fromEnvironment('SOME_VAR', defaultValue: 'SOME_DEFAULT_VALUE');
-    print('MY_ENV_VAR: $SOME_VAR');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
       theme: TAppTheme.lightTheme,
       darkTheme: TAppTheme.darkTheme,
-      home: const LoginScreen(),
+      home: isTokenExpired ? const LoginScreen() : const MainScreen(),
     );
   }
 }
+
