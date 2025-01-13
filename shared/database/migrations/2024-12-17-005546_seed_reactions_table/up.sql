@@ -1,6 +1,6 @@
 -- Your SQL goes here
 INSERT INTO reactions (
-        api_id,
+        apis_id,
         name,
         description,
         http_method,

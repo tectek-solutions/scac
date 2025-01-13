@@ -100,7 +100,7 @@ pub fn get_user_token_by_authentication_id_query(
     let mut database_connection = database.get_connection();
 
     let result = match schema::user_tokens::table
-        .filter(schema::user_tokens::authentication_id.eq(search_autthenication_id))
+        .filter(schema::user_tokens::authentications_id.eq(search_autthenication_id))
         .filter(schema::user_tokens::users_id.eq(search_user_id))
         .first::<UserToken>(&mut database_connection)
         .optional() {
