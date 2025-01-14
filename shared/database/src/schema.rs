@@ -35,8 +35,10 @@ diesel::table! {
         id -> Int4,
         #[max_length = 32]
         name -> Varchar,
-        authentication_url -> Text,
-        refresh_token_url -> Text,
+        authorization_url -> Text,
+        authorization_http_parameters -> Jsonb,
+        token_url -> Text,
+        token_url_http_parameters -> Jsonb,
         client_id -> Text,
         client_secret -> Text,
         created_at -> Nullable<Timestamp>,

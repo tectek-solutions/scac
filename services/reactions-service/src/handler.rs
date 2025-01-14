@@ -42,7 +42,10 @@ impl ErrorResponse {
     )
 )]
 #[get("/")]
-async fn list_reactions_by_api_service_id(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
+async fn list_reactions_by_api_service_id(
+    db: web::Data<database::Database>,
+    id: web::Path<i32>,
+) -> impl Responder {
     match query::list_reactions_by_api_service_id_query(&db, id.into_inner()) {
         Ok(Some(reactions)) => HttpResponse::Ok().json(reactions),
         Ok(None) => ErrorResponse::NotFound("No reactions found".to_string())

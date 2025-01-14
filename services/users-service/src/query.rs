@@ -1,6 +1,6 @@
 use actix_web::web;
 use database;
-use database::model::{User, CreateUser, UpdateUser};
+use database::model::{CreateUser, UpdateUser, User};
 use diesel::prelude::*;
 use log;
 
@@ -85,7 +85,7 @@ pub fn delete_user(
     user_id: i32,
 ) -> Result<Option<()>, diesel::result::Error> {
     let mut database_connection = database.get_connection();
-   
+
     match User::delete(&mut database_connection, user_id) {
         Ok(size) => {
             if size == 0 {

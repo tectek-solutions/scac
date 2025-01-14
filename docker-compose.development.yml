@@ -28,11 +28,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "512M"
     volumes:
       - database-data:/var/lib/postgresql/data
 
@@ -52,11 +47,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.3"
-          memory: "256M"
 
   migration:
     build:
@@ -93,11 +83,6 @@ services:
   #     options:
   #       max-size: "10m"
   #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
 
   # apis-service:
   #   build:
@@ -122,11 +107,6 @@ services:
   #     options:
   #       max-size: "10m"
   #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
 
   # authentications-service:
   #   build:
@@ -151,11 +131,6 @@ services:
   #     options:
   #       max-size: "10m"
   #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
 
   # reactions-service:
   #   build:
@@ -180,11 +155,6 @@ services:
   #     options:
   #       max-size: "10m"
   #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
 
   # trigger-service:
   #   build:
@@ -210,11 +180,6 @@ services:
   #     options:
   #       max-size: "10m"
   #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
 
   user-tokens-service:
     build:
@@ -241,11 +206,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "512M"
 
   users-service:
     build:
@@ -273,11 +233,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "512M"
 
   # workflows-service:
   #   build:
@@ -302,11 +257,6 @@ services:
   #     options:
   #       max-size: "10m"
   #       max-file: "3"
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.5"
-  #         memory: "512M"
 
   api-gateway:
     build:
@@ -355,31 +305,22 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.7"
-          memory: "768M"
 
-  client:
-    build:
-      context: .
-      dockerfile: ./client/Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      API_URL: http://localhost:8000
-    networks:
-      - internal
-    depends_on:
-      - api-gateway
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "512M"
+  # client:
+  #   build:
+  #     context: .
+  #     dockerfile: ./client/Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     API_URL: http://localhost:8000
+  #   networks:
+  #     - internal
+  #   depends_on:
+  #     - api-gateway
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+

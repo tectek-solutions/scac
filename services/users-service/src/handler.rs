@@ -1,8 +1,8 @@
-use actix_web::{get, post, delete, web, HttpResponse, HttpRequest, Responder};
+use actix_web::{delete, get, post, web, HttpRequest, HttpResponse, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-    
+
 use cache;
 use database;
 use jwt;
@@ -164,9 +164,17 @@ async fn sign_in(
         }
     };
 
-    if !verify(&user.password, &existing_user.password_hash).unwrap_or(false) {
-        return ErrorResponse::Unauthorized("Incorrect password".to_string())
-            .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+    match verify(&user.password, &existing_user.password_hash) {
+        Ok(true) => {}
+        Ok(false) => {
+            return ErrorResponse::Unauthorized("Invalid password".to_string())
+                .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+        }
+        Err(err) => {
+            eprintln!("Error verifying password: {:?}", err);
+            return ErrorResponse::InternalServerError("Failed to verify password".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
     }
 
     match jwt::signing_jwt(&cache, existing_user.id) {
@@ -189,7 +197,14 @@ async fn sign_in(
 #[delete("/sign_out")]
 async fn sign_out(cache: web::Data<cache::Cache>, request: HttpRequest) -> impl Responder {
     let jwt_token = match request.headers().get("Authorization") {
-        Some(value) => value.to_str().unwrap_or("").to_string(),
+        Some(value) => match value.to_str() {
+            Ok(value) => value.to_string(),
+            Err(err) => {
+                eprintln!("Error getting token: {:?}", err);
+                return ErrorResponse::Unauthorized("Can't get token".to_string())
+                    .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+            }
+        },
         None => {
             return ErrorResponse::Unauthorized("No token provided".to_string())
                 .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
@@ -228,10 +243,17 @@ async fn sign_out(cache: web::Data<cache::Cache>, request: HttpRequest) -> impl 
 async fn me(
     database: web::Data<database::Database>,
     cache: web::Data<cache::Cache>,
-    request: HttpRequest
+    request: HttpRequest,
 ) -> impl Responder {
     let jwt_token = match request.headers().get("Authorization") {
-        Some(value) => value.to_str().unwrap_or("").to_string(),
+        Some(value) => match value.to_str() {
+            Ok(value) => value.to_string(),
+            Err(err) => {
+                eprintln!("Error getting token: {:?}", err);
+                return ErrorResponse::Unauthorized("Can't get token".to_string())
+                    .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+            }
+        },
         None => {
             return ErrorResponse::Unauthorized("No token provided".to_string())
                 .to_response(actix_web::http::StatusCode::UNAUTHORIZED);

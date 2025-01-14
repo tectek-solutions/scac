@@ -2,7 +2,7 @@ pub mod handler;
 pub mod query;
 
 use actix_cors::Cors;
-use actix_web::{web, middleware::Logger, App, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 use utoipa::OpenApi;
@@ -73,8 +73,8 @@ async fn main() -> std::io::Result<()> {
         let cors = configure_cors();
         let config = Config::new(vec!["/apis/api-docs/openapi.json"]);
         let swagger = SwaggerUi::new("/apis/swagger-ui/{_:.*}")
-             .url("/apis/api-docs/openapi.json", ApiDoc::openapi())
-             .config(config);
+            .url("/apis/api-docs/openapi.json", ApiDoc::openapi())
+            .config(config);
 
         App::new()
             .app_data(db.clone())

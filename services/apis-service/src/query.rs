@@ -1,6 +1,6 @@
 use actix_web::web;
-use database::model::Api;
 use database;
+use database::model::Api;
 use diesel::prelude::*;
 
 pub fn list_api_services_by_authentication_id_query(

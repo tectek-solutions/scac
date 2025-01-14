@@ -31,7 +31,6 @@ impl ErrorResponse {
 // Handlers
 // ----------------------------
 
-
 #[utoipa::path(
     get,
     path = "/authentications/{id}",
@@ -43,7 +42,10 @@ impl ErrorResponse {
     )
 )]
 #[get("/authentications/{id}")]
-async fn list_api_services_by_authentication_id(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
+async fn list_api_services_by_authentication_id(
+    db: web::Data<database::Database>,
+    id: web::Path<i32>,
+) -> impl Responder {
     match query::list_api_services_by_authentication_id_query(&db, id.into_inner()) {
         Ok(Some(api_services)) => HttpResponse::Ok().json(api_services),
         Ok(None) => ErrorResponse::NotFound("No api services found".to_string())
