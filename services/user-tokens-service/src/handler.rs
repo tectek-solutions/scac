@@ -95,7 +95,8 @@ fn get_authorization_url(authentication: database::model::Authentication, user_i
 
     for (key, value) in params {
         let param = format!("&{}={}", key, value);
-        
+        let param = param.replace("\"", "");
+
         result.push_str(&param);
     }
 
@@ -327,16 +328,31 @@ async fn create_user_token(
 
     let url = authentication.token_url.clone();
 
-    let params = [
+    let mut params: Vec<(&str, &str)> = vec![
         ("code", code.as_str()),
         ("client_id", authentication.client_id.as_str()),
         ("client_secret", authentication.client_secret.as_str()),
-        ("grant_type", "authorization_code"),
         ("redirect_uri", redirect_uri.as_str()),
-        ("access_type", "offline"),
-        ("prompt", "consent"),
-        ("code_verifier", "challenge"),
     ];
+
+    let custom_params = match authentication.token_url_http_parameters.as_object() {
+        Some(value) => value,
+        None => {
+            return ErrorResponse::InternalServerError("Failed to get token parameters".to_string())
+                .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+        }
+    };
+
+    for (key, value) in custom_params {
+        let value = match value.as_str() {
+            Some(value) => value,
+            None => {
+                return ErrorResponse::InternalServerError("Failed to get token parameters".to_string())
+                    .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+            }
+        };
+        params.push((key, value));  
+    }
 
     let client = reqwest::Client::new();
 
@@ -352,6 +368,8 @@ async fn create_user_token(
         .post(&url)
         .header("Content-Type", "application/x-www-form-urlencoded")
         .header("Authorization", authorization_header)
+        .header("User-Agent", "SCAC")
+        .header("Accept", "application/json")   
         .form(&params);
 
     println!("Request: {:?}", request);
