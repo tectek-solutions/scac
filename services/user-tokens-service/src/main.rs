@@ -2,14 +2,14 @@ pub mod handler;
 pub mod query;
 
 use actix_cors::Cors;
-use actix_web::{web, middleware::Logger, App, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
-use database;
 use cache;
+use database;
 
 fn setup_logging_and_env() {
     if env::var_os("RUST_LOG").is_none() {
@@ -57,7 +57,7 @@ fn configure_cors() -> Cors {
     paths(
         handler::list_user_tokens_by_user_id,
         handler::get_user_token_by_id,
-        handler::get_user_token_authentication_url_by_authentication_id,
+        handler::get_user_token_authorization_url_by_authentication_id,
         handler::create_user_token,
         handler::get_user_token_by_authentication_id
     ),
@@ -80,8 +80,8 @@ async fn main() -> std::io::Result<()> {
         let cors = configure_cors();
         let config = Config::new(vec!["/users-tokens/api-docs/openapi.json"]);
         let swagger = SwaggerUi::new("/users-tokens/swagger-ui/{_:.*}")
-             .url("/users-tokens/api-docs/openapi.json", ApiDoc::openapi())
-             .config(config);
+            .url("/users-tokens/api-docs/openapi.json", ApiDoc::openapi())
+            .config(config);
 
         App::new()
             .app_data(db.clone())

@@ -1,9 +1,9 @@
-use actix_web::{get, web, HttpResponse, HttpRequest, Responder};
+use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use database;
 use cache;
+use database;
 
 use crate::query;
 
@@ -32,7 +32,6 @@ impl ErrorResponse {
 // Handlers
 // ----------------------------
 
-
 #[utoipa::path(
     get,
     path = "/workflows/{id}",
@@ -51,7 +50,14 @@ async fn list_triggers_by_worflows_id(
     request: HttpRequest,
 ) -> impl Responder {
     let jwt_token = match request.headers().get("Authorization") {
-        Some(value) => value.to_str().unwrap_or("").to_string(),
+        Some(value) => match value.to_str() {
+            Ok(value) => value.to_string(),
+            Err(err) => {
+                eprintln!("Error getting token: {:?}", err);
+                return ErrorResponse::Unauthorized("Can't get token".to_string())
+                    .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+            }
+        },
         None => {
             return ErrorResponse::Unauthorized("No token provided".to_string())
                 .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
@@ -120,10 +126,17 @@ async fn get_trigger_by_id(
     db: web::Data<database::Database>,
     cache: web::Data<cache::Cache>,
     id: web::Path<i32>,
-    request: HttpRequest
+    request: HttpRequest,
 ) -> impl Responder {
     let jwt_token = match request.headers().get("Authorization") {
-        Some(value) => value.to_str().unwrap_or("").to_string(),
+        Some(value) => match value.to_str() {
+            Ok(value) => value.to_string(),
+            Err(err) => {
+                eprintln!("Error getting token: {:?}", err);
+                return ErrorResponse::Unauthorized("Can't get token".to_string())
+                    .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+            }
+        },
         None => {
             return ErrorResponse::Unauthorized("No token provided".to_string())
                 .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
@@ -153,7 +166,20 @@ async fn get_trigger_by_id(
 
     match query::get_trigger_by_id_query(&db, workflow_id) {
         Ok(Some(trigger)) => {
-            let workflow = database::model::Workflow::read(&mut db.get_connection(), trigger.workflows_id).unwrap();
+            let workflow = match database::model::Workflow::read(
+                &mut db.get_connection(),
+                trigger.workflows_id,
+            ) {
+                Ok(workflow) => workflow,
+                Err(err) => {
+                    eprintln!("Error getting workflow: {:?}", err);
+                    return ErrorResponse::InternalServerError(
+                        "Failed to get workflow".to_string(),
+                    )
+                    .to_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR);
+                }
+            };
+
             if workflow.users_id != user_id {
                 return ErrorResponse::Unauthorized("Unauthorized".to_string())
                     .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
@@ -184,6 +210,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/triggers")
             .service(list_triggers_by_worflows_id)
-            .service(get_trigger_by_id)
+            .service(get_trigger_by_id),
     );
 }

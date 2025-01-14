@@ -2,14 +2,14 @@ pub mod handler;
 pub mod query;
 
 use actix_cors::Cors;
-use actix_web::{web, middleware::Logger, App, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
 use std::env;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
 
-use database;
 use cache;
+use database;
 
 fn setup_logging_and_env() {
     if env::var_os("RUST_LOG").is_none() {
@@ -79,8 +79,8 @@ async fn main() -> std::io::Result<()> {
         let cors = configure_cors();
         let config = Config::new(vec!["/users/api-docs/openapi.json"]);
         let swagger = SwaggerUi::new("/users/swagger-ui/{_:.*}")
-             .url("/users/api-docs/openapi.json", ApiDoc::openapi())
-             .config(config);
+            .url("/users/api-docs/openapi.json", ApiDoc::openapi())
+            .config(config);
 
         App::new()
             .app_data(database.clone())

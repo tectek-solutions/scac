@@ -1,11 +1,11 @@
+use actix_web::web;
+use chrono::{Duration, Utc};
 use hmac::{Hmac, Mac};
 use jwt::{SignWithKey, VerifyWithKey};
+use redis::Commands;
 use sha2::Sha256;
 use std::collections::BTreeMap;
-use chrono::{Utc, Duration};
 use std::env;
-use actix_web::web;
-use redis::Commands;
 
 use cache;
 
@@ -15,7 +15,7 @@ pub fn signing_jwt(cache: &web::Data<cache::Cache>, user_id: i32) -> Result<Stri
     let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set".to_string())?;
     let key: Hmac<Sha256> = Hmac::new_from_slice(jwt_secret.as_ref())
         .map_err(|_| "HMAC creation failed".to_string())?;
-    
+
     let mut claims = BTreeMap::new();
     claims.insert("id".to_string(), user_id.to_string());
     claims.insert(
@@ -34,7 +34,6 @@ pub fn signing_jwt(cache: &web::Data<cache::Cache>, user_id: i32) -> Result<Stri
 
     Ok(token)
 }
-
 
 pub fn verify_jwt(cache: &web::Data<cache::Cache>, token: &str) -> bool {
     let mut cache_connection = cache.get_connection();
@@ -72,7 +71,10 @@ pub fn verify_jwt(cache: &web::Data<cache::Cache>, token: &str) -> bool {
     }
 }
 
-pub fn get_user_id_by_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Result<Option<i32>, String> {
+pub fn get_user_id_by_jwt(
+    cache: &web::Data<cache::Cache>,
+    token: &str,
+) -> Result<Option<i32>, String> {
     let mut cache_connection = cache.get_connection();
 
     let jwt_secret = env::var("JWT_SECRET").map_err(|_| "JWT_SECRET not set".to_string())?;
@@ -85,7 +87,10 @@ pub fn get_user_id_by_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Resul
 
     // Check if token exists in Redis
     let redis_key = format!("token:{}", claims.get("id").unwrap_or(&"".to_string()));
-    if !cache_connection.exists(&redis_key).map_err(|_| "Redis check failed".to_string())? {
+    if !cache_connection
+        .exists(&redis_key)
+        .map_err(|_| "Redis check failed".to_string())?
+    {
         return Err("Token not found in Redis".to_string());
     }
 
@@ -112,7 +117,10 @@ pub fn delete_jwt(cache: &web::Data<cache::Cache>, token: &str) -> Result<(), St
 
     // Check if token exists in Redis
     let redis_key = format!("token:{}", claims.get("id").unwrap_or(&"".to_string()));
-    if !cache_connection.exists(&redis_key).map_err(|_| "Redis check failed".to_string())? {
+    if !cache_connection
+        .exists(&redis_key)
+        .map_err(|_| "Redis check failed".to_string())?
+    {
         return Err("Token not found in Redis".to_string());
     }
 

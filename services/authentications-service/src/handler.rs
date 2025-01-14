@@ -90,6 +90,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/authentications")
             .service(list_authentications)
-            .service(get_authentication_by_id)
+            .service(get_authentication_by_id),
     );
 }

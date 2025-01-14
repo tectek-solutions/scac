@@ -4,10 +4,14 @@ CREATE TABLE authentications (
     -- Unique ID
     name VARCHAR(32) UNIQUE NOT NULL,
     -- Name of the authentication service (e.g., Google, Microsoft)
-    authentication_url TEXT NOT NULL,
+    authorization_url TEXT NOT NULL,
     -- OAuth2 authorization URL
-    refresh_token_url TEXT NOT NULL,
-    -- Refresh token URL
+    authorization_http_parameters JSONB,
+    -- OAuth2 authorization URL parameters
+    token_url TEXT NOT NULL,
+    -- Token URL
+    token_url_http_parameters
+    -- Token URL parameters
     client_id TEXT NOT NULL,
     -- OAuth2 client ID
     client_secret TEXT NOT NULL,

@@ -1,6 +1,6 @@
 use actix_web::web;
 use database;
-use database::model::{Workflow, CreateWorkflow};
+use database::model::{CreateWorkflow, Workflow};
 use diesel::prelude::*;
 
 pub fn list_workflows_by_user_id_query(
@@ -40,7 +40,7 @@ pub fn get_workflow_by_id_by_user_id_query(
     let result = workflows
         .filter(users_id.eq(search_user_id))
         .filter(id.eq(search_workflow_id))
-        .select(Workflow::as_select()) 
+        .select(Workflow::as_select())
         .first::<Workflow>(&mut database_connection)
         .optional();
 
@@ -62,7 +62,7 @@ pub fn create_workflow_query(
     new_workflow: CreateWorkflow,
 ) -> Result<Option<Workflow>, diesel::result::Error> {
     let mut database_connection = database.get_connection();
-    
+
     match Workflow::create(&mut database_connection, new_workflow) {
         Ok(workflow) => Ok(Some(workflow)),
         Err(err) => {

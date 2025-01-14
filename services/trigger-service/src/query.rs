@@ -1,6 +1,6 @@
 use actix_web::web;
 use database;
-use database::model::{Trigger, Workflow, UserToken};
+use database::model::{Trigger, UserToken, Workflow};
 use diesel::prelude::*;
 
 pub fn list_triggers_by_worflows_id_query(
@@ -42,7 +42,7 @@ pub fn get_trigger_by_id_query(
 }
 
 pub fn list_workflows(
-    database: &web::Data<database::Database>
+    database: &web::Data<database::Database>,
 ) -> Result<Option<Vec<Workflow>>, diesel::result::Error> {
     use database::schema::workflows::dsl::*;
 
@@ -69,7 +69,9 @@ pub fn get_user_token_by_authentication_by_user_id_query(
 ) -> Result<Option<UserToken>, diesel::result::Error> {
     use database::schema::user_tokens::dsl::*;
 
-    let mut database_connection: diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<PgConnection>> = database.get_connection();
+    let mut database_connection: diesel::r2d2::PooledConnection<
+        diesel::r2d2::ConnectionManager<PgConnection>,
+    > = database.get_connection();
     let result = user_tokens
         .filter(users_id.eq(user_id))
         .filter(authentications_id.eq(authentication_id))

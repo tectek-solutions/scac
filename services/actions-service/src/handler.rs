@@ -42,7 +42,10 @@ impl ErrorResponse {
     )
 )]
 #[get("/")]
-async fn list_actions_by_api_service_id(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
+async fn list_actions_by_api_service_id(
+    db: web::Data<database::Database>,
+    id: web::Path<i32>,
+) -> impl Responder {
     match query::list_actions_by_api_service_id_query(&db, id.into_inner()) {
         Ok(Some(actions)) => HttpResponse::Ok().json(actions),
         Ok(None) => ErrorResponse::NotFound("No actions found".to_string())
@@ -66,10 +69,7 @@ async fn list_actions_by_api_service_id(db: web::Data<database::Database>, id: w
     )
 )]
 #[get("/{id}")]
-async fn get_action_by_id(
-    db: web::Data<database::Database>,
-    id: web::Path<i32>,
-) -> impl Responder {
+async fn get_action_by_id(db: web::Data<database::Database>, id: web::Path<i32>) -> impl Responder {
     match query::get_action_by_id_query(&db, id.into_inner()) {
         Ok(Some(action)) => HttpResponse::Ok().json(action),
         Ok(None) => ErrorResponse::NotFound("Authentication not found".to_string())

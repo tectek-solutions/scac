@@ -2,17 +2,17 @@ pub mod handler;
 pub mod query;
 pub mod worker;
 
-use actix_web::{web, middleware::Logger, App, HttpServer};
 use actix_cors::Cors;
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
+use log::{error, info, warn};
 use std::env;
 use tokio::time::{interval, Duration};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::{Config, SwaggerUi};
-use log::{info, warn, error};
 
-use database;
 use cache;
+use database;
 
 fn setup_logging_and_env() {
     if env::var_os("RUST_LOG").is_none() {

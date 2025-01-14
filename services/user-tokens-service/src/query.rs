@@ -1,5 +1,5 @@
 use actix_web::web;
-use database::model::{UserToken, CreateUserToken, UpdateUserToken};
+use database::model::{CreateUserToken, UpdateUserToken, UserToken};
 use database::schema;
 use diesel::prelude::*;
 
@@ -44,7 +44,6 @@ pub fn create_user_token_query(
     database: &web::Data<database::Database>,
     new_user: CreateUserToken,
 ) -> Result<Option<UserToken>, diesel::result::Error> {
-
     let mut database_connection = database.get_connection();
 
     match UserToken::create(&mut database_connection, new_user) {
@@ -103,7 +102,8 @@ pub fn get_user_token_by_authentication_id_query(
         .filter(schema::user_tokens::authentications_id.eq(search_autthenication_id))
         .filter(schema::user_tokens::users_id.eq(search_user_id))
         .first::<UserToken>(&mut database_connection)
-        .optional() {
+        .optional()
+    {
         Ok(Some(user)) => Ok(Some(user)),
         Ok(None) => Ok(None),
         Err(err) => {
