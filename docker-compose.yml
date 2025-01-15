@@ -23,11 +23,7 @@ services:
       - "5432"
     networks:
       - internal
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+
     volumes:
       - database-data:/var/lib/postgresql/data
 
@@ -42,11 +38,6 @@ services:
       - "6379"
     networks:
       - internal
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   migration:
     image: ghcr.io/tectek-solutions/scac:migration-latest
@@ -67,17 +58,13 @@ services:
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
     networks:
       - internal
     depends_on:
       - migration
       - cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   apis-service:
     image: ghcr.io/tectek-solutions/scac:apis-service-latest
@@ -88,17 +75,13 @@ services:
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
     networks:
       - internal
     depends_on:
       - migration
       - cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   authentications-service:
     image: ghcr.io/tectek-solutions/scac:authentications-service-latest
@@ -109,17 +92,13 @@ services:
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
     networks:
       - internal
     depends_on:
       - migration
       - cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   reactions-service:
     image: ghcr.io/tectek-solutions/scac:reactions-service-latest
@@ -130,17 +109,13 @@ services:
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
     networks:
       - internal
     depends_on:
       - migration
       - cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   trigger-service:
     image: ghcr.io/tectek-solutions/scac:trigger-service-latest
@@ -151,17 +126,13 @@ services:
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
     networks:
       - internal
     depends_on:
       - migration
       - cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   user-tokens-service:
     image: ghcr.io/tectek-solutions/scac:user-tokens-service-latest
@@ -181,11 +152,6 @@ services:
     depends_on:
       - migration
       - cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   users-service:
     image: ghcr.io/tectek-solutions/scac:users-service-latest
@@ -200,16 +166,10 @@ services:
       JWT_SECRET: ${JWT_SECRET}
     networks:
       - internal
-    ports:
-      - "9000:8000"
     depends_on:
       - migration
       - cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+
 
   workflows-service:
     image: ghcr.io/tectek-solutions/scac:workflows-service-latest
@@ -220,17 +180,13 @@ services:
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
     networks:
       - internal
     depends_on:
       - migration
       - cache
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   api-gateway:
     image: ghcr.io/tectek-solutions/scac:api-gateway-latest
@@ -268,15 +224,10 @@ services:
       - users-service
       - workflows-service
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/authentications/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
   client:
     image: ghcr.io/tectek-solutions/scac:client-latest
@@ -289,8 +240,4 @@ services:
       - internal
     depends_on:
       - api-gateway
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+

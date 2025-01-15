@@ -1,15 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "scac.fullname" . }}
+  name: "{{ .Chart.Name }}-{{ .Values.name }}"
   labels:
-    {{- include "scac.labels" . | nindent 4 }}
+    app: {{ .Chart.Name }}
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+  - port: {{ .Values.port }}
+    targetPort: 8000
   selector:
-    {{- include "scac.selectorLabels" . | nindent 4 }}
+    app: {{ .Chart.Name }}
+    service: {{ .Values.name }}
