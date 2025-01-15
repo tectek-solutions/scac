@@ -62,4 +62,14 @@ VALUES
         '{"per_page": 1}',
         '{"Authorization": "Bearer {token}"}',
         '{}'
+    ),
+    (
+        (SELECT id FROM apis WHERE name = 'SumUp'),
+        'New Transaction Made (SumUp)',
+        'Checks if a new transaction is made on SumUp',
+        'GET',
+        '/v2.1/merchants/{merchant_code}/transactions/history'
+        '{"order": "descending"}'
+        '{"Authorization": "Bearer {token}"}',
+        '{}'
     );
