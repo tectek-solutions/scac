@@ -271,7 +271,7 @@ async fn create_user_token(
     println!("Code: {:?}", code);
     println!("State: {:?}", state);
 
-    let authentication_id = match state.split("-").collect::<Vec<&str>>().get(0) {
+    let authentication_id = match state.split(" ").collect::<Vec<&str>>().get(0) {
         Some(value) => match value.split("=").collect::<Vec<&str>>().get(1) {
             Some(value) => match value.parse::<i32>() {
                 Ok(value) => value,
