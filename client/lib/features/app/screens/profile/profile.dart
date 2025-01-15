@@ -38,6 +38,7 @@ class _ProfileState extends State<Profile> {
         _isLoading = false;
         _hasError = true;
       });
+      await storage.deleteAll();
       print('Error fetching user profile: $e');
     }
   }
