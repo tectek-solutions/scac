@@ -28,4 +28,21 @@ class ApiService {
       throw Exception('Failed to fetch');
     }
   }
+
+  Future<void> removeCard(int id) async {
+    final url = Uri.parse('$baseUrl$route$id');
+    final token = await storage.read(key: 'jwt');
+    final response = await http.delete(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      return;
+    } else {
+      throw Exception('Failed to delete');
+    }
+  }
 }

@@ -38,6 +38,17 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
     }
   }
 
+  Future<void> _removeCard(int id) async {
+    try {
+      await apiService.removeCard(id);
+      setState(() {
+        services.removeWhere((service) => service['id'] == id);
+      });
+    } catch (e) {
+      print('Error removing card: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +77,20 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
                                   child: ListTile(
                                     title: Text(service['name']),
                                     subtitle: Text(service['description']),
+                                    trailing: IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () async {
+                                        await _removeCard(service['id']);
+                                      },
+                                    ),
+                                    onTap: () {
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => IntermediatePage(itemIndex: index, id: service['id']),
+                                      //   ),
+                                      // );
+                                    },
                                   ),
                                 );
                               },
