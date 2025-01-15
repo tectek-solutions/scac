@@ -21,7 +21,7 @@ VALUES (
         '/gmail/v1/users/me/messages/send',
         '{}',
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{"raw": "From: {from}\r\nTo: {to}\r\nSubject: {subject}\r\n\r\n{body}"}'
     ),
     (
         (
@@ -35,5 +35,5 @@ VALUES (
         '/me/sendMail',
         '{}',
         '{"Authorization": "Bearer {token}", "Content-Type": "application/json"}',
-        '{}'
+        '{"message":{"toRecipients":[{"emailAddress":{"address":"{ to }","name":" { to }"}}],"subject":" { subject }","body":{"content":"{ body }","contentType":"text"}}}  '
     );

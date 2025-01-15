@@ -1,5 +1,5 @@
-use actix_web::web;
-use database;
+use actix_web::{http::header, web};
+use database::{self, schema::reactions};
 
 use crate::query;
 
@@ -104,28 +104,85 @@ impl Worker {
 
         let url = format!("{}/{}", action_api.base_url, action.http_endpoint);
 
-        let response = client
-            .request(
-                match reqwest::Method::from_bytes(action.http_method.as_bytes()) {
-                    Ok(method) => method,
-                    Err(err) => {
-                        error!("Error getting method: {:?}", err);
-                        return Err(std::io::Error::new(
-                            std::io::ErrorKind::Other,
-                            "Error getting method",
-                        ));
-                    }
-                },
-                &url,
-            )
+        info!("URL: {}", url);
+
+        let method = match reqwest::Method::from_bytes(action.http_method.as_bytes()) {
+            Ok(method) => method,
+            Err(err) => {
+                error!("Error getting method: {:?}", err);
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "Error getting method",
+                ));
+            }
+        };
+
+        let mut headers = match action.http_headers {
+            Some(headers) => headers,
+            None => {
+                warn!("No headers found");
+                serde_json::Value::default()
+            }
+        };
+        let headers= match headers.as_object_mut() {
+            Some(headers) => headers,
+            None => &mut {
+                warn!("No headers found");
+                serde_json::Map::new()
+            }
+        };
+
+        let mut headers_map = reqwest::header::HeaderMap::new();
+
+        for (key, value) in headers {
+            let value = match value.as_str() {
+                Some(value) => value,
+                None => {
+                    warn!("No value found");
+                    ""
+                }
+            };
+
+            let key = match reqwest::header::HeaderName::from_bytes(key.as_bytes()) {
+                Ok(key) => key,
+                Err(err) => {
+                    error!("Error getting header key: {:?}", err);
+                    continue;
+                }
+            };
+
+            let value = match reqwest::header::HeaderValue::from_str(value) {
+                Ok(value) => value,
+                Err(err) => {
+                    error!("Error getting header value: {:?}", err);
+                    continue;
+                }
+            };
+
+            headers_map.insert(key, value);
+        }
+
+        let request = client
+            .request(method, &url)
             .form(&action.http_parameters)
-            .header(
-                "Authorization",
-                format!("Bearer {}", action_user_token.access_token),
-            )
+            .headers(headers_map)
             .json(&action.http_body)
-            .send()
-            .await;
+            .build();
+
+        let request = match request {
+            Ok(request) => request,
+            Err(err) => {
+                error!("Error building request: {:?}", err);
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "Error building request",
+                ));
+            }
+        };
+
+        info!("Request: {:?}", request);
+
+        let response = client.execute(request).await;
 
         let response = match response {
             Ok(response) => response,
@@ -138,8 +195,15 @@ impl Worker {
             }
         };
 
-        let data: serde_json::Value = match response.json().await {
-            Ok(data) => data,
+        info!("Response: {:?}", response);
+
+        info!("Response status: {:?}", response.status());
+        info!("Response headers: {:?}", response.headers());
+        let response_text = response.text().await;
+        info!("Response text: {:?}", response_text);
+
+        let data: serde_json::Value = match response_text {
+            Ok(text) => serde_json::from_str(&text).unwrap_or_default(),
             Err(err) => {
                 error!("Error getting json response: {:?}", err);
                 return Err(std::io::Error::new(
@@ -149,7 +213,8 @@ impl Worker {
             }
         };
 
-        println!("Response: {:?}", data);
+        println!("Response: {}", data);
+
 
         let reaction = match database::model::Reaction::read(
             &mut self.database.get_connection(),
