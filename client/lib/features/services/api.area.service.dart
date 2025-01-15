@@ -1,6 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'api.service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+final storage = const FlutterSecureStorage();
 
 class ApiService {
   final String baseUrl;
@@ -10,8 +13,7 @@ class ApiService {
 
   Future<dynamic> fetchCards() async {
     final url = Uri.parse('$baseUrl$route');
-    final token = getToken();
-    print(token);
+    final token = await storage.read(key: 'jwt');
     final response = await http.get(
       url,
       headers: {

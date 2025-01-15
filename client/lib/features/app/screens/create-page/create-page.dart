@@ -23,7 +23,7 @@ class _CreatePageState extends State<CreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Page'),
+        title: const Text('Create a workflow'),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),

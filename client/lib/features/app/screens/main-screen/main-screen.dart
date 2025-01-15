@@ -41,8 +41,8 @@ class _MainScreenState extends State<MainScreen> {
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.apps_outlined),
-            label: 'My Applets',
+            icon: Icon(Icons.workspaces_filled),
+            label: 'My Workflows',
             backgroundColor: TColors.lightColor,
           ),
           // BottomNavigationBarItem(
@@ -52,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
           // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
-            label: 'Create',
+            label: 'Create Workflow',
             backgroundColor: TColors.lightColor,
           ),
           BottomNavigationBarItem(

@@ -1,5 +1,6 @@
 import 'package:client/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
+import '../../../services/api.area.service.dart';
 
 class ClickableCardScreen extends StatefulWidget {
   @override
@@ -8,119 +9,71 @@ class ClickableCardScreen extends StatefulWidget {
 
 class _ClickableCardScreenState extends State<ClickableCardScreen> {
   bool _showDetail = false;
+  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
+  ApiService apiService = ApiService(baseUrl: baseUrlString, route: '/workflows/');
+  List<dynamic> services = [];
+  bool _isLoading = true;
+  bool _hasError = false;
 
-  void toggleDetail() {
-    setState(() {
-      _showDetail = !_showDetail;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _fetchServices();
+  }
+
+  Future<void> _fetchServices() async {
+    try {
+      final value = await apiService.fetchCards();
+      setState(() {
+        services = value is List ? value : [value];
+        _showDetail = true;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+      print('Error fetching cards: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: TSizes.appBarHeight, left: 16.0, right: 16.0),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: toggleDetail,
-                  child: Card(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(width: 16.0),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Automation Trigger',
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
+      appBar: AppBar(
+        title: const Text('Clickable Card Screen'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: TSizes.appBarHeight, left: 16.0, right: 16.0),
+        child: Column(
+          children: [
+            _isLoading
+                ? const CircularProgressIndicator()
+                : _hasError
+                    ? const Text('Error loading services')
+                    : _showDetail
+                        ? Expanded(
+                            child: ListView.builder(
+                              itemCount: services.length,
+                              itemBuilder: (context, index) {
+                                final service = services[index];
+                                return Card(
+                                  elevation: 4.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
                                   ),
-                                ),
-                                const SizedBox(height: 8.0),
-                                Text(
-                                  'Perform an action when a condition is met.',
-                                  style: TextStyle(
-                                      fontSize: 14.0, color: Colors.grey[700]),
-                                ),
-                              ],
+                                  child: ListTile(
+                                    title: Text(service['name']),
+                                    subtitle: Text(service['description']),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                          Icon(
-                            _showDetail
-                                ? Icons.keyboard_arrow_left
-                                : Icons.keyboard_arrow_right,
-                            size: 24.0,
-                            color: Colors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Animated Detail Section
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300), // Animation duration
-            curve: Curves.easeInOut, // Animation curve
-            right: _showDetail ? 0 : -MediaQuery.of(context).size.width,
-            top: 0,
-            bottom: 0,
-            child: Padding(
-              padding: const EdgeInsets.only(top: TSizes.appBarHeight),
-              child: Material(
-                elevation: 8.0,
-                child: Container(
-                  color: Colors.white,
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: toggleDetail,
-                          ),
-                          const SizedBox(width: 16.0),
-                          const Text(
-                            'Card Details',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16.0),
-                      Text(
-                        'This is the detailed section of the card. It slides in from the right.',
-                        style: TextStyle(fontSize: 16.0, color: Colors.grey[700]),
-                      ),
-                      const Spacer(),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+                          )
+                        : const Text('No services available'),
+          ],
+        ),
       ),
     );
   }
