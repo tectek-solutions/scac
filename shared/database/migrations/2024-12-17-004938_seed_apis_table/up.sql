@@ -17,4 +17,58 @@ VALUES (
         ),
         'Outlook',
         'https://graph.microsoft.com'
+    ),
+    (
+        (
+            SELECT id
+            FROM authentications
+            WHERE name = 'Spotify'
+        ),
+        'Spotify',
+        'https://api.spotify.com/v1'
+    ),
+    (
+        (
+            SELECT id
+            FROM authentications
+            WHERE name = 'Reddit'
+        ),
+        'Reddit',
+        'https://oauth.reddit.com'
+    ),
+    (
+        (
+            SELECT id
+            FROM authentications
+            WHERE name = 'Twitter'
+        ),
+        'Twitter',
+        'https://api.twitter.com/2'
+    ),
+    (
+        (
+            SELECT id
+            FROM authentications
+            WHERE name = 'Facebook'
+        ),
+        'Facebook',
+        'https://graph.facebook.com'
+    ),
+    (
+        (
+            SELECT id
+            FROM authentications
+            WHERE name = 'Github'
+        ),
+        'Github',
+        'https://api.github.com'
+    ),
+    (
+        (
+            SELECT id
+            FROM authentications
+            WHERE name = 'SumUp'
+        ),
+        'SumUp',
+        'https://api.sumup.com/v0.1'
     );

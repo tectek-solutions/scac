@@ -1,5 +1,5 @@
-use actix_web::web;
-use database;
+use actix_web::{http::header, web};
+use database::{self, schema::reactions};
 
 use crate::query;
 
@@ -117,15 +117,55 @@ impl Worker {
             }
         };
 
+        let mut headers = match action.http_headers {
+            Some(headers) => headers,
+            None => {
+                warn!("No headers found");
+                serde_json::Value::default()
+            }
+        };
+        let headers= match headers.as_object_mut() {
+            Some(headers) => headers,
+            None => &mut {
+                warn!("No headers found");
+                serde_json::Map::new()
+            }
+        };
+
+        let mut headers_map = reqwest::header::HeaderMap::new();
+
+        for (key, value) in headers {
+            let value = match value.as_str() {
+                Some(value) => value,
+                None => {
+                    warn!("No value found");
+                    ""
+                }
+            };
+
+            let key = match reqwest::header::HeaderName::from_bytes(key.as_bytes()) {
+                Ok(key) => key,
+                Err(err) => {
+                    error!("Error getting header key: {:?}", err);
+                    continue;
+                }
+            };
+
+            let value = match reqwest::header::HeaderValue::from_str(value) {
+                Ok(value) => value,
+                Err(err) => {
+                    error!("Error getting header value: {:?}", err);
+                    continue;
+                }
+            };
+
+            headers_map.insert(key, value);
+        }
+
         let request = client
             .request(method, &url)
             .form(&action.http_parameters)
-            .header(
-                "Authorization",
-                format!("Bearer {}", action_user_token.access_token),
-            )
-            .header("Content-Type", "application/json") 
-            .header("Accept", "application/json")
+            .headers(headers_map)
             .json(&action.http_body)
             .build();
 
@@ -174,6 +214,7 @@ impl Worker {
         };
 
         println!("Response: {}", data);
+
 
         let reaction = match database::model::Reaction::read(
             &mut self.database.get_connection(),
