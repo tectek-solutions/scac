@@ -53,16 +53,31 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Clickable Card Screen'),
+        title: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: const Text('My Workflows'),
+        ),
+        backgroundColor: Colors.teal,
+        automaticallyImplyLeading: false,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              onPressed: () {
+              },
+              icon: Icon(Icons.download),
+            ),
+          ),
+        ],
       ),
       body: Padding(
-        padding: const EdgeInsets.only(top: TSizes.appBarHeight, left: 16.0, right: 16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             _isLoading
-                ? const CircularProgressIndicator()
+                ? const Center(child: CircularProgressIndicator())
                 : _hasError
-                    ? const Text('Error loading services')
+                    ? const Center(child: Text('Error loading services', style: TextStyle(color: Colors.red)))
                     : _showDetail
                         ? Expanded(
                             child: ListView.builder(
@@ -75,30 +90,34 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
                                     borderRadius: BorderRadius.circular(12.0),
                                   ),
                                   child: ListTile(
-                                    title: Text(service['name']),
+                                    leading: CircleAvatar(
+                                      backgroundColor: Colors.teal,
+                                      child: Text(service['name'][0].toUpperCase(), style: TextStyle(color: Colors.white)),
+                                    ),
+                                    title: Text(service['name'], style: TextStyle(fontWeight: FontWeight.bold)),
                                     subtitle: Text(service['description']),
                                     trailing: IconButton(
-                                      icon: Icon(Icons.delete),
+                                      icon: Icon(Icons.delete, color: Colors.red),
                                       onPressed: () async {
                                         await _removeCard(service['id']);
                                       },
                                     ),
                                     onTap: () {
-                                      // Navigator.push(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //     builder: (context) => IntermediatePage(itemIndex: index, id: service['id']),
-                                      //   ),
-                                      // );
+                                      // Handle card tap
                                     },
                                   ),
                                 );
                               },
                             ),
                           )
-                        : const Text('No services available'),
+                        : const Center(child: Text('No services available')),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _fetchServices,
+        backgroundColor: Colors.teal,
+        child: const Icon(Icons.refresh),
       ),
     );
   }

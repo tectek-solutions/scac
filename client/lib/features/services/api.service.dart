@@ -72,7 +72,7 @@ class ApiAccountService {
       },
     );
     if (response.statusCode == 200) {
-      await storage.delete(key: 'jwt');
+      await storage.deleteAll();
       return;
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized');
