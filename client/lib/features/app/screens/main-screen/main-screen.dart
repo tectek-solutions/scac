@@ -9,7 +9,6 @@ import 'package:client/utils/constants/colors.dart';
 import 'package:client/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 

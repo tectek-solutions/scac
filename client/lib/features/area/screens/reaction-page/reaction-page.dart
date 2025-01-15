@@ -9,7 +9,6 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../../../../widgets/card-grid.dart';
 import 'package:http/http.dart' as http;
 import '../../../services/api.service.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 const baseUrlString =
     String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
@@ -23,12 +22,10 @@ class ReactionPage extends StatefulWidget {
 }
 
 class _ReactionPageState extends State<ReactionPage> {
-  ApiService apiService = ApiService(
-      baseUrl: IntermediatePageReaction.baseUrlString,
-      route: '/authentications/');
+  ApiService apiService = ApiService(baseUrl: IntermediatePageReaction.baseUrlString, route: '/authentications/');
   List<dynamic> services = [];
 
-  Future<void> navigateToIntermediatePage(
+  Future<void> navigateToIntermediatePage (
     BuildContext context, dynamic card, int index) async {
     final token = await storage.read(key: 'jwt');
     final service = services[index];
@@ -49,24 +46,14 @@ class _ReactionPageState extends State<ReactionPage> {
         },
       );
       var url = response.body.substring(1, response.body.length - 1);
-      // url = url.replaceAll('"', '');
-      //print("Attempting to launch URL: $url");
-      if (await canLaunchUrlString(url)) {
-        print("Launching URL: $url");
-        await launchUrlString(url, mode: LaunchMode.externalApplication);
-      } else {
-        print("Failed to launch URL: $url");
-        throw 'Could not launch $url';
-      }
-    } else {
-      print("HERE IS THE RESPONSE: ${response.body}");
-      // Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => IntermediatePageReaction(itemIndex: index, id: 1),
-      //     ),
-      //   );
+      await launchUrl(Uri.parse(url), mode: LaunchMode.inAppBrowserView);
     }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IntermediatePageReaction(itemIndex: index, id: service['id']),
+      ),
+    );
   }
 
   // void navigateToIntermediatePage(BuildContext context, dynamic card, int index) {
@@ -95,11 +82,6 @@ class _ReactionPageState extends State<ReactionPage> {
     });
   }
 
-  Future<void> clearAppCache() async {
-    await DefaultCacheManager().emptyCache();
-    print("App cache cleared");
-  }
-
   @override
   Widget build(BuildContext context) {
     return CardGrid(
@@ -109,27 +91,4 @@ class _ReactionPageState extends State<ReactionPage> {
       onTap: navigateToIntermediatePage,
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('Choose a Service'),
-  //       actions: [
-  //         IconButton(
-  //           icon: Icon(Icons.delete),
-  //           onPressed: () async {
-  //             await clearAppCache();
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //     body: CardGrid(
-  //       appBarTitle: 'Choose a Service',
-  //       cards: services,
-  //       icon: Icons.star_half,
-  //       onTap: navigateToIntermediatePage,
-  //     ),
-  //   );
-  // }
 }
