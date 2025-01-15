@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:client/features/area/screens/reaction-page/reaction-page.dart';
 import 'package:client/features/services/api.area.service.dart';
 import 'package:client/features/area/screens/reaction-page/detail-page-reaction.dart';
 import 'package:client/widgets/card-grid.dart';
@@ -21,6 +24,7 @@ class _IntermediatePageReactionState extends State<IntermediatePageReaction> {
   @override
   void initState() {
     super.initState();
+    print(baseUrlString);
     apiService = ApiService(baseUrl: IntermediatePageReaction.baseUrlString, route: '/apis/${widget.id}');
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
