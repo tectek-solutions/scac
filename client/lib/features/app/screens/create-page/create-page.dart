@@ -10,6 +10,7 @@ class CreatePage extends StatefulWidget {
   _CreatePageState createState() => _CreatePageState();
 }
 
+
 class _CreatePageState extends State<CreatePage> {
   String resultTitleAction = 'Actions';
   String resultDescriptionAction = 'Go to Action Page';
@@ -18,6 +19,15 @@ class _CreatePageState extends State<CreatePage> {
   String resultTitleReaction = 'Reactions';
   String resultDescriptionReaction = 'Go to Reaction Page';
   String resultReaction = 'No reaction selected';
+
+  final List<Map<String, String>> data = [
+      {"Mail": "Enter mail"},
+      {"test2": "Workflow"},
+      {"test3": "Reaction"},
+    ];
+  
+
+  final Color boxColor = Colors.grey[700]!; // Définissez une couleur commune
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +92,7 @@ class _CreatePageState extends State<CreatePage> {
                               resultDescriptionAction,
                               style: TextStyle(
                                 fontSize: 14.0,
-                                color: Colors.grey[700]
+                                color: boxColor,
                               ),
                             ),
                             const SizedBox(height: 8.0),
@@ -92,7 +102,7 @@ class _CreatePageState extends State<CreatePage> {
                                   'Action: ',
                                   style: TextStyle(
                                     fontSize: 14.0,
-                                    color: Colors.grey[700],
+                                    color: boxColor,
                                   ),
                                 ),
                                 Text(
@@ -157,8 +167,8 @@ class _CreatePageState extends State<CreatePage> {
                             Text(
                               resultDescriptionReaction,
                               style: TextStyle(
-                                  fontSize: 14.0,
-                                  color: Colors.grey[700]
+                                fontSize: 14.0,
+                                color: boxColor,
                               ),
                             ),
                             const SizedBox(height: 8.0),
@@ -168,7 +178,7 @@ class _CreatePageState extends State<CreatePage> {
                                   'Reaction: ',
                                   style: TextStyle(
                                     fontSize: 14.0,
-                                    color: Colors.grey[700],
+                                    color: boxColor,
                                   ),
                                 ),
                                 Text(
@@ -189,9 +199,108 @@ class _CreatePageState extends State<CreatePage> {
               ),
             ),
             const SizedBox(height: 10.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Card(
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Action',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 100.0, width: 480.0),
+                        ...data.map((entry) {
+                          final key = entry.keys.first;
+                          final value = entry.values.first;
+                            return Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0), // Espace entre les inputs
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                              Text(
+                                key,
+                                style: const TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 28.0), // Espace horizontal entre les textes
+                              SizedBox(
+                                width: 200.0, // Définir une largeur fixe pour l'input
+                                child: TextField(
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  hintText: value,
+                                ),
+                                ),
+                              ),
+                              ],
+                            ),
+                            );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
+                ),
+                Card(
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Workflow',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 280.0, width: 480.0),
+                      ],
+                    ),
+                  ),
+                ),
+                Card(
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Reaction',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 280.0, width: 480.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10.0),
             TextButton(
               onPressed: () {
-                //La tu ajoute les fonctionalités pour quand tu clique sur le bouton
+                // Ajoutez les fonctionnalités pour le bouton ici
               },
               child: const Text(
                 'Continue',
