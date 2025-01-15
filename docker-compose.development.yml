@@ -64,6 +64,7 @@ services:
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
       API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -84,6 +85,7 @@ services:
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
       API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -104,6 +106,7 @@ services:
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
       API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -124,6 +127,7 @@ services:
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
       API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -144,6 +148,7 @@ services:
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
       API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -185,6 +190,7 @@ services:
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
       API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -205,12 +211,13 @@ services:
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
       API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
       - migration
       - cache
-
+     
   api-gateway:
     build:
       context: .
@@ -249,7 +256,7 @@ services:
       - users-service
       - workflows-service
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://10.49.84.35:8000 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3  
@@ -272,3 +279,20 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # client:
+  #   build:
+  #     context: .
+  #     dockerfile: ./client/Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     API_URL: http://10.49.84.35:8000
+  #   networks:
+  #     - internal
+  #   depends_on:
+  #     - api-gateway
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"

@@ -1,5 +1,6 @@
 import 'package:client/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class ClickableCardScreen extends StatefulWidget {
   @override
@@ -13,6 +14,11 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
     setState(() {
       _showDetail = !_showDetail;
     });
+  }
+
+  Future<void> clearAppCache() async {
+    await DefaultCacheManager().emptyCache();
+    print("App cache cleared");
   }
 
   @override
@@ -121,6 +127,11 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: clearAppCache,
+        child: const Icon(Icons.delete),
+        tooltip: 'Clear Cache',
       ),
     );
   }

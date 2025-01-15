@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -101,6 +102,7 @@ class ApiAccountService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else if (response.statusCode == 401) {
+      await storage.deleteAll();
       throw Exception('Unauthorized');
     } else if (response.statusCode == 500) {
       throw Exception('Internal server error');
