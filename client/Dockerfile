@@ -10,7 +10,7 @@ ARG GRADLE_VERSION=6.3
 ARG ANDROID_API_LEVEL=29
 ARG ANDROID_BUILD_TOOLS_LEVEL=29.0.3
 ARG ANDROID_NDK_VERSION=21.1.6352462
-ARG ANDROID_SDK_ROOT=/home/flutter/android
+ARG ANDROID_SDK_ROOT=/home/flutter/ android
 ARG GRADLE_SDK_ROOT=/home/flutter/gradle
 ARG GRADLEW_SDK_ROOT=/home/flutter/gradlew
 
@@ -86,6 +86,7 @@ ARG APP=/home/flutter/scac
 # Copy built web application to NGINX HTML directory
 COPY --from=builder --chown=nginx:nginx $APP/client/build/web /var/www/client
 COPY --from=builder --chown=root:root $APP/client/nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder --chown=root:root $APP/client/build/app/outputs/flutter-apk/app-release.apk /var/www/client/app-release.apk
 
 # Expose and run NGINX
 EXPOSE 8000
