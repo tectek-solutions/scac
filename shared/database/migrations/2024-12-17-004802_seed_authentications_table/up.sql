@@ -45,7 +45,7 @@ VALUES (
         'https://accounts.spotify.com/authorize?client_id={ client_id }&redirect_uri={ redirect_uri }&state={ state }',
         '{
             "response_type": "code",
-            "scope": "user-read-private"
+            "scope": "user-read-private user-modify-playback-state user-read-playback-state user-read-currently-playing"
         }',
         'https://accounts.spotify.com/api/token',
         '{

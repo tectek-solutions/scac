@@ -44,11 +44,31 @@ VALUES
         '{}'
     ),
     (
+        (SELECT id FROM apis WHERE name = 'Spotify'),
+        'Currently Playing Song (Spotify)',
+        'Checks if the user is currently playing a song on Spotify',
+        'GET',
+        '/me/player/currently-playing',
+        '{}',
+        '{"Authorization": "Bearer {token}"}',
+        '{}'
+    ),
+    (
+        (SELECT id FROM apis WHERE name = 'Spotify'),
+        'New Playlist Created (Spotify)',
+        'Checks if a new playlist is created on Spotify',
+        'GET',
+        '/me/playlists',
+        '{"limit": 1}',
+        '{"Authorization": "Bearer {token}"}',
+        '{}'
+    )
+    (
         (SELECT id FROM apis WHERE name = 'Github'),
         'New Repository Created (Github)',
         'Checks if a new repository is created on Github',
         'GET',
-        '/users/{owner}/repos',
+        '/user/repos',
         '{"sort": "created", "per_page": 1}',
         '{"Authorization": "Bearer {token}"}',
         '{}'
@@ -60,6 +80,16 @@ VALUES
         'GET',
         '/repos/{owner}/{repo}/commits',
         '{"per_page": 1}',
+        '{"Authorization": "Bearer {token}"}',
+        '{}'
+    ),
+    (
+        (SELECT id FROM apis WHERE name = 'Github'),
+        'New member added to repository (Github)',
+        'Checks if a new member is added to a repository on Github',
+        'GET',
+        '/repos/{owner}/{repo}/collaborators',
+        '{}',
         '{"Authorization": "Bearer {token}"}',
         '{}'
     ),
