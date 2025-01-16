@@ -20,6 +20,11 @@ VOLUME [ "/home/flutter" ]
 RUN apt-get update
 RUN apt install -qq -y curl git unzip xz-utils zip libglu1-mesa default-jre default-jdk libglu1 libpulse-dev libasound2 libc6 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxi6 libxtst6 libnss3 wget
 
+# Create a non-root user
+RUN groupadd flutter
+RUN useradd -m -g flutter flutter
+USER flutter
+
 # Set up Flutter environment variables
 ENV PATH="$FLUTTER_SDK/bin:$FLUTTER_SDK/bin/cache/dart-sdk/bin:${PATH}"
 
@@ -37,11 +42,6 @@ RUN wget -q 'https://dl.google.com/android/repository/commandlinetools-linux-620
 RUN unzip -q -d ${ANDROID_SDK_ROOT}/cmdline-tools /tmp/commandlinetools-linux-6200805_latest.zip
 RUN yes Y | ${ANDROID_SDK_ROOT}//cmdline-tools/tools/bin/sdkmanager --install "build-tools;${ANDROID_BUILD_TOOLS_LEVEL}" "platforms;android-${ANDROID_API_LEVEL}" "platform-tools" "ndk;${ANDROID_NDK_VERSION}"
 RUN yes Y | ${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin/sdkmanager --licenses
-
-# Create a non-root user
-RUN groupadd flutter
-RUN useradd -m -g flutter flutter
-USER flutter
 
 # Define variables
 ARG FLUTTER_SDK=/home/flutter/flutter
