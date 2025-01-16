@@ -51,6 +51,8 @@ WORKDIR $FLUTTER_SDK
 RUN git fetch
 RUN git checkout $FLUTTER_VERSION
 
+# Set up Flutter environment variables
+ENV PATH="$FLUTTER_SDK/bin:$FLUTTER_SDK/bin/cache/dart-sdk/bin:${PATH}"
 
 # Environment variables to be used for build
 ENV GRADLE_HOME=/opt/gradle/gradle-$GRADLE_VERSION
