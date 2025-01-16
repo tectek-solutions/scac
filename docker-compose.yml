@@ -60,6 +60,8 @@ services:
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -76,7 +78,9 @@ services:
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -94,6 +98,8 @@ services:
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -111,6 +117,8 @@ services:
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -128,6 +136,8 @@ services:
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -164,6 +174,8 @@ services:
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -182,6 +194,8 @@ services:
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       REDIS_URL: redis://cache:6379
       JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
     networks:
       - internal
     depends_on:
@@ -229,15 +243,20 @@ services:
       timeout: 5s
       retries: 3
 
-  client:
-    image: ghcr.io/tectek-solutions/scac:client-latest
-    ports:
-      - "3000:3000"
-    environment:
-      API_URL: http://localhost:8000
-      CLIENT_URL: http://localhost:8000
-    networks:
-      - internal
-    depends_on:
-      - api-gateway
 
+  # client:
+  #   image: ghcr.io/tectek-solutions/scac:client-latest
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     API_URL: http://localhost:8000
+  #     CLIENT_URL: http://localhost:8000
+  #   networks:
+  #     - internal
+  #   depends_on:
+  #     - api-gateway
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
