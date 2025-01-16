@@ -11,6 +11,8 @@ ARG ANDROID_API_LEVEL=29
 ARG ANDROID_BUILD_TOOLS_LEVEL=29.0.3
 ARG ANDROID_NDK_VERSION=21.1.6352462
 ARG ANDROID_SDK_ROOT=/home/android
+ARG GRADLE_SDK_ROOT=/home/gradle
+ARG GRADLEW_SDK_ROOT=${GRADLEW_SDK_ROOT}
 
 VOLUME [ "/home/flutter" ]
 
@@ -23,17 +25,17 @@ ENV PATH="$FLUTTER_SDK/bin:$FLUTTER_SDK/bin/cache/dart-sdk/bin:${PATH}"
 
 # Download gradle, install gradle and gradlew
 RUN wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp
-RUN unzip -q -d /opt/gradle /tmp/gradle-${GRADLE_VERSION}-bin.zip
-RUN mkdir /opt/gradlew 
-RUN /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper --gradle-version ${GRADLE_VERSION} --distribution-type all -p /opt/gradlew
-RUN /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper -p /opt/gradlew
+RUN unzip -q -d ${GRADLE_SDK_ROOT} /tmp/gradle-${GRADLE_VERSION}-bin.zip
+RUN mkdir ${GRADLEW_SDK_ROOT} 
+RUN ${GRADLE_SDK_ROOT}/gradle-${GRADLE_VERSION}/bin/gradle wrapper --gradle-version ${GRADLE_VERSION} --distribution-type all -p ${GRADLEW_SDK_ROOT}
+RUN ${GRADLE_SDK_ROOT}/gradle-${GRADLE_VERSION}/bin/gradle wrapper -p ${GRADLEW_SDK_ROOT}
 
 # Download commandlinetools, install packages and accept all licenses
 RUN mkdir ${ANDROID_SDK_ROOT}
 RUN mkdir ${ANDROID_SDK_ROOT}/cmdline-tools
 RUN wget -q 'https://dl.google.com/android/repository/commandlinetools-linux-6200805_latest.zip' -P /tmp
 RUN unzip -q -d ${ANDROID_SDK_ROOT}/cmdline-tools /tmp/commandlinetools-linux-6200805_latest.zip
-RUN yes Y | opt/android//cmdline-tools/tools/bin/sdkmanager --install "build-tools;${ANDROID_BUILD_TOOLS_LEVEL}" "platforms;android-${ANDROID_API_LEVEL}" "platform-tools" "ndk;${ANDROID_NDK_VERSION}"
+RUN yes Y | ${ANDROID_SDK_ROOT}//cmdline-tools/tools/bin/sdkmanager --install "build-tools;${ANDROID_BUILD_TOOLS_LEVEL}" "platforms;android-${ANDROID_API_LEVEL}" "platform-tools" "ndk;${ANDROID_NDK_VERSION}"
 RUN yes Y | ${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin/sdkmanager --licenses
 
 # Create a non-root user
@@ -56,10 +58,10 @@ RUN git checkout $FLUTTER_VERSION
 ENV PATH="$FLUTTER_SDK/bin:$FLUTTER_SDK/bin/cache/dart-sdk/bin:${PATH}"
 
 # Environment variables to be used for build
-ENV GRADLE_HOME=/opt/gradle/gradle-$GRADLE_VERSION
+ENV GRADLE_HOME=${GRADLE_SDK_ROOT}/gradle-$GRADLE_VERSION
 ENV ANDROID_HOME=${ANDROID_SDK_ROOT}
 ENV ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}
-ENV PATH "$PATH:$GRADLE_HOME/bin:/opt/gradlew:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/tools/bin:$ANDROID_HOME/platform-tools:${ANDROID_NDK_HOME}"
+ENV PATH "$PATH:$GRADLE_HOME/bin:${GRADLEW_SDK_ROOT}:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/tools/bin:$ANDROID_HOME/platform-tools:${ANDROID_NDK_HOME}"
 ENV LD_LIBRARY_PATH "$ANDROID_HOME/emulator/lib64:$ANDROID_HOME/emulator/lib64/qt/lib"
 
 # Verify Flutter installation
