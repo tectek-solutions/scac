@@ -59,10 +59,6 @@ ENV ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}
 ENV PATH "$PATH:$GRADLE_HOME/bin:/opt/gradlew:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/tools/bin:$ANDROID_HOME/platform-tools:${ANDROID_NDK_HOME}"
 ENV LD_LIBRARY_PATH "$ANDROID_HOME/emulator/lib64:$ANDROID_HOME/emulator/lib64/qt/lib"
 
-# Clean up
-RUN rm /tmp/gradle-${GRADLE_VERSION}-bin.zip
-RUN rm /tmp/commandlinetools-linux-6200805_latest.zip
-
 # Verify Flutter installation
 RUN flutter doctor -v
 
