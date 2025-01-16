@@ -31,13 +31,13 @@ ENV PATH="$FLUTTER_SDK/bin:$FLUTTER_SDK/bin/cache/dart-sdk/bin:${PATH}"
 # Download gradle, install gradle and gradlew
 RUN wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp
 RUN unzip -q -d ${GRADLE_SDK_ROOT} /tmp/gradle-${GRADLE_VERSION}-bin.zip
-RUN mkdir ${GRADLEW_SDK_ROOT} 
+RUN mkdir -p ${GRADLEW_SDK_ROOT} 
 RUN ${GRADLE_SDK_ROOT}/gradle-${GRADLE_VERSION}/bin/gradle wrapper --gradle-version ${GRADLE_VERSION} --distribution-type all -p ${GRADLEW_SDK_ROOT}
 RUN ${GRADLE_SDK_ROOT}/gradle-${GRADLE_VERSION}/bin/gradle wrapper -p ${GRADLEW_SDK_ROOT}
 
 # Download commandlinetools, install packages and accept all licenses
-RUN mkdir ${ANDROID_SDK_ROOT}
-RUN mkdir ${ANDROID_SDK_ROOT}/cmdline-tools
+RUN mkdir -p ${ANDROID_SDK_ROOT}
+RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools
 RUN wget -q 'https://dl.google.com/android/repository/commandlinetools-linux-6200805_latest.zip' -P /tmp
 RUN unzip -q -d ${ANDROID_SDK_ROOT}/cmdline-tools /tmp/commandlinetools-linux-6200805_latest.zip
 RUN yes Y | ${ANDROID_SDK_ROOT}//cmdline-tools/tools/bin/sdkmanager --install "build-tools;${ANDROID_BUILD_TOOLS_LEVEL}" "platforms;android-${ANDROID_API_LEVEL}" "platform-tools" "ndk;${ANDROID_NDK_VERSION}"
@@ -48,7 +48,7 @@ ARG FLUTTER_SDK=/home/flutter/flutter
 ARG APP=/home/flutter/scac
 
 # Clone the Flutter SDK
-RUN mkdir -p $FLUTTER_SDK
+RUN mkdir -p -p $FLUTTER_SDK
 RUN git clone https://github.com/flutter/flutter.git $FLUTTER_SDK
 WORKDIR $FLUTTER_SDK
 RUN git fetch
@@ -68,7 +68,7 @@ ENV LD_LIBRARY_PATH "$ANDROID_HOME/emulator/lib64:$ANDROID_HOME/emulator/lib64/q
 RUN flutter doctor -v
 
 # Copy the web application source code
-RUN mkdir -p $APP
+RUN mkdir -p -p $APP
 COPY --chown=flutter:flutter ./client $APP/client
 WORKDIR $APP
 
