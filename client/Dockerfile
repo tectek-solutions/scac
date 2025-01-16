@@ -10,6 +10,7 @@ ARG GRADLE_VERSION=6.3
 ARG ANDROID_API_LEVEL=29
 ARG ANDROID_BUILD_TOOLS_LEVEL=29.0.3
 ARG ANDROID_NDK_VERSION=21.1.6352462
+ARG ANDROID_SDK_ROOT=/home/android
 
 VOLUME [ "/home/flutter" ]
 
@@ -28,12 +29,12 @@ RUN /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper --gradle-version ${G
 RUN /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper -p /opt/gradlew
 
 # Download commandlinetools, install packages and accept all licenses
-RUN mkdir /opt/android
-RUN mkdir /opt/android/cmdline-tools
+RUN mkdir ${ANDROID_SDK_ROOT}
+RUN mkdir ${ANDROID_SDK_ROOT}/cmdline-tools
 RUN wget -q 'https://dl.google.com/android/repository/commandlinetools-linux-6200805_latest.zip' -P /tmp
-RUN unzip -q -d /opt/android/cmdline-tools /tmp/commandlinetools-linux-6200805_latest.zip
-RUN yes Y | /opt/android/cmdline-tools/tools/bin/sdkmanager --install "build-tools;${ANDROID_BUILD_TOOLS_LEVEL}" "platforms;android-${ANDROID_API_LEVEL}" "platform-tools" "ndk;${ANDROID_NDK_VERSION}"
-RUN yes Y | /opt/android/cmdline-tools/tools/bin/sdkmanager --licenses
+RUN unzip -q -d ${ANDROID_SDK_ROOT}/cmdline-tools /tmp/commandlinetools-linux-6200805_latest.zip
+RUN yes Y | opt/android//cmdline-tools/tools/bin/sdkmanager --install "build-tools;${ANDROID_BUILD_TOOLS_LEVEL}" "platforms;android-${ANDROID_API_LEVEL}" "platform-tools" "ndk;${ANDROID_NDK_VERSION}"
+RUN yes Y | ${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin/sdkmanager --licenses
 
 # Create a non-root user
 RUN groupadd flutter
@@ -56,7 +57,7 @@ ENV PATH="$FLUTTER_SDK/bin:$FLUTTER_SDK/bin/cache/dart-sdk/bin:${PATH}"
 
 # Environment variables to be used for build
 ENV GRADLE_HOME=/opt/gradle/gradle-$GRADLE_VERSION
-ENV ANDROID_HOME=/opt/android
+ENV ANDROID_HOME=${ANDROID_SDK_ROOT}
 ENV ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}
 ENV PATH "$PATH:$GRADLE_HOME/bin:/opt/gradlew:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/tools/bin:$ANDROID_HOME/platform-tools:${ANDROID_NDK_HOME}"
 ENV LD_LIBRARY_PATH "$ANDROID_HOME/emulator/lib64:$ANDROID_HOME/emulator/lib64/qt/lib"
