@@ -86,7 +86,7 @@ ARG APP=/home/flutter/scac
 # Copy built web application to NGINX HTML directory
 COPY --from=builder --chown=nginx:nginx $APP/client/build/web /var/www/client
 COPY --from=builder --chown=root:root $APP/client/nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder --chown=root:root $APP/client/build/app/outputs/flutter-apk/app-release.apk /var/www/client/app-release.apk
+COPY --from=builder --chown=root:root $APP/client/build/app/outputs/flutter-apk/app-release.apk /var/www/client/client.apk
 
 # Expose and run NGINX
 EXPOSE 8000
