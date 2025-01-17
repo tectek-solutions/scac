@@ -18,6 +18,8 @@ CREATE TABLE actions (
     -- Headers
     http_body JSONB,
     -- Body
+    data_keys JSONB,
+    -- Data keys
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- Creation timestamp
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

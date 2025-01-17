@@ -14,6 +14,10 @@ CREATE TABLE workflows (
     -- References the reaction action
     data_transformation JSONB,
     -- Transformation rules for data
+    action_data JSONB,
+    -- Data for the trigger action
+    reaction_data JSONB,
+    -- Data for the reaction action
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- Creation timestamp
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

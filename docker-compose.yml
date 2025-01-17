@@ -244,19 +244,19 @@ services:
       retries: 3
 
 
-  # client:
-  #   image: ghcr.io/tectek-solutions/scac:client-latest
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     API_URL: http://localhost:8000
-  #     CLIENT_URL: http://localhost:8000
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - api-gateway
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+  client:
+    image: ghcr.io/tectek-solutions/scac:client-latest
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:8000
+    networks:
+      - internal
+    depends_on:
+      - api-gateway
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

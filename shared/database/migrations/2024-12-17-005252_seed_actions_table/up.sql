@@ -6,7 +6,8 @@ INSERT INTO actions (
     http_endpoint,
     http_parameters,
     http_headers,
-    http_body
+    http_body,
+    data_keys
 )
 VALUES
     (
@@ -18,9 +19,10 @@ VALUES
         '{"maxResults": 1}',
         '{
             "Authorization": "Bearer {token}",
-            "Accept": "application/json"
+            "Accept": "application/json",
             "Content-Type": "application/json"
         }',
+        '{}',
         '{}'
     ),
     (
@@ -31,6 +33,7 @@ VALUES
         '/me/messages',
         '{"$top": 1, "$select": "receivedDateTime"}',
         '{"Authorization": "Bearer {token}"}',
+        '{}',
         '{}'
     ),
     (
@@ -62,7 +65,7 @@ VALUES
         '{"limit": 1}',
         '{"Authorization": "Bearer {token}"}',
         '{}'
-    )
+    ),
     (
         (SELECT id FROM apis WHERE name = 'Github'),
         'New Repository Created (Github)',
@@ -71,7 +74,10 @@ VALUES
         '/user/repos',
         '{"sort": "created", "per_page": 1}',
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{}',
+        '{
+            "owner": "The owner of the repository"
+        }'
     ),
     (
         (SELECT id FROM apis WHERE name = 'Github'),
@@ -81,7 +87,11 @@ VALUES
         '/repos/{owner}/{repo}/commits',
         '{"per_page": 1}',
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{}',
+        '{
+            "owner": "The owner of the repository",
+            "repo": "The repository name"
+        }'
     ),
     (
         (SELECT id FROM apis WHERE name = 'Github'),
@@ -98,8 +108,11 @@ VALUES
         'New Transaction Made (SumUp)',
         'Checks if a new transaction is made on SumUp',
         'GET',
-        '/v2.1/merchants/{merchant_code}/transactions/history'
-        '{"order": "descending"}'
+        '/v2.1/merchants/{merchant_code}/transactions/history',
+        '{"order": "descending"}',
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{}',
+        '{
+            "merchant_code": "The merchant code"
+        }'
     );
