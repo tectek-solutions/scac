@@ -7,7 +7,8 @@ INSERT INTO reactions (
         http_endpoint,
         http_parameters,
         http_headers,
-        http_body
+        http_body,
+        data_keys
     )
 VALUES (
         (
@@ -21,7 +22,13 @@ VALUES (
         '/gmail/v1/users/me/messages/send',
         '{}',
         '{"Authorization": "Bearer {token}"}',
-        '{"raw": "From: {from}\r\nTo: {to}\r\nSubject: {subject}\r\n\r\n{body}"}'
+        '{"raw": "From: {from}\r\nTo: {to}\r\nSubject: {subject}\r\n\r\n{body}"}',
+        '{
+            "from": "The sender of the mail",
+            "to": "The recipient of the mail",
+            "subject": "The subject of the mail",
+            "body": "The body of the mail"
+        }'
     ),
     (
         (
@@ -35,5 +42,10 @@ VALUES (
         '/me/sendMail',
         '{}',
         '{"Authorization": "Bearer {token}", "Content-Type": "application/json"}',
-        '{"message":{"toRecipients":[{"emailAddress":{"address":"{ to }","name":" { to }"}}],"subject":" { subject }","body":{"content":"{ body }","contentType":"text"}}}  '
+        '{"message":{"toRecipients":[{"emailAddress":{"address":"{ to }","name":" { to }"}}],"subject":" { subject }","body":{"content":"{ body }","contentType":"text"}}}',
+        '{
+            "to": "The recipient of the mail",
+            "subject": "The subject of the mail",
+            "body": "The body of the mail"
+        }'
     );
