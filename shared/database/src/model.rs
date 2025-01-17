@@ -320,6 +320,7 @@ pub struct Action {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
+    pub data_keys: Option<serde_json::Value>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -335,6 +336,7 @@ pub struct CreateAction {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
+    pub data_keys: Option<serde_json::Value>,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
@@ -348,6 +350,7 @@ pub struct UpdateAction {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
+    pub data_keys: Option<serde_json::Value>,
 }
 
 impl Action {
@@ -407,6 +410,7 @@ pub struct Reaction {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
+    pub data_keys: Option<serde_json::Value>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -422,6 +426,7 @@ pub struct CreateReaction {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
+    pub data_keys: Option<serde_json::Value>,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
@@ -435,6 +440,7 @@ pub struct UpdateReaction {
     pub http_parameters: Option<serde_json::Value>,
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
+    pub data_keys: Option<serde_json::Value>,
 }
 
 impl Reaction {
@@ -491,6 +497,8 @@ pub struct Workflow {
     pub actions_id: i32,
     pub reactions_id: i32,
     pub data_transformation: Option<serde_json::Value>,
+    pub action_data: Option<serde_json::Value>,
+    pub reaction_data: Option<serde_json::Value>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -504,6 +512,8 @@ pub struct CreateWorkflow {
     pub actions_id: i32,
     pub reactions_id: i32,
     pub data_transformation: Option<serde_json::Value>,
+    pub action_data: Option<serde_json::Value>,
+    pub reaction_data: Option<serde_json::Value>,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
@@ -515,6 +525,8 @@ pub struct UpdateWorkflow {
     pub actions_id: Option<i32>,
     pub reactions_id: Option<i32>,
     pub data_transformation: Option<serde_json::Value>,
+    pub action_data: Option<serde_json::Value>,
+    pub reaction_data: Option<serde_json::Value>,
 }
 
 impl Workflow {

@@ -7,6 +7,7 @@ INSERT INTO actions (
     http_parameters,
     http_headers,
     http_body
+    data_keys
 )
 VALUES
     (
@@ -21,6 +22,7 @@ VALUES
             "Accept": "application/json"
             "Content-Type": "application/json"
         }',
+        '{}',
         '{}'
     ),
     (
@@ -31,6 +33,7 @@ VALUES
         '/me/messages',
         '{"$top": 1, "$select": "receivedDateTime"}',
         '{"Authorization": "Bearer {token}"}',
+        '{}',
         '{}'
     ),
     (
@@ -51,7 +54,10 @@ VALUES
         '/users/{owner}/repos',
         '{"sort": "created", "per_page": 1}',
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{}',
+        '{
+            "owner": "The owner of the repository"
+        }'
     ),
     (
         (SELECT id FROM apis WHERE name = 'Github'),
@@ -61,7 +67,11 @@ VALUES
         '/repos/{owner}/{repo}/commits',
         '{"per_page": 1}',
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{}',
+        '{
+            "owner": "The owner of the repository",
+            "repo": "The repository name"
+        }'
     ),
     (
         (SELECT id FROM apis WHERE name = 'SumUp'),
@@ -71,5 +81,8 @@ VALUES
         '/v2.1/merchants/{merchant_code}/transactions/history'
         '{"order": "descending"}'
         '{"Authorization": "Bearer {token}"}',
-        '{}'
+        '{}',
+        '{
+            "merchant_code": "The merchant code"
+        }'
     );
