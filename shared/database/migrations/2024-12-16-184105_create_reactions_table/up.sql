@@ -4,7 +4,7 @@ CREATE TABLE reactions (
     -- Unique ID
     apis_id INT NOT NULL,
     -- References the API service
-    name VARCHAR(32) NOT NULL,
+    name VARCHAR(64) NOT NULL,
     -- Unique name
     description TEXT,
     -- Description

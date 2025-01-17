@@ -4,7 +4,7 @@ diesel::table! {
     actions (id) {
         id -> Int4,
         apis_id -> Int4,
-        #[max_length = 32]
+        #[max_length = 64]
         name -> Varchar,
         description -> Nullable<Text>,
         #[max_length = 8]
@@ -51,7 +51,7 @@ diesel::table! {
     reactions (id) {
         id -> Int4,
         apis_id -> Int4,
-        #[max_length = 32]
+        #[max_length = 64]
         name -> Varchar,
         description -> Nullable<Text>,
         #[max_length = 8]

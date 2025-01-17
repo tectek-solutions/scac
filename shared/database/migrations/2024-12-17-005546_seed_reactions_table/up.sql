@@ -10,7 +10,8 @@ INSERT INTO reactions (
         http_body,
         data_keys
     )
-VALUES (
+VALUES 
+(
         (
             SELECT id
             FROM apis
@@ -22,13 +23,15 @@ VALUES (
         '/gmail/v1/users/me/messages/send',
         '{}',
         '{"Authorization": "Bearer {token}"}',
-        '{"raw": "From: {from}\r\nTo: {to}\r\nSubject: {subject}\r\n\r\n{body}"}',
+        '{
+            "raw": "From: {from}\\r\\nTo: {to}\\r\\nSubject: {subject}\\r\\n\\r\\n{body}"
+        }',
         '{
             "from": "The sender of the mail",
             "to": "The recipient of the mail",
             "subject": "The subject of the mail",
             "body": "The body of the mail"
-        }'
+        }' 
     ),
     (
         (
@@ -63,14 +66,14 @@ VALUES (
         '{"Authorization": "Bearer {token}", "Content-Type": "application/json"}',
         '{}',
         '{
-            "device_id": "{device_id}",
+            "device_id": "{device_id}"
         }'
     ),
     (
         (
             SELECT id
             FROM apis
-            WHERE name = 'Spotify'
+            WHERE name = 'Spotify'  
         ),
         'Pause music (Spotify)',
         'Pauses music on Spotify',
@@ -80,7 +83,7 @@ VALUES (
         '{"Authorization": "Bearer {token}", "Content-Type": "application/json"}',
         '{}',
         '{
-            "device_id": "{device_id}",
+            "device_id": "The device ID for the player"
         }'
     ),
     (
@@ -97,7 +100,7 @@ VALUES (
         '{"Authorization": "Bearer {token}", "Content-Type": "application/json"}',
         '{}',
         '{
-            "device_id": "{device_id}",
+            "device_id": "{device_id}"
         }'
     ),
     (
@@ -129,7 +132,7 @@ VALUES (
         '/me/playlists',
         '{}',
         '{"Authorization": "Bearer {token}", "Content-Type": "application/json"}',
-        '{"name": "{name}", "description": "{description}", "public": {public}}',
+        '{"name": "{name}", "description": "{description}", "public": "{public}"}',
         '{
             "name": "The name of the playlist",
             "description": "The description of the playlist",
@@ -148,7 +151,8 @@ VALUES (
         '/user/repos',
         '{}',
         '{"Authorization": "Bearer {token}", "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}',
-        '{"name": "{name}", "description": "{description}", "private": {private}}' '{
+        '{"name": "{name}", "description": "{description}", "private": "{private}"}',
+        '{
             "name": "The name of the repository",
             "description": "The description of the repository",
             "private": "The visibility of the repository"
