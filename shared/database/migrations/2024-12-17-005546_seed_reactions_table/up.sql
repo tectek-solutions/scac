@@ -117,7 +117,7 @@ VALUES
         '{"Authorization": "Bearer {token}", "Content-Type": "application/json"}',
         '{}',
         '{
-            "device_id": "{device_id}",
+            "device_id": "{device_id}"
         }'
     ),
     (

@@ -5,7 +5,7 @@ INSERT INTO workflows (
         description,
         actions_id,
         reactions_id,
-        data_transformation
+        data_transformation,
         action_data,
         reaction_data
     )
@@ -25,7 +25,7 @@ VALUES (
         (
             SELECT id
             FROM reactions
-            WHERE name = 'Sends a mail as the user on Outlook'
+            WHERE name = 'Send Mail (Outlook)'
         ),
         '{}',
         '{}',
