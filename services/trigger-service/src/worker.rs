@@ -1,5 +1,7 @@
-use actix_web::{http::header, web};
-use database::{self, schema::reactions};
+use actix_web::web;
+use database;
+use std::collections::HashMap;
+use tinytemplate::TinyTemplate;
 
 use crate::query;
 
@@ -102,7 +104,64 @@ impl Worker {
 
         let client = reqwest::Client::new();
 
-        let url = format!("{}/{}", action_api.base_url, action.http_endpoint);
+        let action_data = match &self.workflow.action_data {
+            Some(action_data) => action_data,
+            None => {
+                warn!("No action data found");
+                &serde_json::Value::default()
+            }
+        };
+
+        let action_data = match action_data.as_object() {
+            Some(action_data) => action_data,
+            None => {
+                warn!("No action data found");
+                &serde_json::Map::new()
+            }
+        };
+
+        let mut context = HashMap::new();
+        for (key, value) in action_data {
+            if let Some(value_str) = value.as_str() {
+                context.insert(key.clone(), value_str.to_string());
+            } else {
+                warn!("Value is not a string");
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "Value is not a string",
+                ));
+            }
+        }
+        
+        context.insert("token".to_string(), action_user_token.access_token);
+
+        println!("Context: {:?}", context);
+
+        let mut tt = TinyTemplate::new();
+    
+        match tt.add_template("action_http_endpoint", &action.http_endpoint) {
+            Ok(_) => (),
+            Err(err) => {
+                error!("Error adding template: {:?}", err);
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "Error adding template",
+                ));
+            }
+        }
+
+        let action_http_endpoint = match tt.render("action_http_endpoint", &context) {
+            Ok(action_http_endpoint) => action_http_endpoint,
+            Err(err) => {
+                error!("Error rendering template: {:?}", err);
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "Error rendering template",
+                ));
+            }
+        };
+
+        let url = format!("{}/{}", action_api.base_url, action_http_endpoint);
 
         info!("URL: {}", url);
 
@@ -117,32 +176,61 @@ impl Worker {
             }
         };
 
-        let mut headers = match action.http_headers {
-            Some(headers) => headers,
+        let mut action_headers = match action.http_headers {
+            Some(action_headers) => action_headers,
             None => {
-                warn!("No headers found");
+                warn!("No action_headers found");
                 serde_json::Value::default()
             }
         };
-        let headers= match headers.as_object_mut() {
-            Some(headers) => headers,
+        let action_headers = match action_headers.as_object_mut() {
+            Some(action_headers) => action_headers,
             None => &mut {
-                warn!("No headers found");
+                warn!("No action_headers found");
                 serde_json::Map::new()
             }
         };
 
-        let mut headers_map = reqwest::header::HeaderMap::new();
+        let mut action_headers_map = reqwest::header::HeaderMap::new();
 
-        for (key, value) in headers {
+        for (key, value) in action_headers {
             let value = match value.as_str() {
                 Some(value) => value,
                 None => {
                     warn!("No value found");
-                    ""
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        "No value found",
+                    ));
                 }
             };
 
+            match tt.add_template(value, value) {
+                Ok(_) => (),
+                Err(err) => {
+                    error!("Error adding template: {:?}", err);
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        "Error adding template",
+                    ));
+                }
+            }
+
+            let value = match tt.render(value, &context) {
+                Ok(value) => value,
+                Err(err) => {
+                    error!("Error rendering template: {:?}", err);
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        "Error rendering template",
+                    ));
+                }
+            };
+        
+
+            println!("Key: {:?}", key);
+            println!("Value: {:?}", value);
+        
             let key = match reqwest::header::HeaderName::from_bytes(key.as_bytes()) {
                 Ok(key) => key,
                 Err(err) => {
@@ -151,7 +239,8 @@ impl Worker {
                 }
             };
 
-            let value = match reqwest::header::HeaderValue::from_str(value) {
+
+            let value = match reqwest::header::HeaderValue::from_str(&value) {
                 Ok(value) => value,
                 Err(err) => {
                     error!("Error getting header value: {:?}", err);
@@ -159,14 +248,119 @@ impl Worker {
                 }
             };
 
-            headers_map.insert(key, value);
+            action_headers_map.insert(key, value);
         }
+
+        println!("Headers: {:?}", action_headers_map);
+
+        let action_params = match action.http_parameters {
+            Some(params) => params,
+            None => {
+                warn!("No parameters found");
+                serde_json::Value::default()
+            }
+        };
+
+        let action_params = match action_params.as_object() {
+            Some(params) => params,
+            None => {
+                warn!("No parameters found");
+                &serde_json::Map::new()
+            }
+        };
+
+        let mut action_params_map = HashMap::new();
+
+        println!("Params:");
+
+        for (key, value) in action_params {
+            let value = match value.as_str() {
+                Some(value) => value,
+                None => {
+                    warn!("No value found");
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        "No value found",
+                    ));
+                }
+            };
+
+            match tt.add_template(value, value) {
+                Ok(_) => (),
+                Err(err) => {
+                    error!("Error adding template: {:?}", err);
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        "Error adding template",
+                    ));
+                }
+            }
+
+            let value = match tt.render(value, &context) {
+                Ok(value) => value,
+                Err(err) => {
+                    error!("Error rendering template: {:?}", err);
+                    return Err(std::io::Error::new(
+                        std::io::ErrorKind::Other,
+                        "Error rendering template",
+                    ));
+                }
+            };
+
+            println!("Key: {:?}", key);
+            println!("Value: {:?}", value);
+
+            action_params_map.insert(key.clone(), value);
+        }
+
+        let action_http_body = match action.http_body {
+            Some(http_body) => http_body,
+            None => {
+                warn!("No body found");
+                serde_json::Value::default()
+            }
+        };
+
+        let action_http_body = match action_http_body.as_str() {
+            Some(http_body) => http_body,
+            None => {
+                warn!("No body found");
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "No body found",
+                ));
+            }
+        };
+        
+        match tt.add_template("action_http_body", action_http_body) {
+            Ok(_) => (),
+            Err(err) => {
+                error!("Error adding template: {:?}", err);
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "Error adding template",
+                ));
+            }
+        }
+        
+        let action_http_body = match tt.render("action_http_body", &context) {
+            Ok(action_http_body) => action_http_body,
+            Err(err) => {
+                error!("Error rendering template: {:?}", err);
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    "Error rendering template",
+                ));
+            }
+        };
+
+        println!("Body: {:?}", action_http_body);
 
         let request = client
             .request(method, &url)
-            .form(&action.http_parameters)
-            .headers(headers_map)
-            .json(&action.http_body)
+            .form(&action_params_map)
+            .headers(action_headers_map)
+            .json(&action_http_body)
             .build();
 
         let request = match request {

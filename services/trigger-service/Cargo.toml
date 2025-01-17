@@ -26,3 +26,4 @@ cache = { path = "../../shared/cache" }
 jwt = { path = "../../shared/jwt" }
 tokio = { version = "1.43.0" }
 log = "0.4.24"
+tinytemplate = "1.2.1"
