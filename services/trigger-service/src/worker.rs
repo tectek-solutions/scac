@@ -1,7 +1,8 @@
 use actix_web::web;
-use database;
+use database::{self, model::CreateTrigger};
 use std::collections::HashMap;
 use tinytemplate::TinyTemplate;
+use url;
 
 use crate::query;
 
@@ -23,7 +24,7 @@ impl Worker {
         }
     }
 
-    pub async fn run(&self) -> std::result::Result<(), std::io::Error> {
+    pub async fn run(&self) -> CreateTrigger {
         info!("Running worker for workflow: {}", self.workflow.id);
 
         let user = match database::model::User::read(
@@ -33,10 +34,10 @@ impl Worker {
             Ok(user) => user,
             Err(err) => {
                 error!("Error getting user: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting user",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting user: {:?}", err)
+                };
             }
         };
 
@@ -47,10 +48,10 @@ impl Worker {
             Ok(action) => action,
             Err(err) => {
                 error!("Error getting action: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting action",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting action: {:?}", err)
+                };
             }
         };
 
@@ -59,10 +60,10 @@ impl Worker {
                 Ok(action_api) => action_api,
                 Err(err) => {
                     error!("Error getting action api: {:?}", err);
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Error getting action api",
-                    ));
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error getting action api: {:?}", err)
+                    };
                 }
             };
 
@@ -73,10 +74,10 @@ impl Worker {
             Ok(action_authentication) => action_authentication,
             Err(err) => {
                 error!("Error getting action authentication: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting action authentication",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting action authentication: {:?}", err)
+                };
             }
         };
 
@@ -88,17 +89,17 @@ impl Worker {
             Ok(Some(action_user_token)) => action_user_token,
             Ok(None) => {
                 warn!("No user token found for action");
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "No user token found for action",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: "No user token found for action".to_string()
+                };
             }
             Err(err) => {
                 error!("Error getting user token: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting user token",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting user token: {:?}", err)
+                };
             }
         };
 
@@ -126,16 +127,14 @@ impl Worker {
                 context.insert(key.clone(), value_str.to_string());
             } else {
                 warn!("Value is not a string");
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Value is not a string",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: "Value is not a string".to_string()
+                };
             }
         }
         
         context.insert("token".to_string(), action_user_token.access_token);
-
-        println!("Context: {:?}", context);
 
         let mut tt = TinyTemplate::new();
     
@@ -143,10 +142,10 @@ impl Worker {
             Ok(_) => (),
             Err(err) => {
                 error!("Error adding template: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error adding template",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error adding template: {:?}", err)
+                };
             }
         }
 
@@ -154,25 +153,25 @@ impl Worker {
             Ok(action_http_endpoint) => action_http_endpoint,
             Err(err) => {
                 error!("Error rendering template: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error rendering template",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error rendering template: {:?}", err)
+                };
             }
         };
 
-        let url = format!("{}/{}", action_api.base_url, action_http_endpoint);
+        let action_url = format!("{}{}", action_api.base_url, action_http_endpoint);
 
-        info!("URL: {}", url);
+        info!("URL: {}", action_url);
 
         let method = match reqwest::Method::from_bytes(action.http_method.as_bytes()) {
             Ok(method) => method,
             Err(err) => {
                 error!("Error getting method: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting method",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting method: {:?}", err)
+                };
             }
         };
 
@@ -198,10 +197,10 @@ impl Worker {
                 Some(value) => value,
                 None => {
                     warn!("No value found");
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "No value found",
-                    ));
+                    return  CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: "No value found".to_string()
+                    };
                 }
             };
 
@@ -209,10 +208,10 @@ impl Worker {
                 Ok(_) => (),
                 Err(err) => {
                     error!("Error adding template: {:?}", err);
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Error adding template",
-                    ));
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error adding template: {:?}", err)
+                    };
                 }
             }
 
@@ -220,16 +219,12 @@ impl Worker {
                 Ok(value) => value,
                 Err(err) => {
                     error!("Error rendering template: {:?}", err);
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Error rendering template",
-                    ));
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error rendering template: {:?}", err)
+                    };
                 }
             };
-        
-
-            println!("Key: {:?}", key);
-            println!("Value: {:?}", value);
         
             let key = match reqwest::header::HeaderName::from_bytes(key.as_bytes()) {
                 Ok(key) => key,
@@ -251,8 +246,6 @@ impl Worker {
             action_headers_map.insert(key, value);
         }
 
-        println!("Headers: {:?}", action_headers_map);
-
         let action_params = match action.http_parameters {
             Some(params) => params,
             None => {
@@ -271,44 +264,40 @@ impl Worker {
 
         let mut action_params_map = HashMap::new();
 
-        println!("Params:");
-
         for (key, value) in action_params {
             let value = match value.as_str() {
                 Some(value) => value,
                 None => {
                     warn!("No value found");
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "No value found",
-                    ));
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: "No value found".to_string()
+                    };
                 }
             };
 
             match tt.add_template(value, value) {
                 Ok(_) => (),
                 Err(err) => {
-                    error!("Error adding template: {:?}", err);
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Error adding template",
-                    ));
+                    error!("Error adding template, value: {:?}: {:?}", value, err);
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error adding template, value: {:?}: {:?}", value, err)
+                    };
                 }
             }
 
             let value = match tt.render(value, &context) {
                 Ok(value) => value,
                 Err(err) => {
-                    error!("Error rendering template: {:?}", err);
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Error rendering template",
-                    ));
+                    error!("Error rendering template: value: {:?}: {:?}", value, err);
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error rendering template: value: {:?}: {:?}", value, err)
+                    };
                 }
             };
 
-            println!("Key: {:?}", key);
-            println!("Value: {:?}", value);
 
             action_params_map.insert(key.clone(), value);
         }
@@ -321,45 +310,59 @@ impl Worker {
             }
         };
 
-        let action_http_body = match action_http_body.as_str() {
-            Some(http_body) => http_body,
-            None => {
-                warn!("No body found");
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "No body found",
-                ));
-            }
-        };
-        
-        match tt.add_template("action_http_body", action_http_body) {
-            Ok(_) => (),
-            Err(err) => {
-                error!("Error adding template: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error adding template",
-                ));
-            }
-        }
-        
-        let action_http_body = match tt.render("action_http_body", &context) {
-            Ok(action_http_body) => action_http_body,
-            Err(err) => {
-                error!("Error rendering template: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error rendering template",
-                ));
-            }
-        };
+        let action_http_body = action_http_body.to_string();
 
-        println!("Body: {:?}", action_http_body);
+        // match tt.add_template("action_http_body", &action_http_body) {
+        //     Ok(_) => (),
+        //     Err(err) => {
+        //         error!("Error adding template: {:?}", err);
+        //         return CreateTrigger {
+        //             workflows_id: self.workflow.id,
+        //             status: format!("Error adding template: {:?}", err)
+        //         };
+        //     }
+        // }
+        
+        // let action_http_body = match tt.render("action_http_body", &context) {
+        //     Ok(action_http_body) => action_http_body,
+        //     Err(err) => {
+        //         error!("Error rendering template: {:?}", err);
+        //         return CreateTrigger {
+        //             workflows_id: self.workflow.id,
+        //             status: format!("Error rendering template: {:?}", err)
+        //         }
+        //     }
+        // };
+
+        let action_host= match url::Url::parse(&action_url) {
+            Ok(url) => {
+                let host = url.host_str();
+                match host {
+                    Some(host) => host.to_string(),
+                    None => {
+                        warn!("No host found");
+                        return CreateTrigger {
+                            workflows_id: self.workflow.id,
+                            status: "No host found".to_string()
+                        };
+                    }
+                }
+            }
+            Err(err) => {
+                error!("Error getting host: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting host: {:?}", err)
+                };
+            }   
+        };
 
         let request = client
-            .request(method, &url)
+            .request(method, &action_url)
             .form(&action_params_map)
             .headers(action_headers_map)
+            .header("Host", action_host)
+            .header("User-Agent", "curl/7.81.0")
             .json(&action_http_body)
             .build();
 
@@ -367,14 +370,12 @@ impl Worker {
             Ok(request) => request,
             Err(err) => {
                 error!("Error building request: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error building request",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error building request: {:?}", err)
+                };
             }
         };
-
-        info!("Request: {:?}", request);
 
         let response = client.execute(request).await;
 
@@ -382,97 +383,31 @@ impl Worker {
             Ok(response) => response,
             Err(err) => {
                 error!("Error getting response: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting response",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting response: {:?}", err)
+                };
             }
         };
 
-        info!("Response: {:?}", response);
-
         info!("Response status: {:?}", response.status());
-        info!("Response headers: {:?}", response.headers());
-        let response_text = response.text().await;
-        info!("Response text: {:?}", response_text);
 
-        let data: serde_json::Value = match response_text {
+        let response_raw = response.text().await;
+
+        let data: serde_json::Value = match response_raw {
             Ok(text) => serde_json::from_str(&text).unwrap_or_default(),
             Err(err) => {
                 error!("Error getting json response: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting json response",
-                ));
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting json response: {:?}", err)
+                };
             }
         };
 
-        println!("Response: {}", data);
-
-
-        let reaction = match database::model::Reaction::read(
-            &mut self.database.get_connection(),
-            self.workflow.reactions_id,
-        ) {
-            Ok(reaction) => reaction,
-            Err(err) => {
-                error!("Error getting reaction: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting reaction",
-                ));
-            }
-        };
-
-        let reaction_api =
-            match database::model::Api::read(&mut self.database.get_connection(), reaction.apis_id)
-            {
-                Ok(reaction_api) => reaction_api,
-                Err(err) => {
-                    error!("Error getting reaction api: {:?}", err);
-                    return Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Error getting reaction api",
-                    ));
-                }
-            };
-
-        let reaction_authentication = match database::model::Authentication::read(
-            &mut self.database.get_connection(),
-            reaction_api.authentications_id,
-        ) {
-            Ok(reaction_authentication) => reaction_authentication,
-            Err(err) => {
-                error!("Error getting reaction authentication: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting reaction authentication",
-                ));
-            }
-        };
-
-        let reaction_user_token = match query::get_user_token_by_authentication_by_user_id_query(
-            &self.database,
-            reaction_authentication.id,
-            user.id,
-        ) {
-            Ok(Some(reaction_user_token)) => reaction_user_token,
-            Ok(None) => {
-                warn!("No user token found for reaction");
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "No user token found for reaction",
-                ));
-            }
-            Err(err) => {
-                error!("Error getting user token: {:?}", err);
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Error getting user token",
-                ));
-            }
-        };
-
-        Ok(())
+        CreateTrigger {
+            workflows_id: self.workflow.id,
+            status: "Success".to_string()
+        }
     }
 }

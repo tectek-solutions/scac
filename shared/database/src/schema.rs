@@ -70,7 +70,7 @@ diesel::table! {
     triggers (id) {
         id -> Int4,
         workflows_id -> Int4,
-        data -> Nullable<Jsonb>,
+        status -> Text,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }
@@ -112,7 +112,6 @@ diesel::table! {
         description -> Nullable<Text>,
         actions_id -> Int4,
         reactions_id -> Int4,
-        data_transformation -> Nullable<Jsonb>,
         action_data -> Nullable<Jsonb>,
         reaction_data -> Nullable<Jsonb>,
         created_at -> Nullable<Timestamp>,

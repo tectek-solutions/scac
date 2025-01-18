@@ -496,7 +496,6 @@ pub struct Workflow {
     pub description: Option<String>,
     pub actions_id: i32,
     pub reactions_id: i32,
-    pub data_transformation: Option<serde_json::Value>,
     pub action_data: Option<serde_json::Value>,
     pub reaction_data: Option<serde_json::Value>,
     pub created_at: Option<NaiveDateTime>,
@@ -511,7 +510,6 @@ pub struct CreateWorkflow {
     pub description: Option<String>,
     pub actions_id: i32,
     pub reactions_id: i32,
-    pub data_transformation: Option<serde_json::Value>,
     pub action_data: Option<serde_json::Value>,
     pub reaction_data: Option<serde_json::Value>,
 }
@@ -524,7 +522,6 @@ pub struct UpdateWorkflow {
     pub description: Option<String>,
     pub actions_id: Option<i32>,
     pub reactions_id: Option<i32>,
-    pub data_transformation: Option<serde_json::Value>,
     pub action_data: Option<serde_json::Value>,
     pub reaction_data: Option<serde_json::Value>,
 }
@@ -573,7 +570,7 @@ impl Workflow {
 pub struct Trigger {
     pub id: i32,
     pub workflows_id: i32,
-    pub data: Option<serde_json::Value>,
+    pub status: String,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -582,14 +579,14 @@ pub struct Trigger {
 #[diesel(table_name = triggers)]
 pub struct CreateTrigger {
     pub workflows_id: i32,
-    pub data: Option<serde_json::Value>,
+    pub status: String,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
 #[diesel(table_name = triggers)]
 pub struct UpdateTrigger {
     pub workflows_id: Option<i32>,
-    pub data: Option<serde_json::Value>,
+    pub status: String,
 }
 
 impl Trigger {

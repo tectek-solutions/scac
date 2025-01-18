@@ -19,9 +19,9 @@ VALUES (
         'Checks if a new mail is received on Gmail',
         'GET',
         '/gmail/v1/users/me/messages',
-        '{"maxResults": 1}',
+        '{}',
         '{
-            "Authorization": "Bearer {token}",
+            "Authorization": "Bearer { token }",
             "Accept": "application/json",
             "Content-Type": "application/json"
         }',
@@ -38,8 +38,12 @@ VALUES (
         'Checks if a new mail is received on Outlook',
         'GET',
         '/me/messages',
-        '{"$top": 1, "$select": "receivedDateTime"}',
-        '{"Authorization": "Bearer {token}"}',
+        '{"$select": "receivedDateTime"}',
+        '{
+            "Authorization": "Bearer { token }",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }',
         '{}',
         '{}'
     ),
@@ -53,8 +57,12 @@ VALUES (
         'Checks if a new song is added to the user''s library on Spotify',
         'GET',
         '/me/tracks',
-        '{"limit": 1}',
-        '{"Authorization": "Bearer {token}"}',
+        '{}',
+        '{
+            "Authorization": "Bearer { token }",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }',
         '{}',
         '{}'
     ),
@@ -69,7 +77,11 @@ VALUES (
         'GET',
         '/me/player/currently-playing',
         '{}',
-        '{"Authorization": "Bearer {token}"}',
+        '{
+            "Authorization": "Bearer { token }",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }',
         '{}',
         '{}'
     ),
@@ -83,8 +95,12 @@ VALUES (
         'Checks if a new playlist is created on Spotify',
         'GET',
         '/me/playlists',
-        '{"limit": 1}',
-        '{"Authorization": "Bearer {token}"}',
+        '{}',
+        '{
+            "Authorization": "Bearer { token }",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }',
         '{}',
         '{}'
     ),
@@ -98,8 +114,12 @@ VALUES (
         'Checks if a new repository is created on Github',
         'GET',
         '/user/repos',
-        '{"sort": "created", "per_page": 1}',
-        '{"Authorization": "Bearer {token}"}',
+        '{"sort": "created"}',
+        '{
+            "Authorization": "Bearer { token }",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }',
         '{}',
         '{
             "owner": "The owner of the repository"
@@ -115,8 +135,12 @@ VALUES (
         'Checks if a new commit is made on Github',
         'GET',
         '/repos/{owner}/{repo}/commits',
-        '{"per_page": 1}',
-        '{"Authorization": "Bearer {token}"}',
+        '{}',
+        '{
+            "Authorization": "Bearer { token }",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }',
         '{}',
         '{
             "owner": "The owner of the repository",
@@ -134,7 +158,11 @@ VALUES (
         'GET',
         '/repos/{owner}/{repo}/collaborators',
         '{}',
-        '{"Authorization": "Bearer {token}"}',
+        '{
+            "Authorization": "Bearer { token }",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }',
         '{}',
         '{
             "owner": "The owner of the repository",
@@ -152,7 +180,11 @@ VALUES (
         'GET',
         '/v2.1/merchants/{merchant_code}/transactions/history',
         '{"order": "descending"}',
-        '{"Authorization": "Bearer {token}"}',
+        '{
+            "Authorization": "Bearer { token }",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }',
         '{}',
         '{
             "merchant_code": "The merchant code"
