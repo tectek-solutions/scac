@@ -41,7 +41,7 @@ impl ErrorResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse)
     )
 )]
-#[get("/")]
+#[get("/apis/{id}")]
 async fn list_actions_by_api_service_id(
     db: web::Data<database::Database>,
     id: web::Path<i32>,
