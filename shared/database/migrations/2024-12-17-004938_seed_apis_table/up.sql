@@ -16,7 +16,7 @@ VALUES (
             WHERE name = 'Microsoft'
         ),
         'Outlook',
-        'https://graph.microsoft.com'
+        'https://graph.microsoft.com/v1.0'
     ),
     (
         (

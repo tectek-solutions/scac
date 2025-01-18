@@ -4,7 +4,6 @@ ARG RUST_VERSION=1.82.0
 # Stage 1: Builder
 FROM rust:${RUST_VERSION}-slim-bookworm AS builder
 
-VOLUME [ "/usr/src/scac" ]
 
 # Install required build dependencies
 RUN apt-get update
