@@ -23,6 +23,7 @@ class ApiAccountService {
     if (response.statusCode == 200) {
       final token = jsonDecode(response.body);
       await storage.write(key: 'jwt', value: token);
+      print(token);
       return token;
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized');
@@ -73,7 +74,7 @@ class ApiAccountService {
       },
     );
     if (response.statusCode == 200) {
-      await storage.delete(key: 'jwt');
+      await storage.deleteAll();
       return;
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized');

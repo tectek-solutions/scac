@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'intermediate-page.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ServicePage extends StatefulWidget {
   const ServicePage({super.key});
@@ -17,6 +18,7 @@ class ServicePage extends StatefulWidget {
 class _ServicePageState extends State<ServicePage> {
   ApiService apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/authentications/');
   List<dynamic> services = [];
+  final storage = FlutterSecureStorage();
 
   _ServicePageState() {
     apiService.fetchCards().then((value) {

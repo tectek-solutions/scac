@@ -88,7 +88,6 @@ Widget build(BuildContext context) {
                               }
                               return false;
                             });
-                            print('$action button pressed');
                           },
                           child: Text(action),
                         );

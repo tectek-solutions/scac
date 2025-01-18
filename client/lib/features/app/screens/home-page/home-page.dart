@@ -1,6 +1,7 @@
-import 'package:client/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
+import '../../../services/api.area.service.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import './intermediate-page-workflow.dart';
 
 class ClickableCardScreen extends StatefulWidget {
   @override
@@ -9,11 +10,44 @@ class ClickableCardScreen extends StatefulWidget {
 
 class _ClickableCardScreenState extends State<ClickableCardScreen> {
   bool _showDetail = false;
+  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
+  ApiService apiService = ApiService(baseUrl: baseUrlString, route: '/workflows/');
+  List<dynamic> services = [];
+  bool _isLoading = true;
+  bool _hasError = false;
 
-  void toggleDetail() {
-    setState(() {
-      _showDetail = !_showDetail;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _fetchServices();
+  }
+
+  Future<void> _fetchServices() async {
+    try {
+      final value = await apiService.fetchCards();
+      setState(() {
+        services = value is List ? value : [value];
+        _showDetail = true;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+      print('Error fetching cards: $e');
+    }
+  }
+
+  Future<void> _removeCard(int id) async {
+    try {
+      await apiService.removeCard(id);
+      setState(() {
+        services.removeWhere((service) => service['id'] == id);
+      });
+    } catch (e) {
+      print('Error removing card: $e');
+    }
   }
 
   Future<void> clearAppCache() async {
@@ -24,114 +58,78 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: const Text('My Workflows'),
+        ),
+        backgroundColor: Colors.teal,
+        automaticallyImplyLeading: false,
+        actions: [
           Padding(
-            padding: const EdgeInsets.only(top: TSizes.appBarHeight, left: 16.0, right: 16.0),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: toggleDetail,
-                  child: Card(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(width: 16.0),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Automation Trigger',
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8.0),
-                                Text(
-                                  'Perform an action when a condition is met.',
-                                  style: TextStyle(
-                                      fontSize: 14.0, color: Colors.grey[700]),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            _showDetail
-                                ? Icons.keyboard_arrow_left
-                                : Icons.keyboard_arrow_right,
-                            size: 24.0,
-                            color: Colors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Animated Detail Section
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300), // Animation duration
-            curve: Curves.easeInOut, // Animation curve
-            right: _showDetail ? 0 : -MediaQuery.of(context).size.width,
-            top: 0,
-            bottom: 0,
-            child: Padding(
-              padding: const EdgeInsets.only(top: TSizes.appBarHeight),
-              child: Material(
-                elevation: 8.0,
-                child: Container(
-                  color: Colors.white,
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: toggleDetail,
-                          ),
-                          const SizedBox(width: 16.0),
-                          const Text(
-                            'Card Details',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16.0),
-                      Text(
-                        'This is the detailed section of the card. It slides in from the right.',
-                        style: TextStyle(fontSize: 16.0, color: Colors.grey[700]),
-                      ),
-                      const Spacer(),
-                    ],
-                  ),
-                ),
-              ),
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              onPressed: () {
+              },
+              icon: Icon(Icons.download),
             ),
           ),
         ],
       ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _hasError
+                    ? const Center(child: Text('Error loading services', style: TextStyle(color: Colors.red)))
+                    : _showDetail
+                        ? Expanded(
+                            child: ListView.builder(
+                              itemCount: services.length,
+                              itemBuilder: (context, index) {
+                                final service = services[index];
+                                return Card(
+                                  elevation: 4.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundColor: Colors.teal,
+                                      child: Text(service['name'][0].toUpperCase(), style: TextStyle(color: Colors.white)),
+                                    ),
+                                    title: Text(service['name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                                    subtitle: Text(service['description']),
+                                    trailing: IconButton(
+                                      icon: Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () async {
+                                        await _removeCard(service['id']);
+                                      },
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => IntermediatePageWorkflow(itemIndex: index, id: service['id']),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        : const Center(child: Text('No services available')),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: clearAppCache,
-        child: const Icon(Icons.delete),
-        tooltip: 'Clear Cache',
+        backgroundColor: Colors.teal,
+        child: const Icon(Icons.refresh),
+        tooltip: "Clear cache",
       ),
     );
   }
