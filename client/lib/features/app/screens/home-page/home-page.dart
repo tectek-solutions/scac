@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../services/api.area.service.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -15,19 +14,11 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
   List<dynamic> services = [];
   bool _isLoading = true;
   bool _hasError = false;
-  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _fetchServices();
-    _startPolling();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
   }
 
   Future<void> _fetchServices() async {
@@ -56,12 +47,6 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
     } catch (e) {
       print('Error removing card: $e');
     }
-  }
-
-  void _startPolling() {
-    _timer = Timer.periodic(Duration(seconds: 5), (timer) async {
-      await _fetchServices();
-    });
   }
 
   Future<void> clearAppCache() async {
@@ -137,7 +122,7 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
         onPressed: clearAppCache,
         backgroundColor: Colors.teal,
         child: const Icon(Icons.refresh),
-        tooltip: "Clear app cache",
+        tooltip: "Clear cache",
       ),
     );
   }
