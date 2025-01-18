@@ -16,6 +16,8 @@ CREATE TABLE workflows (
     -- Data for the trigger action
     reaction_data JSONB,
     -- Data for the reaction action
+    last_id TEXT,
+    -- Last hash of the workflow
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- Creation timestamp
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

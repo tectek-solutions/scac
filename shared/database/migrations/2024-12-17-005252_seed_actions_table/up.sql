@@ -7,7 +7,8 @@ INSERT INTO actions (
         http_parameters,
         http_headers,
         http_body,
-        data_keys
+        data_keys,
+        last_id_json_path
     )
 VALUES (
         (
@@ -26,7 +27,8 @@ VALUES (
             "Content-Type": "application/json"
         }',
         '{}',
-        '{}'
+        '{}',
+        '/messages/0/id'
     ),
     (
         (
@@ -45,7 +47,8 @@ VALUES (
             "Content-Type": "application/json"
         }',
         '{}',
-        '{}'
+        '{}',
+        '/value/0/id'
     ),
     (
         (
@@ -64,7 +67,8 @@ VALUES (
             "Content-Type": "application/json"
         }',
         '{}',
-        '{}'
+        '{}',
+        '/items/0/track/id'
     ),
     (
         (
@@ -83,7 +87,8 @@ VALUES (
             "Content-Type": "application/json"
         }',
         '{}',
-        '{}'
+        '{}',
+        '/item/id'
     ),
     (
         (
@@ -102,7 +107,8 @@ VALUES (
             "Content-Type": "application/json"
         }',
         '{}',
-        '{}'
+        '{}',
+        '/items/0/id'
     ),
     (
         (
@@ -123,7 +129,8 @@ VALUES (
         '{}',
         '{
             "owner": "The owner of the repository"
-        }'
+        }',
+        '/'
     ),
     (
         (
@@ -145,7 +152,8 @@ VALUES (
         '{
             "owner": "The owner of the repository",
             "repo": "The repository name"
-        }'
+        }',
+        '/'
     ),
     (
         (
@@ -167,7 +175,8 @@ VALUES (
         '{
             "owner": "The owner of the repository",
             "repo": "The repository name"
-        }'
+        }',
+        '/'
     ),
     (
         (
@@ -188,5 +197,6 @@ VALUES (
         '{}',
         '{
             "merchant_code": "The merchant code"
-        }'
+        }',
+        '/'
     );
