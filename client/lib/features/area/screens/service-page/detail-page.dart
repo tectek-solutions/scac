@@ -16,89 +16,106 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
 
   late final ApiService apiService;
+  List<Map<String, String>> actions = [];
 
   @override
   void initState() {
     super.initState();
-    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/actions/${widget.id}');
+    apiService = ApiService(
+    baseUrl: IntermediatePage.baseUrlString,
+    route: '/actions/${widget.id}'
+    );
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
         value = [value];
       }
+      print("Passed value: $value");
       setState(() {
         for (var i = 0; i < value.length; i++) {
-          actions.add(value[i]['name']);
+          actions.add({
+            'value': value[i]['name'],
+            ...value[i]['data_keys'],
+          });
         }
+        print("Actions: $actions");
       });
     });
   }
-  List<dynamic> actions = [];
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Detail Page'),
-    ),
-    body: actions.isEmpty
-        ? const Center(child: CircularProgressIndicator())
-        : Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          actions[widget.itemIndex],
-                          style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 10.0),
-                        const Text(
-                          'No Description',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                      ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail Page'),
+      ),
+      body: actions.isEmpty
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title Section
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.itemIndex < actions.length &&
+                                actions[widget.itemIndex]['type'] == 'name'
+                                ? actions[widget.itemIndex]['value'] as String
+                                : 'Invalid Item',
+                            style: const TextStyle(
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          const Text(
+                            'No Description',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Divider(),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: actions.map<Widget>((action) {
-                        return ElevatedButton(
-                          onPressed: () {
-                            int count = 0;
-                            Navigator.of(context).popUntil((route) {
-                              count++;
-                              if (count == 3) {
-                                Navigator.pop(context, {
-                                  'action': action,
-                                });
-                                return true;
-                              }
-                              return false;
-                            });
-                            print('$action button pressed');
-                          },
-                          child: Text(action),
-                        );
-                      }).toList(),
+                    const Divider(),
+
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: actions.map<Widget>((action) {
+                          return ElevatedButton(
+                            onPressed: () {
+                              int count = 0;
+                              Navigator.of(context).popUntil((route) {
+                                count++;
+                                if (count == 3) {
+                                  Navigator.pop(context, {
+                                    'action': actions,
+                                  });
+                                  return true;
+                                }
+                                return false;
+                              });
+                            },
+                            child: Text(action['value'] ?? 'No Value'),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-  );
-}
+    );
+  }
 }

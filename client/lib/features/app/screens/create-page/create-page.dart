@@ -20,6 +20,9 @@ class _CreatePageState extends State<CreatePage> {
   String resultDescriptionReaction = 'Go to Reaction Page';
   String resultReaction = 'No reaction selected';
 
+  Map<String, String> actions = {};
+  Map<String, String> reactions = {};
+
   final List<Map<String, String>> data = [
       {"test1": "Enter mail"},
       {"test2": "Workflow"},
@@ -28,21 +31,7 @@ class _CreatePageState extends State<CreatePage> {
 
     ];
 
-  List<Map<String, String>> reactionData = [
-    {"reaction1": "Choose trigger"},
-    {"reaction2": "Define logic"},
-    {"reaction3": "Output action"},
-     {"reaction1": "Choose trigger"},
-        {"reaction2": "Define logic"},
-        {"reaction3": "Output action"},
-         {"reaction1": "Choose trigger"},
-            {"reaction2": "Define logic"},
-            {"reaction3": "Output action"},
-             {"reaction1": "Choose trigger"},
-                {"reaction2": "Define logic"},
-                {"reaction3": "Output action"},
-  ];
-
+  Map<String, String> reactionData = {};
   Map<String, TextEditingController> controllers = {};
   
 
@@ -51,9 +40,6 @@ class _CreatePageState extends State<CreatePage> {
 
   Map<String, String?> selectedValues = {}; // Stocke les sélections indépendantes
   Map<String, TextEditingController> reactionControllers = {};
-  
-  
-  
 
   final Color boxColor = Colors.grey[700]!; // Définissez une couleur commune
 
@@ -71,8 +57,8 @@ class _CreatePageState extends State<CreatePage> {
       controllers[key] = TextEditingController(text: ""); // Initialisez avec une chaîne vide
     }
   
-    for (var entry in reactionData) {
-      final key = entry.keys.first;
+    for (var entry in reactionData.entries) {
+      final key = entry.key;
       reactionControllers[key] = TextEditingController(text: ""); // Initialisez avec une chaîne vide
     }
   }
@@ -84,365 +70,269 @@ class _CreatePageState extends State<CreatePage> {
     super.dispose();
   }
 
-  void saveData() {
-    // Construire un nouveau JSON avec les données saisies
-    List<Map<String, String>> updatedData = data.map((entry) {
-      final key = entry.keys.first;
-      return {key: controllers[key]!.text};
-    }).toList();
-
-    List<Map<String, String>> updatedReactionData = reactionData.map((entry) {
-      final key = entry.keys.first;
-      return {key: reactionControllers[key]!.text};
-    }).toList();
-
-    // Afficher ou utiliser les nouvelles données
-    print(updatedData);
-  }
-
-  void saveReactionData() {
-
-    List<Map<String, String>> updatedReactionData = reactionData.map((entry) {
-      final key = entry.keys.first;
-      return {key: reactionControllers[key]!.text};
-    }).toList();
-
-    print(updatedReactionData);
-  }
-
-  void saveWorkflowData() {
-    // Construire un nouveau JSON avec les données des menus déroulants
-    Map<String, dynamic> workflowData = {
-      "values": selectedValues.values.toList(), // Extraire les valeurs sélectionnées
-      "parameters": {
-        "url": controllers['url']!.text, // Vous pouvez ajouter des contrôleurs spécifiques si nécessaires
-        "content": controllers['content']!.text, // Exemple avec des contrôleurs pour d'autres entrées
-      },
-    };
-  
-    print(workflowData); // Afficher ou traiter le JSON généré
-  }
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Vérification si l'affichage est mobile
+    final isMobile = screenWidth < 600;
+
+    reactions.removeWhere((key, value) => key == 'value');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Page'),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              const Text(
+                'Select an option below to proceed:',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20.0),
+
+              // Carte d'Action
+              GestureDetector(
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ServicePage()),
+                  );
+                  if (result != null && result['action'] != null) {
+                    setState(() {
+                      actions = result['action'][0];
+                    });
+                    print('Data received from Widget B HERE: $result');
+                  } else {
+                    print('No data received');
+                  }
+                },
+                child: _buildOptionCard(
+                  icon: Icons.build,
+                  title: resultTitleAction,
+                  description: resultDescriptionAction,
+                  actionLabel: 'Action: ',
+                  actionValue: resultAction,
+                ),
+              ),
+
+              const SizedBox(height: 10.0),
+              const Icon(Icons.add, size: 30.0),
+              const SizedBox(height: 10.0),
+
+              // Carte de Réaction
+              GestureDetector(
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ReactionPage()),
+                  );
+                  if (result != null && result['reaction'] != null) {
+                    setState(() {
+                      reactions = result['reaction'][0];
+                    });
+                    print('Data received from Widget B: $result');
+                  } else {
+                    print('No data received');
+                  }
+                },
+                child: _buildOptionCard(
+                  icon: Icons.new_releases,
+                  title: resultTitleReaction,
+                  description: resultDescriptionReaction,
+                  actionLabel: 'Reaction: ',
+                  actionValue: resultReaction,
+                ),
+              ),
+
+              const SizedBox(height: 20.0),
+
+              // Cards réactives pour Action et Reaction
+              isMobile
+                  ? Column(
+                      children: [
+                        _buildActionReactionCard(
+                          title: 'Action',
+                          data: actions,
+                          controllers: controllers,
+                        ),
+                        const SizedBox(height: 20.0),
+                        _buildActionReactionCard(
+                          title: 'Reaction',
+                          data: reactions,
+                          controllers: reactionControllers,
+                        ),
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Flexible(
+                          child: _buildActionReactionCard(
+                            title: 'Action',
+                            data: actions,
+                            controllers: controllers,
+                          ),
+                        ),
+                        const SizedBox(width: 16.0),
+                        Flexible(
+                          child: _buildActionReactionCard(
+                            title: 'Reaction',
+                            data: reactions,
+                            controllers: reactionControllers,
+                          ),
+                        ),
+                      ],
+                    ),
+
+              const SizedBox(height: 10.0),
+              TextButton(
+                onPressed: () {
+                  // Fonctionnalités pour le bouton Continue
+                },
+                child: const Text(
+                  'Create Workflow',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget générique pour les options (Action et Reaction)
+  Widget _buildOptionCard({
+    required IconData icon,
+    required String title,
+    required String description,
+    required String actionLabel,
+    required String actionValue,
+  }) {
+    return Card(
+      elevation: 4.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Select an option below to proceed:',
-              style: TextStyle(
-                fontSize: 24.0,
+            Icon(icon, size: 30.0),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: boxColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Row(
+                    children: [
+                      Text(
+                        actionLabel,
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: boxColor,
+                        ),
+                      ),
+                      Text(
+                        actionValue,
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget générique pour les cartes Action et Reaction
+  Widget _buildActionReactionCard({
+    required String title,
+    required Map<String, dynamic> data,
+    required Map<String, TextEditingController> controllers,
+  }) {
+    return Card(
+      elevation: 4.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20.0),
-            GestureDetector(
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ServicePage()),
-                );
-                if (result != null && result['action'] != null) {
-                  setState(() {
-                    resultAction = result['action'];
-                  });
-                  print('Data received from Widget B: $result');
-                } else {
-                  print('No data received');
-                }
-              },
-              child: Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.build, size: 30.0),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              resultTitleAction,
-                              style: const TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8.0),
-                            Text(
-                              resultDescriptionAction,
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                color: boxColor,
-                              ),
-                            ),
-                            const SizedBox(height: 8.0),
-                            Row(
-                              children: [
-                                Text(
-                                  'Action: ',
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    color: boxColor,
-                                  ),
-                                ),
-                                Text(
-                                  resultAction,
-                                  style: const TextStyle(
-                                    fontSize: 14.0,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            const Icon(Icons.add, size: 30.0),
-            const SizedBox(height: 10.0),
-            GestureDetector(
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ReactionPage()),
-                );
-                if (result != null && result['action'] != null) {
-                  setState(() {
-                    resultReaction = result['action'];
-                  });
-                  print('Data received from Widget B: $result');
-                } else {
-                  print('No data received');
-                }
-              },
-              child: Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.new_releases, size: 30.0),
-                      const SizedBox(width: 16.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              resultTitleReaction,
-                              style: const TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8.0),
-                            Text(
-                              resultDescriptionReaction,
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                color: boxColor,
-                              ),
-                            ),
-                            const SizedBox(height: 8.0),
-                            Row(
-                              children: [
-                                Text(
-                                  'Reaction: ',
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    color: boxColor,
-                                  ),
-                                ),
-                                Text(
-                                  resultReaction,
-                                  style: const TextStyle(
-                                    fontSize: 14.0,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Espace égal entre les cartes
-              children: [
-                // Card pour Action
-                Card(
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SizedBox(
-                      height: 300.0, // Même hauteur pour les deux cartes
-                      width: 400.0, // Même largeur pour les deux cartes
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Action',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 20.0),
-                            ...data.map((entry) {
-                              final key = entry.keys.first;
-                              final value = entry.values.first;
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      key,
-                                      style: const TextStyle(
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 28.0),
-                                    SizedBox(
-                                      width: 200.0,
-                                      child: TextField(
-                                        controller: controllers[key], // Lier le contrôleur au champ
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          hintText: value,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                            const SizedBox(height: 20.0), // Espacement avant le bouton
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: saveData, // Appel de la fonction pour sauvegarder les données
-                                child: const Text('Sauvegarder et afficher le JSON'),
-                              ),
-                            ),
-                          ],
+            ...data.entries.map((entry) {
+              final key = entry.key;
+              final value = entry.value;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        key,
+                        style: const TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ),
-                ),
-
-            
-                // Card pour Reaction
-                Card(
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SizedBox(
-                      height: 300.0, // Même hauteur pour les deux cartes
-                      width: 400.0, // Même largeur pour les deux cartes
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Reaction',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 20.0),
-                            ...reactionData.map((entry) {
-                              final key = entry.keys.first;
-                              final value = entry.values.first;
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      key,
-                                      style: const TextStyle(
-                                        fontSize: 20.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 28.0),
-                                    SizedBox(
-                                      width: 200.0,
-                                      child: TextField(
-                                        controller: reactionControllers[key], // Lier le contrôleur au champ
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                        hintText: value,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                            const SizedBox(height: 20.0), // Espacement avant le bouton
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: saveReactionData, // Appel de la fonction pour sauvegarder les données
-                                child: const Text('Sauvegarder et afficher le JSON'),
-                              ),
-                            ),
-                          ],
+                    const SizedBox(width: 16.0),
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        controller: controllers[key],
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: value,
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-            
-            const SizedBox(height: 10.0),
-            TextButton(
-              onPressed: () {
-                // Ajoutez les fonctionnalités pour le bouton ici
-              },
-              child: const Text(
-                'Continue',
-                style: TextStyle(fontSize: 16.0),
-              ),
-            ),
+              );
+            }).toList(),
           ],
         ),
       ),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class DetailPage extends StatefulWidget {
   final int itemIndex;
-  int id;
+  final int id;
   final dynamic card;
 
   DetailPage({required this.itemIndex, required this.id, required this.card, super.key});
@@ -14,25 +14,32 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-
   late final ApiService apiService;
+  List<Map<String, String>> reactions = [];
 
   @override
   void initState() {
     super.initState();
-    apiService = ApiService(baseUrl: IntermediatePageReaction.baseUrlString, route: '/reactions/${widget.id}');
+    apiService = ApiService(
+      baseUrl: IntermediatePageReaction.baseUrlString,
+      route: '/reactions/${widget.id}',
+    );
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
         value = [value];
       }
+      print("Passed value: $value");
       setState(() {
         for (var i = 0; i < value.length; i++) {
-          actions.add(value[i]['name']);
+          reactions.add({
+            'value': value[i]['name'],
+            ...value[i]['data_keys'],
+          });
         }
+        print("Reactions: $reactions");
       });
     });
   }
-  List<dynamic> actions = [];
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +47,7 @@ class _DetailPageState extends State<DetailPage> {
       appBar: AppBar(
         title: const Text('Detail Page'),
       ),
-      body: actions.isEmpty
+      body: reactions.isEmpty
           ? const Center(
               child: CircularProgressIndicator(),
             )
@@ -54,16 +61,21 @@ class _DetailPageState extends State<DetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Title Section
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.itemIndex < actions.length // Vérification supplémentaire pour éviter les erreurs
-                                ? actions[widget.itemIndex]
+                            widget.itemIndex < reactions.length &&
+                                reactions[widget.itemIndex]['type'] == 'name'
+                                ? reactions[widget.itemIndex]['value'] as String
                                 : 'Invalid Item',
-                            style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 10.0),
                           const Text(
@@ -74,11 +86,12 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
                     const Divider(),
+
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: actions.map<Widget>((action) {
+                        children: reactions.map<Widget>((reaction) {
                           return ElevatedButton(
                             onPressed: () {
                               int count = 0;
@@ -86,15 +99,14 @@ class _DetailPageState extends State<DetailPage> {
                                 count++;
                                 if (count == 3) {
                                   Navigator.pop(context, {
-                                    'action': action,
-
+                                    'reaction': reactions,
                                   });
                                   return true;
                                 }
                                 return false;
                               });
                             },
-                            child: Text(action),
+                            child: Text(reaction['value'] ?? 'No Value'),
                           );
                         }).toList(),
                       ),
