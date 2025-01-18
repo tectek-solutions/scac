@@ -321,6 +321,7 @@ pub struct Action {
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
     pub data_keys: Option<serde_json::Value>,
+    pub last_id_json_path: String,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -337,6 +338,7 @@ pub struct CreateAction {
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
     pub data_keys: Option<serde_json::Value>,
+    pub last_id_json_path: String,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
@@ -351,6 +353,7 @@ pub struct UpdateAction {
     pub http_headers: Option<serde_json::Value>,
     pub http_body: Option<serde_json::Value>,
     pub data_keys: Option<serde_json::Value>,
+    pub last_id_json_path: String,
 }
 
 impl Action {
@@ -498,6 +501,7 @@ pub struct Workflow {
     pub reactions_id: i32,
     pub action_data: Option<serde_json::Value>,
     pub reaction_data: Option<serde_json::Value>,
+    pub last_id: Option<String>,
     pub created_at: Option<NaiveDateTime>,
     pub updated_at: Option<NaiveDateTime>,
 }
@@ -512,6 +516,7 @@ pub struct CreateWorkflow {
     pub reactions_id: i32,
     pub action_data: Option<serde_json::Value>,
     pub reaction_data: Option<serde_json::Value>,
+    pub last_id: Option<String>,
 }
 
 #[derive(AsChangeset, Deserialize, ToSchema)]
@@ -524,6 +529,7 @@ pub struct UpdateWorkflow {
     pub reactions_id: Option<i32>,
     pub action_data: Option<serde_json::Value>,
     pub reaction_data: Option<serde_json::Value>,
+    pub last_id: Option<String>,
 }
 
 impl Workflow {

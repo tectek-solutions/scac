@@ -265,10 +265,10 @@ services:
     build:
       context: .
       dockerfile: ./client/Dockerfile
+      args:
+        - API_URL=http://localhost:8000
     ports:
       - "3000:3000"
-    environment:
-      API_URL: http://localhost:8000
     networks:
       - internal
     depends_on:

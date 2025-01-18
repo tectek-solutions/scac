@@ -405,6 +405,64 @@ impl Worker {
             }
         };
 
+        let last_id_json_path = action.last_id_json_path.clone();
+
+        let id_retrieved = match data.pointer(&last_id_json_path) {
+            Some(id) => id,
+            None => {
+                warn!("No id found");
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: "No id found".to_string()
+                };
+            }
+        };
+
+        let id = match id_retrieved.as_str() {
+            Some(id) => id,
+            None => {
+                warn!("No id found");
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: "No id found".to_string()
+                };
+            }
+        };
+
+        match self.workflow.last_id {
+            Some(ref last_id) if last_id == id => {
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: "No new action".to_string()
+                };
+            }
+            _ => (),
+        };
+
+        println!("New id: {}", id);
+
+        let updated_workflow = database::model::UpdateWorkflow {
+            users_id: Some(self.workflow.users_id),
+            name: Some(self.workflow.name.clone()),
+            description: self.workflow.description.clone(),
+            actions_id: Some(self.workflow.actions_id),
+            reactions_id: Some(self.workflow.reactions_id),
+            action_data: self.workflow.action_data.clone(),
+            reaction_data: self.workflow.reaction_data.clone(),
+            last_id: Some(id.to_string()),
+        };
+
+        match database::model::Workflow::update(&mut self.database.get_connection(), self.workflow.id, updated_workflow) {  
+            Ok(_) => (),
+            Err(err) => {
+                error!("Error updating workflow: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error updating workflow: {:?}", err)
+                };
+            }
+        }
+
         CreateTrigger {
             workflows_id: self.workflow.id,
             status: "Success".to_string()

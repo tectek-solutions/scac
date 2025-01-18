@@ -14,6 +14,7 @@ diesel::table! {
         http_headers -> Nullable<Jsonb>,
         http_body -> Nullable<Jsonb>,
         data_keys -> Nullable<Jsonb>,
+        last_id_json_path -> Text,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }
@@ -114,6 +115,7 @@ diesel::table! {
         reactions_id -> Int4,
         action_data -> Nullable<Jsonb>,
         reaction_data -> Nullable<Jsonb>,
+        last_id -> Nullable<Text>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }
