@@ -1,6 +1,7 @@
 import 'package:client/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import '../../../services/api.area.service.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class ClickableCardScreen extends StatefulWidget {
   @override
@@ -47,6 +48,11 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
     } catch (e) {
       print('Error removing card: $e');
     }
+  }
+
+  Future<void> clearAppCache() async {
+    await DefaultCacheManager().emptyCache();
+    print("App cache cleared");
   }
 
   @override

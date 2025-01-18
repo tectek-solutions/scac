@@ -5,7 +5,9 @@ INSERT INTO workflows (
         description,
         actions_id,
         reactions_id,
-        data_transformation
+        data_transformation,
+        action_data,
+        reaction_data
     )
 VALUES (
         (
@@ -25,5 +27,11 @@ VALUES (
             FROM reactions
             WHERE name = 'Send Mail (Outlook)'
         ),
-        '{}'
+        '{}',
+        '{}',
+        '{
+            "to": "xavierclementantoine@gmai.com",
+            "subject": "Mail send from Outlook via SCAC",
+            "body": "Hello, this mail is sent from Outlook via SCAC"
+        }'
     );

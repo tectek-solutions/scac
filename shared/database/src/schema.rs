@@ -4,7 +4,7 @@ diesel::table! {
     actions (id) {
         id -> Int4,
         apis_id -> Int4,
-        #[max_length = 32]
+        #[max_length = 64]
         name -> Varchar,
         description -> Nullable<Text>,
         #[max_length = 8]
@@ -13,6 +13,7 @@ diesel::table! {
         http_parameters -> Nullable<Jsonb>,
         http_headers -> Nullable<Jsonb>,
         http_body -> Nullable<Jsonb>,
+        data_keys -> Nullable<Jsonb>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }
@@ -50,7 +51,7 @@ diesel::table! {
     reactions (id) {
         id -> Int4,
         apis_id -> Int4,
-        #[max_length = 32]
+        #[max_length = 64]
         name -> Varchar,
         description -> Nullable<Text>,
         #[max_length = 8]
@@ -59,6 +60,7 @@ diesel::table! {
         http_parameters -> Nullable<Jsonb>,
         http_headers -> Nullable<Jsonb>,
         http_body -> Nullable<Jsonb>,
+        data_keys -> Nullable<Jsonb>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }
@@ -111,6 +113,8 @@ diesel::table! {
         actions_id -> Int4,
         reactions_id -> Int4,
         data_transformation -> Nullable<Jsonb>,
+        action_data -> Nullable<Jsonb>,
+        reaction_data -> Nullable<Jsonb>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
     }

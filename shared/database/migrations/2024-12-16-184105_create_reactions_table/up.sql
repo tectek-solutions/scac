@@ -4,7 +4,7 @@ CREATE TABLE reactions (
     -- Unique ID
     apis_id INT NOT NULL,
     -- References the API service
-    name VARCHAR(32) NOT NULL,
+    name VARCHAR(64) NOT NULL,
     -- Unique name
     description TEXT,
     -- Description
@@ -18,6 +18,8 @@ CREATE TABLE reactions (
     -- Headers
     http_body JSONB,
     -- Body
+    data_keys JSONB,
+    -- Data keys
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- Creation timestamp
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use tinytemplate::TinyTemplate;
 use utoipa::ToSchema;
+use base64;
 
 use cache;
 use database;
@@ -62,6 +63,8 @@ fn get_authorization_url(authentication: database::model::Authentication, user_i
         "authentication_id={} user_id={}",
         authentication.id, user_id
     );
+
+    let state = base64::encode(state);
 
     let context = UserTokenAuthenticationContext {
         client_id: authentication.client_id,
@@ -248,6 +251,22 @@ async fn create_user_token(
 ) -> impl Responder {
     let code = &query.code;
     let state = &query.state;
+
+    let state = match base64::decode(state) {
+        Ok(state) => match String::from_utf8(state) {
+            Ok(state) => state,
+            Err(err) => {
+                eprintln!("Error decoding state: {:?}", err);
+                return ErrorResponse::Unauthorized("Can't decode state".to_string())
+                    .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+            }
+        },
+        Err(err) => {
+            eprintln!("Error decoding state: {:?}", err);
+            return ErrorResponse::Unauthorized("Can't decode state".to_string())
+                .to_response(actix_web::http::StatusCode::UNAUTHORIZED);
+        }
+    };
 
     println!("Code: {:?}", code);
     println!("State: {:?}", state);

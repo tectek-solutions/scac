@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-config
+data:
+  database_url: postgres://{{ .Values.global.database.user }}:{{ .Values.global.database.password }}@{{ .Release.Name }}-database:{{ .Values.database.servicePort }}/{{ .Values.global.database.dbName }}
+  redis_url: redis://{{ .Release.Name }}-redis:{{ .Values.redis.servicePort }}
+  jwt_secret: {{ .Values.global.jwtSecret }}
