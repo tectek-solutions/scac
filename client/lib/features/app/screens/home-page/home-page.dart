@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../services/api.area.service.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import './intermediate-page-workflow.dart';
 
 class ClickableCardScreen extends StatefulWidget {
   @override
@@ -108,6 +109,12 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
                                       },
                                     ),
                                     onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => IntermediatePageWorkflow(itemIndex: index, id: service['id']),
+                                        ),
+                                      );
                                     },
                                   ),
                                 );
