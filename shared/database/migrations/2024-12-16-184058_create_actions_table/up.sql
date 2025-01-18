@@ -20,6 +20,8 @@ CREATE TABLE actions (
     -- Body
     data_keys JSONB,
     -- Data keys
+    last_id_json_path TEXT,
+    -- Last JSON path
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- Creation timestamp
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

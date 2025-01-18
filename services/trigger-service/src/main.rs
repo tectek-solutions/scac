@@ -65,7 +65,7 @@ fn configure_cors() -> Cors {
 struct ApiDoc;
 
 async fn run_background_job(db: web::Data<database::Database>) {
-    let mut interval = interval(Duration::from_secs(5));
+    let mut interval = interval(Duration::from_secs(10));
     loop {
         interval.tick().await;
 
@@ -81,11 +81,15 @@ async fn run_background_job(db: web::Data<database::Database>) {
             }
         };
 
+
         for workflow in workflows {
             let worker = worker::Worker::new(&db, workflow);
-            match worker.run().await {
-                Ok(_) => info!("Worker ran successfully"),
-                Err(err) => error!("Error running worker: {:?}", err),
+            let trigger = worker.run().await;
+            let mut database_connection = db.get_connection();
+            
+            match database::model::Trigger::create(&mut database_connection, trigger) {
+                Ok(_) => info!("Trigger created"),
+                Err(err) => error!("Error creating trigger: {:?}", err),
             }
         }
     }
@@ -103,11 +107,11 @@ async fn main() -> std::io::Result<()> {
     let cache_url = env::var("REDIS_URL").expect("REDIS_URL must be set");
     let cache = web::Data::new(cache::Cache::new(&cache_url));
 
-    // Spawn the background job
     let db_clone = db.clone();
-    tokio::spawn(async move {
+    tokio::task::spawn_local(async move {
         run_background_job(db_clone).await;
     });
+    
 
     HttpServer::new(move || {
         let cors = configure_cors();
