@@ -312,29 +312,29 @@ impl Worker {
 
         let action_http_body = action_http_body.to_string();
 
-        // match tt.add_template("action_http_body", &action_http_body) {
-        //     Ok(_) => (),
-        //     Err(err) => {
-        //         error!("Error adding template: {:?}", err);
-        //         return CreateTrigger {
-        //             workflows_id: self.workflow.id,
-        //             status: format!("Error adding template: {:?}", err)
-        //         };
-        //     }
-        // }
+        match tt.add_template("action_http_body", &action_http_body) {
+            Ok(_) => (),
+            Err(err) => {
+                error!("Error adding template: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error adding template: {:?}", err)
+                };
+            }
+        }
         
-        // let action_http_body = match tt.render("action_http_body", &context) {
-        //     Ok(action_http_body) => action_http_body,
-        //     Err(err) => {
-        //         error!("Error rendering template: {:?}", err);
-        //         return CreateTrigger {
-        //             workflows_id: self.workflow.id,
-        //             status: format!("Error rendering template: {:?}", err)
-        //         }
-        //     }
-        // };
+        let action_http_body = match tt.render("action_http_body", &context) {
+            Ok(action_http_body) => action_http_body,
+            Err(err) => {
+                error!("Error rendering template: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error rendering template: {:?}", err)
+                }
+            }
+        };
 
-        let action_host= match url::Url::parse(&action_url) {
+        let action_host = match url::Url::parse(&action_url) {
             Ok(url) => {
                 let host = url.host_str();
                 match host {
@@ -462,6 +462,321 @@ impl Worker {
                 };
             }
         }
+
+        let reaction = match database::model::Reaction::read(
+            &mut self.database.get_connection(),
+            self.workflow.reactions_id,
+        ) {
+            Ok(reaction) => reaction,
+            Err(err) => {
+                error!("Error getting reaction: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting reaction: {:?}", err)
+                };
+            }
+        };
+
+        let reaction_api = match database::model::Api::read(
+            &mut self.database.get_connection(),
+            reaction.apis_id,
+        ) {
+            Ok(reaction_api) => reaction_api,
+            Err(err) => {
+                error!("Error getting reaction api: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting reaction api: {:?}", err)
+                };
+            }
+        };
+
+        let reaction_authentication = match database::model::Authentication::read(
+            &mut self.database.get_connection(),
+            reaction_api.authentications_id,
+        ) {
+            Ok(reaction_authentication) => reaction_authentication,
+            Err(err) => {
+                error!("Error getting reaction authentication: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting reaction authentication: {:?}", err)
+                };
+            }
+        };
+
+        let reaction_user_token = match query::get_user_token_by_authentication_by_user_id_query(
+            &self.database,
+            reaction_authentication.id,
+            user.id,
+        ) {
+            Ok(Some(reaction_user_token)) => reaction_user_token,
+            Ok(None) => {
+                warn!("No user token found for reaction");
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: "No user token found for reaction".to_string()
+                };
+            }
+            Err(err) => {
+                error!("Error getting user token: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting user token: {:?}", err)
+                };
+            }
+        };
+
+        let mut context = HashMap::new();
+
+        context.insert("token".to_string(), reaction_user_token.access_token);
+
+        let mut tt = TinyTemplate::new();
+
+        match tt.add_template("reaction_http_endpoint", &reaction.http_endpoint) {
+            Ok(_) => (),
+            Err(err) => {
+                error!("Error adding template: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error adding template: {:?}", err)
+                };
+            }
+        }
+
+        let reaction_http_endpoint = match tt.render("reaction_http_endpoint", &context) {
+            Ok(reaction_http_endpoint) => reaction_http_endpoint,
+            Err(err) => {
+                error!("Error rendering template: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error rendering template: {:?}", err)
+                };
+            }
+        };
+
+        let reaction_url = format!("{}{}", reaction_api.base_url, reaction_http_endpoint);
+
+        info!("URL: {}", reaction_url);
+
+        let method = match reqwest::Method::from_bytes(reaction.http_method.as_bytes()) {
+            Ok(method) => method,
+            Err(err) => {
+                error!("Error getting method: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting method: {:?}", err)
+                };
+            }
+        };
+
+        let mut reaction_headers = match reaction.http_headers {
+            Some(reaction_headers) => reaction_headers,
+            None => {
+                warn!("No reaction_headers found");
+                serde_json::Value::default()
+            }
+        };
+
+        let reaction_headers = match reaction_headers.as_object_mut() {
+            Some(reaction_headers) => reaction_headers,
+            None => &mut {
+                warn!("No reaction_headers found");
+                serde_json::Map::new()
+            }
+        };
+
+        let mut reaction_headers_map = reqwest::header::HeaderMap::new();
+
+        for (key, value) in reaction_headers {
+            let value = match value.as_str() {
+                Some(value) => value,
+                None => {
+                    warn!("No value found");
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: "No value found".to_string()
+                    };
+                }
+            };
+
+            match tt.add_template(value, value) {
+                Ok(_) => (),
+                Err(err) => {
+                    error!("Error adding template: {:?}", err);
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error adding template: {:?}", err)
+                    };
+                }
+            }
+
+            let value = match tt.render(value, &context) {
+                Ok(value) => value,
+                Err(err) => {
+                    error!("Error rendering template: {:?}", err);
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error rendering template: {:?}", err)
+                    };
+                }
+            };
+        
+            let key = match reqwest::header::HeaderName::from_bytes(key.as_bytes()) {
+                Ok(key) => key,
+                Err(err) => {
+                    error!("Error getting header key: {:?}", err);
+                    continue;
+                }
+            };
+
+            reaction_headers_map.insert(key, value.parse().unwrap());
+        }
+
+        let reaction_params = match reaction.http_parameters {
+            Some(params) => params,
+            None => {
+                warn!("No parameters found");
+                serde_json::Value::default()
+            }
+        };
+
+        let reaction_params = match reaction_params.as_object() {
+            Some(params) => params,
+            None => {
+                warn!("No parameters found");
+                &serde_json::Map::new()
+            }
+        };
+
+        let mut reaction_params_map = HashMap::new();
+
+        for (key, value) in reaction_params {
+            let value = match value.as_str() {
+                Some(value) => value,
+                None => {
+                    warn!("No value found");
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: "No value found".to_string()
+                    };
+                }
+            };
+
+            match tt.add_template(value, value) {
+                Ok(_) => (),
+                Err(err) => {
+                    error!("Error adding template, value: {:?}: {:?}", value, err);
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error adding template, value: {:?}: {:?}", value, err)
+                    };
+                }
+            }
+
+            let value = match tt.render(value, &context) {
+                Ok(value) => value,
+                Err(err) => {
+                    error!("Error rendering template: value: {:?}: {:?}", value, err);
+                    return CreateTrigger {
+                        workflows_id: self.workflow.id,
+                        status: format!("Error rendering template: value: {:?}: {:?}", value, err)
+                    };
+                }
+            };
+
+            reaction_params_map.insert(key.clone(), value);
+        }
+
+        let reaction_http_body = match reaction.http_body {
+            Some(http_body) => http_body,
+            None => {
+                warn!("No body found");
+                serde_json::Value::default()
+            }
+        };
+
+        let reaction_http_body = reaction_http_body.to_string();
+
+        match tt.add_template("reaction_http_body", &reaction_http_body) {
+            Ok(_) => (),
+            Err(err) => {
+                error!("Error adding template: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error adding template: {:?}", err)
+                };
+            }
+        }
+
+        let reaction_http_body = match tt.render("reaction_http_body", &context) {
+            Ok(reaction_http_body) => reaction_http_body,
+            Err(err) => {
+                error!("Error rendering template: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error rendering template: {:?}", err)
+                };
+            }
+        };
+
+        let reaction_host = match url::Url::parse(&reaction_url) {
+            Ok(url) => {
+                let host = url.host_str();
+                match host {
+                    Some(host) => host.to_string(),
+                    None => {
+                        warn!("No host found");
+                        return CreateTrigger {
+                            workflows_id: self.workflow.id,
+                            status: "No host found".to_string()
+                        };
+                    }
+                }
+            }
+            Err(err) => {
+                error!("Error getting host: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting host: {:?}", err)
+                };
+            }   
+        };
+
+        let request = client
+            .request(method, &reaction_url)
+            .form(&reaction_params_map)
+            .headers(reaction_headers_map)
+            .header("Host", reaction_host)
+            .header("User-Agent", "curl/7.81.0")
+            .json(&reaction_http_body)
+            .build();
+
+        let request = match request {
+            Ok(request) => request,
+            Err(err) => {
+                error!("Error building request: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error building request: {:?}", err)
+                };
+            }
+        };
+
+        let response = client.execute(request).await;
+
+        let response = match response {
+            Ok(response) => response,
+            Err(err) => {
+                error!("Error getting response: {:?}", err);
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: format!("Error getting response: {:?}", err)
+                };
+            }
+        };
+
+        info!("Response status: {:?}", response.status());
 
         CreateTrigger {
             workflows_id: self.workflow.id,
