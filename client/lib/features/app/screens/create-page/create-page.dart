@@ -1,6 +1,8 @@
 import 'package:client/features/area/screens/reaction-page/reaction-page.dart';
 import 'package:client/features/area/screens/service-page/services-page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
@@ -27,11 +29,10 @@ class _CreatePageState extends State<CreatePage> {
   bool isActionSelected = false;
   bool isReactionSelected = false;
 
-  // Map<String, String> reactionData = {};
   Map<String, TextEditingController> controllers = {};
   Map<String, TextEditingController> reactionControllers = {};
 
-  final Color boxColor = Colors.grey[700]!; // Définissez une couleur commune
+  final Color boxColor = Colors.grey[700]!;
 
   @override
   void initState() {
@@ -52,6 +53,25 @@ class _CreatePageState extends State<CreatePage> {
     reactionControllers.forEach((key, controller) => controller.dispose());
     super.dispose();
   }
+
+  void createWorkflow() async {
+  final url = Uri.parse('https://your-api-endpoint.com/create-workflow');
+  final response = await http.post(
+    url,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      // Mettre les bonnes valeurs ici
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Workflow created successfully');
+  } else {
+    print('Failed to create workflow');
+  }
+}
 
   Widget build(BuildContext context) {
   
@@ -216,6 +236,8 @@ class _CreatePageState extends State<CreatePage> {
                   });
                   print('Action Data: $actionData');
                   print('Reaction Data: $reactionData');
+                  // Fonction pour créer le workflow (POST request)
+                  //createWorkflow();
                 },
                 child: const Text(
                   'Create Workflow',
