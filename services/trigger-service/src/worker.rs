@@ -3,6 +3,7 @@ use database::{self, model::CreateTrigger};
 use std::collections::HashMap;
 use tinytemplate::TinyTemplate;
 use url;
+use handlebars::Handlebars;
 
 use crate::query;
 
@@ -131,7 +132,21 @@ impl Worker {
                     workflows_id: self.workflow.id,
                     status: "Value is not a string".to_string()
                 };
-            }
+            }        let action_data = match &self.workflow.action_data {
+                Some(action_data) => action_data,
+                None => {
+                    warn!("No action data found");
+                    &serde_json::Value::default()
+                }
+            };
+    
+            let action_data = match action_data.as_object() {
+                Some(action_data) => action_data,
+                None => {
+                    warn!("No action data found");
+                    &serde_json::Map::new()
+                }
+            };
         }
         
         context.insert("token".to_string(), action_user_token.access_token);
@@ -312,25 +327,27 @@ impl Worker {
 
         let action_http_body = action_http_body.to_string();
 
-        match tt.add_template("action_http_body", &action_http_body) {
+        let mut register = Handlebars::new();
+
+        match register.register_template_string("action_http_body", &action_http_body) {
             Ok(_) => (),
             Err(err) => {
-                error!("Error adding template: {:?}", err);
+                error!("Error registering template: {:?}", err);
                 return CreateTrigger {
                     workflows_id: self.workflow.id,
-                    status: format!("Error adding template: {:?}", err)
+                    status: format!("Error registering template: {:?}", err)
                 };
             }
         }
-        
-        let action_http_body = match tt.render("action_http_body", &context) {
+
+        let action_http_body = match register.render("action_http_body", &context) {
             Ok(action_http_body) => action_http_body,
             Err(err) => {
                 error!("Error rendering template: {:?}", err);
                 return CreateTrigger {
                     workflows_id: self.workflow.id,
                     status: format!("Error rendering template: {:?}", err)
-                }
+                };
             }
         };
 
@@ -439,7 +456,7 @@ impl Worker {
             _ => (),
         };
 
-        println!("New id: {}", id);
+        info!("New id: {}", id);
 
         let updated_workflow = database::model::UpdateWorkflow {
             users_id: Some(self.workflow.users_id),
@@ -527,7 +544,48 @@ impl Worker {
             }
         };
 
+        let reaction_data = match &self.workflow.reaction_data {
+            Some(reaction_data) => reaction_data,
+            None => {
+                warn!("No reaction data found");
+                &serde_json::Value::default()
+            }
+        };
+
+        let reaction_data = match reaction_data.as_object() {
+            Some(reaction_data) => reaction_data,
+            None => {
+                warn!("No reaction data found");
+                &serde_json::Map::new()
+            }
+        };
+
         let mut context = HashMap::new();
+        for (key, value) in reaction_data {
+            if let Some(value_str) = value.as_str() {
+                context.insert(key.clone(), value_str.to_string());
+            } else {
+                warn!("Value is not a string");
+                return CreateTrigger {
+                    workflows_id: self.workflow.id,
+                    status: "Value is not a string".to_string()
+                };
+            }        let reaction_data = match &self.workflow.reaction_data {
+                Some(reaction_data) => reaction_data,
+                None => {
+                    warn!("No reaction data found");
+                    &serde_json::Value::default()
+                }
+            };
+    
+            let reaction_data = match reaction_data.as_object() {
+                Some(reaction_data) => reaction_data,
+                None => {
+                    warn!("No reaction data found");
+                    &serde_json::Map::new()
+                }
+            };
+        }
 
         context.insert("token".to_string(), reaction_user_token.access_token);
 
@@ -557,7 +615,7 @@ impl Worker {
 
         let reaction_url = format!("{}{}", reaction_api.base_url, reaction_http_endpoint);
 
-        info!("URL: {}", reaction_url);
+        info!("Reaction URL: {}", reaction_url);
 
         let method = match reqwest::Method::from_bytes(reaction.http_method.as_bytes()) {
             Ok(method) => method,
@@ -633,6 +691,10 @@ impl Worker {
             reaction_headers_map.insert(key, value.parse().unwrap());
         }
 
+        for (key, value) in reaction_headers_map.iter() {
+            info!("Reaction Headers {}: {:?}", key, value);
+        }
+
         let reaction_params = match reaction.http_parameters {
             Some(params) => params,
             None => {
@@ -688,6 +750,10 @@ impl Worker {
             reaction_params_map.insert(key.clone(), value);
         }
 
+        for (key, value) in reaction_params_map.iter() {
+            info!("Reaction Params {}: {}", key, value);
+        }
+
         let reaction_http_body = match reaction.http_body {
             Some(http_body) => http_body,
             None => {
@@ -698,18 +764,20 @@ impl Worker {
 
         let reaction_http_body = reaction_http_body.to_string();
 
-        match tt.add_template("reaction_http_body", &reaction_http_body) {
+        let mut register = Handlebars::new();
+
+        match register.register_template_string("reaction_http_body", &reaction_http_body) {
             Ok(_) => (),
             Err(err) => {
-                error!("Error adding template: {:?}", err);
+                error!("Error registering template: {:?}", err);
                 return CreateTrigger {
                     workflows_id: self.workflow.id,
-                    status: format!("Error adding template: {:?}", err)
+                    status: format!("Error registering template: {:?}", err)
                 };
             }
         }
 
-        let reaction_http_body = match tt.render("reaction_http_body", &context) {
+        let reaction_http_body = match register.render("reaction_http_body", &context) {
             Ok(reaction_http_body) => reaction_http_body,
             Err(err) => {
                 error!("Error rendering template: {:?}", err);
@@ -719,6 +787,8 @@ impl Worker {
                 };
             }
         };
+
+        info!("Reaction Body: {}", reaction_http_body);
 
         let reaction_host = match url::Url::parse(&reaction_url) {
             Ok(url) => {
@@ -742,6 +812,8 @@ impl Worker {
                 };
             }   
         };
+
+        info!("Reaction Host: {}", reaction_host);
 
         let request = client
             .request(method, &reaction_url)
@@ -776,7 +848,8 @@ impl Worker {
             }
         };
 
-        info!("Response status: {:?}", response.status());
+        info!("Reaction Response status: {:?}", response.status());
+        info!("Reaction Response body: {:?}", response.text().await);
 
         CreateTrigger {
             workflows_id: self.workflow.id,
