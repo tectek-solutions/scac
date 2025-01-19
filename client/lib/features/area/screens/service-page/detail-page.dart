@@ -34,9 +34,7 @@ class _DetailPageState extends State<DetailPage> {
             ...value[i]['data_keys'],
           });
         }
-        print(value);
       });
-      print(actions);
     });
   }
 
