@@ -46,7 +46,7 @@ VALUES
         'Send Mail (Outlook)',
         'Sends a mail as the user on Outlook',
         'POST',
-        '/me/sendMail',
+        '/me/microsoft.graph.sendMail',
         '{}',
         '{
             "Authorization": "Bearer { token }",

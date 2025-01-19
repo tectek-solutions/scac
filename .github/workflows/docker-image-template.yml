@@ -20,6 +20,10 @@ on:
         required: false
         default: true
         type: boolean
+      api_url:
+        description: "API URL"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -60,6 +64,7 @@ jobs:
           docker buildx build \
             --file ${{ inputs.dockerfile }} \
             --tag ${{ inputs.image_name }} \
+            ${{ inputs.api_url && '--build-arg API_URL=${{ inputs.api_url }}' || '' }} \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
             ${{ env.mode }} \

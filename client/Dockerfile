@@ -72,6 +72,8 @@ RUN mkdir -p -p $APP
 COPY --chown=flutter:flutter ./client $APP/client
 WORKDIR $APP
 
+ARG API_URL
+
 # Build the web application
 RUN cd client && flutter clean
 RUN cd client && flutter pub get
