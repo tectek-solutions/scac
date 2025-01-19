@@ -3,6 +3,7 @@ import 'package:client/features/area/screens/service-page/services-page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:client/features/services/api.area.service.dart';
 
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key});
@@ -13,6 +14,8 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
+  ApiService apiService = ApiService(baseUrl: 'http://localhost:8000', route: '/workflows/');
+
   String resultTitleAction = 'Actions';
   String resultDescriptionAction = 'Go to Action Page';
   String resultAction = 'No action selected';
@@ -29,8 +32,16 @@ class _CreatePageState extends State<CreatePage> {
   bool isActionSelected = false;
   bool isReactionSelected = false;
 
+  String actionIndex = "";
+  String reactionIndex = "";
+
+  String name = '';
+  String description = '';
+
   Map<String, TextEditingController> controllers = {};
   Map<String, TextEditingController> reactionControllers = {};
+  TextEditingController nameController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
   final Color boxColor = Colors.grey[700]!;
 
@@ -54,23 +65,8 @@ class _CreatePageState extends State<CreatePage> {
     super.dispose();
   }
 
-  void createWorkflow() async {
-  final url = Uri.parse('https://your-api-endpoint.com/create-workflow');
-  final response = await http.post(
-    url,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      // Mettre les bonnes valeurs ici
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    print('Workflow created successfully');
-  } else {
-    print('Failed to create workflow');
-  }
+  void createWorkflow(Map<String, String> actionData, Map<String, String> reactionData) async {
+  apiService.addCard(name, description, int.parse(actionIndex), int.parse(reactionIndex), actionData, reactionData);
 }
 
   Widget build(BuildContext context) {
@@ -90,8 +86,8 @@ class _CreatePageState extends State<CreatePage> {
       reactionCleaned[key] = controller;
     }
 
-    actionCleaned.removeWhere((key, value) => key == 'value');
-    reactionCleaned.removeWhere((key, value) => key == 'value');
+    actionCleaned.removeWhere((key, value) => key == 'value' || key == 'id');
+    reactionCleaned.removeWhere((key, value) => key == 'value' || key == 'id');
 
     isActionSelected = actionCleaned.isNotEmpty;
     isReactionSelected = reactionCleaned.isNotEmpty;
@@ -110,6 +106,10 @@ class _CreatePageState extends State<CreatePage> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+              _buildNameDescriptionFields(
+                name: name,
+                description: description,
+              ),
               const Text(
                 'Select an option below to proceed:',
                 style: TextStyle(
@@ -125,9 +125,10 @@ class _CreatePageState extends State<CreatePage> {
                     context,
                     MaterialPageRoute(builder: (context) => const ServicePage()),
                   );
-                  if (result != null && result['index'] != null && result['action'] != null) {
+                  if (result != null && result['index'] != null && result['id'] != null && result['action'] != null) {
                     setState(() {
                       var index = result['index'];
+                      actionIndex = result['id'];
                       actions = result['action'][index];
                     });
                     print('Data received from Widget B HERE: $result');
@@ -155,9 +156,11 @@ class _CreatePageState extends State<CreatePage> {
                   MaterialPageRoute(
                     builder: (context) => ReactionPage(actions)),
                   );
-                  if (result != null && result['index'] != null && result['reaction'] != null) {
+                  if (result != null && result['index'] != null && result['id'] != null && result['reaction'] != null) {
                     setState(() {
-                      reactions = result['reaction'][result['index']];
+                      var index = result['index'];
+                      reactionIndex = result['id'];
+                      reactions = result['reaction'][index];
                     });
                     print('Data received from Widget B: $result');
                   } else {
@@ -223,21 +226,34 @@ class _CreatePageState extends State<CreatePage> {
               const SizedBox(height: 10.0),
               TextButton(
                 onPressed: () {
-                  var actionData = {};
+                  Map<String, String> actionData = {};
                   if (controllers.isEmpty) {
                     actionData = actions;
                   } else {
                     actionData = controllers.map((key, controller) {
-                    return MapEntry(key, controller.text.isNotEmpty ? controller.text : actions['value']);
+                    return MapEntry(key, controller.text.isNotEmpty ? controller.text : (actions['value'] ?? ''));
                   });
                   }
-                  final reactionData = reactionControllers.map((key, controller) {
+                  Map<String, String> reactionData = reactionControllers.map((key, controller) {
                     return MapEntry(key, controller.text);
                   });
-                  print('Action Data: $actionData');
-                  print('Reaction Data: $reactionData');
-                  // Fonction pour créer le workflow (POST request)
-                  //createWorkflow();
+                  createWorkflow(actionData, reactionData);
+                  setState(() {
+                    name = '';
+                    description = '';
+                    actions.clear();
+                    actionCleaned.clear();
+                    reactions.clear();
+                    reactionCleaned.clear();
+                    controllers.clear();
+                    reactionControllers.clear();
+                    nameController.clear();
+                    descriptionController.clear();
+                    isActionSelected = false;
+                    isReactionSelected = false;
+                    actionIndex = "";
+                    reactionIndex = "";
+                  });
                 },
                 child: const Text(
                   'Create Workflow',
@@ -324,6 +340,43 @@ class _CreatePageState extends State<CreatePage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNameDescriptionFields({
+    required String name,
+    required String description,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: nameController,
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            labelText: 'Name',
+            errorText: name.isEmpty ? 'Name is required' : null,
+          ),
+          onChanged: (value) {
+            setState(() {
+              this.name = value;
+            });
+          },
+        ),
+        const SizedBox(height: 16.0),
+        TextField(
+          controller: descriptionController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Description',
+          ),
+          onChanged: (value) {
+            setState(() {
+              this.description = value;
+            });
+          },
+        ),
+      ],
     );
   }
 

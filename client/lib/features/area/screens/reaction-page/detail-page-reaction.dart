@@ -33,6 +33,7 @@ class _DetailPageState extends State<DetailPage> {
         for (var i = 0; i < value.length; i++) {
           reactions.add({
             'value': value[i]['name'],
+            'id': value[i]['id'].toString(),
             ...value[i]['data_keys'],
           });
         }
@@ -70,8 +71,7 @@ class _DetailPageState extends State<DetailPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.itemIndex < reactions.length &&
-                                        reactions[widget.itemIndex]['type'] == 'name'
+                                widget.itemIndex < reactions.length
                                     ? reactions[widget.itemIndex]['value'] as String
                                     : 'Invalid Item',
                                 style: const TextStyle(
@@ -103,6 +103,7 @@ class _DetailPageState extends State<DetailPage> {
                                         'action': widget.action,
                                         'reaction': reactions,
                                         'index': reactionIndex,
+                                        'id': reaction['id'],
                                       });
                                       return true;
                                     }

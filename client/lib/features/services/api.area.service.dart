@@ -45,4 +45,30 @@ class ApiService {
       throw Exception('Failed to delete');
     }
   }
+
+  Future<void> addCard(String name, String description, int actionId, int reactionId, Map<String, String> actionData, Map<String, String> reactionData) async {
+    final url = Uri.parse('$baseUrl$route');
+    final token = await storage.read(key: 'jwt');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'name': name,
+        'users_id': 0,
+        'description': description,
+        'actions_id': actionId,
+        'reactions_id': reactionId,
+        'action_data': actionData,
+        'reaction_data': reactionData,
+      }),
+    );
+    if (response.statusCode == 200) {
+      return;
+    } else {
+      throw Exception('Failed to add');
+    }
+  }
 }
