@@ -30,10 +30,13 @@ class _DetailPageState extends State<DetailPage> {
         for (var i = 0; i < value.length; i++) {
           actions.add({
             'value': value[i]['name'],
+            'id': value[i]['id'].toString(),
             ...value[i]['data_keys'],
           });
         }
+        print(value);
       });
+      print(actions);
     });
   }
 
@@ -98,6 +101,7 @@ class _DetailPageState extends State<DetailPage> {
                                       Navigator.pop(context, {
                                         'action': actions,
                                         'index': actionIndex,
+                                        'id': action['id'],
                                       });
                                       return true;
                                     }

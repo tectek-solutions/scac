@@ -29,6 +29,9 @@ class _CreatePageState extends State<CreatePage> {
   bool isActionSelected = false;
   bool isReactionSelected = false;
 
+  String actionIndex = '';
+  String reactionIndex = '';
+
   Map<String, TextEditingController> controllers = {};
   Map<String, TextEditingController> reactionControllers = {};
 
@@ -55,10 +58,10 @@ class _CreatePageState extends State<CreatePage> {
   }
 
   void createWorkflow(Map<String, dynamic> actionData, Map<String, dynamic> reactionData) async {
-  final actionId = actions['id'];
-  final reactionId = reactions['id'];
   print('Action Data Here: $actionData');
   print('Reaction Data: $reactionData');
+  print('Action ID: $actionIndex');
+  print('Reaction ID: $reactionIndex');
   // final url = Uri.parse('https://your-api-endpoint.com/create-workflow');
   // final response = await http.post(
   //   url,
@@ -94,8 +97,8 @@ class _CreatePageState extends State<CreatePage> {
       reactionCleaned[key] = controller;
     }
 
-    actionCleaned.removeWhere((key, value) => key == 'value');
-    reactionCleaned.removeWhere((key, value) => key == 'value');
+    actionCleaned.removeWhere((key, value) => key == 'value' || key == 'id');
+    reactionCleaned.removeWhere((key, value) => key == 'value' || key == 'id');
 
     isActionSelected = actionCleaned.isNotEmpty;
     isReactionSelected = reactionCleaned.isNotEmpty;
@@ -129,9 +132,10 @@ class _CreatePageState extends State<CreatePage> {
                     context,
                     MaterialPageRoute(builder: (context) => const ServicePage()),
                   );
-                  if (result != null && result['index'] != null && result['action'] != null) {
+                  if (result != null && result['index'] != null && result['id'] != null && result['action'] != null) {
                     setState(() {
                       var index = result['index'];
+                      actionIndex = result['id'];
                       actions = result['action'][index];
                     });
                     print('Data received from Widget B HERE: $result');
@@ -159,9 +163,11 @@ class _CreatePageState extends State<CreatePage> {
                   MaterialPageRoute(
                     builder: (context) => ReactionPage(actions)),
                   );
-                  if (result != null && result['index'] != null && result['reaction'] != null) {
+                  if (result != null && result['index'] != null && result['id'] != null && result['reaction'] != null) {
                     setState(() {
-                      reactions = result['reaction'][result['index']];
+                      var index = result['index'];
+                      reactionIndex = result['id'];
+                      reactions = result['reaction'][index];
                     });
                     print('Data received from Widget B: $result');
                   } else {
@@ -238,8 +244,6 @@ class _CreatePageState extends State<CreatePage> {
                   var reactionData = reactionControllers.map((key, controller) {
                     return MapEntry(key, controller.text);
                   });
-                  print('Action Data: $actionData');
-                  print('Reaction Data: $reactionData');
                   // Fonction pour créer le workflow (POST request)
                   createWorkflow(actionData.cast<String, dynamic>(), reactionData.cast<String, dynamic>());
                 },
