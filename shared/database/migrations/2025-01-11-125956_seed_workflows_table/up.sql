@@ -1,4 +1,3 @@
--- Your SQL goes here
 INSERT INTO workflows (
         users_id,
         name,
@@ -32,4 +31,4 @@ VALUES (
             "subject": "Mail send from Outlook via SCAC",
             "body": "Hello, this mail is sent from Outlook via SCAC"
         }'
-    ),
+    );
