@@ -4,7 +4,7 @@ CREATE TABLE triggers (
     -- Unique ID
     workflows_id INT NOT NULL,
     -- References the workflow
-    data JSONB,
+    status TEXT NOT NULL,
     -- Trigger data
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- Creation timestamp
