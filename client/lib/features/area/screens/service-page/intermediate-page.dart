@@ -21,18 +21,14 @@ class _IntermediatePageState extends State<IntermediatePage> {
   @override
   void initState() {
     super.initState();
-    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/${widget.id}');
+    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/authentications/${widget.id}');
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
         value = [value];
-        print("HERE IS THE VALUE $value");
       }
-      print("Passed value: $value");
       setState(() {
         for (var i = 0; i < value.length; i++) {
-          print("Value: ${value[i]['name']}");
           cards.add({'title': value[i]['name']});
-          print("Cards: $cards");
         }
       });
     });

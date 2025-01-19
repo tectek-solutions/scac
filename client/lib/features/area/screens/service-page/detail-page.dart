@@ -23,12 +23,10 @@ class _DetailPageState extends State<DetailPage> {
     super.initState();
     apiService = ApiService(
     baseUrl: IntermediatePage.baseUrlString,
-    route: '/actions/${widget.id}'
+    route: '/actions/apis/${widget.id}'
     );
     apiService.fetchCards().then((value) {
-      if (value is Map<String, dynamic>) {
-        value = [value];
-      }
+      print("OK");
       print("Passed value: $value");
       setState(() {
         for (var i = 0; i < value.length; i++) {
@@ -52,69 +50,78 @@ class _DetailPageState extends State<DetailPage> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Title Section
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.itemIndex < actions.length &&
-                                actions[widget.itemIndex]['type'] == 'name'
-                                ? actions[widget.itemIndex]['value'] as String
-                                : 'Invalid Item',
-                            style: const TextStyle(
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 10.0),
-                          const Text(
-                            'No Description',
-                            style: TextStyle(fontSize: 16.0),
-                          ),
-                        ],
-                      ),
+          : ListView(
+              children: actions.map<Widget>((action) {
+                var actionIndex = actions.indexOf(action);
+                print("Action: $action");
+                print("Widget Index: ${widget.itemIndex}");
+                print("Widget Card: ${widget.card}");
+                print("Widget ID: ${widget.id}");
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
-                    const Divider(),
-
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: actions.map<Widget>((action) {
-                          return ElevatedButton(
-                            onPressed: () {
-                              int count = 0;
-                              Navigator.of(context).popUntil((route) {
-                                count++;
-                                if (count == 3) {
-                                  Navigator.pop(context, {
-                                    'action': actions,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title Section
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.itemIndex < actions.length &&
+                                        actions[widget.itemIndex]['type'] == 'name'
+                                    ? actions[widget.itemIndex]['value'] as String
+                                    : 'Invalid Item',
+                                style: const TextStyle(
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 10.0),
+                              const Text(
+                                'No Description',
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  int count = 0;
+                                  Navigator.of(context).popUntil((route) {
+                                    count++;
+                                    if (count == 3) {
+                                      Navigator.pop(context, {
+                                        'action': actions,
+                                        'index': actionIndex,
+                                      });
+                                      return true;
+                                    }
+                                    return false;
                                   });
-                                  return true;
-                                }
-                                return false;
-                              });
-                            },
-                            child: Text(action['value'] ?? 'No Value'),
-                          );
-                        }).toList(),
-                      ),
+                                },
+                                child: Text(action['value'] ?? 'No Value'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              }).toList(),
             ),
     );
   }

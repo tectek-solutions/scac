@@ -10,7 +10,6 @@ class CreatePage extends StatefulWidget {
   _CreatePageState createState() => _CreatePageState();
 }
 
-
 class _CreatePageState extends State<CreatePage> {
   String resultTitleAction = 'Actions';
   String resultDescriptionAction = 'Go to Action Page';
@@ -20,25 +19,16 @@ class _CreatePageState extends State<CreatePage> {
   String resultDescriptionReaction = 'Go to Reaction Page';
   String resultReaction = 'No reaction selected';
 
-  Map<String, String> actions = {};
-  Map<String, String> reactions = {};
+  static Map<String, String> actions = {};
+  static Map<String, String> actionCleaned = {};
+  static Map<String, String> reactions = {};
+  static Map<String, String> reactionCleaned = {};
 
-  final List<Map<String, String>> data = [
-      {"test1": "Enter mail"},
-      {"test2": "Workflow"},
-      {"test3": "Reaction"},
-      {"test4": "Action"},
-
-    ];
+  bool isActionSelected = false;
+  bool isReactionSelected = false;
 
   Map<String, String> reactionData = {};
   Map<String, TextEditingController> controllers = {};
-  
-
-  final List<String> availableValues = ["Option 1", "Option 2", "Option 3"];
-  String? selectedValue;
-
-  Map<String, String?> selectedValues = {}; // Stocke les sélections indépendantes
   Map<String, TextEditingController> reactionControllers = {};
 
   final Color boxColor = Colors.grey[700]!; // Définissez une couleur commune
@@ -46,25 +36,18 @@ class _CreatePageState extends State<CreatePage> {
   @override
   void initState() {
     super.initState();
-    // Initialiser chaque clé avec une valeur vide pour permettre à l'utilisateur de rentrer directement du texte
-    data.forEach((entry) {
-      final key = entry.keys.first;
-      selectedValues[key] = availableValues.first; // Vous pouvez mettre une valeur par défaut pour la sélection
-    });
-  
-    for (var entry in data) {
-      final key = entry.keys.first;
-      controllers[key] = TextEditingController(text: ""); // Initialisez avec une chaîne vide
-    }
-  
-    for (var entry in reactionData.entries) {
-      final key = entry.key;
-      reactionControllers[key] = TextEditingController(text: ""); // Initialisez avec une chaîne vide
-    }
+    _initializeControllers(actionCleaned, controllers);
+    _initializeControllers(reactionCleaned, reactionControllers);
   }
+
+  void _initializeControllers(Map<String, String> data, Map<String, TextEditingController> controllers) {
+    data.forEach((key, value) {
+      controllers[key] = TextEditingController(text: value);
+    });
+  }
+
   @override
   void dispose() {
-    // Nettoyer les contrôleurs pour éviter les fuites de mémoire
     controllers.forEach((key, controller) => controller.dispose());
     reactionControllers.forEach((key, controller) => controller.dispose());
     super.dispose();
@@ -73,10 +56,33 @@ class _CreatePageState extends State<CreatePage> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Vérification si l'affichage est mobile
     final isMobile = screenWidth < 600;
 
-    reactions.removeWhere((key, value) => key == 'value');
+    for (var entry in actions.entries) {
+      final key = entry.key;
+      final controller = entry.value;
+      actionCleaned[key] = controller;
+    }
+
+    for (var entry in reactions.entries) {
+      final key = entry.key;
+      final controller = entry.value;
+      reactionCleaned[key] = controller;
+    }
+
+    actionCleaned.removeWhere((key, value) => key == 'value');
+    reactionCleaned.removeWhere((key, value) => key == 'value');
+
+    print('Action Cleaned: $actionCleaned');
+    print('Actions: $actions');
+    print('Reaction Cleaned: $reactionCleaned');
+    print('Reactions: $reactions');
+
+    isActionSelected = actionCleaned.isNotEmpty;
+    isReactionSelected = reactionCleaned.isNotEmpty;
+
+    _syncControllers(actionCleaned, controllers);
+    _syncControllers(reactionCleaned, reactionControllers);
 
     return Scaffold(
       appBar: AppBar(
@@ -98,16 +104,16 @@ class _CreatePageState extends State<CreatePage> {
               ),
               const SizedBox(height: 20.0),
 
-              // Carte d'Action
               GestureDetector(
                 onTap: () async {
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const ServicePage()),
                   );
-                  if (result != null && result['action'] != null) {
+                  if (result != null && result['index'] != null && result['action'] != null) {
                     setState(() {
-                      actions = result['action'][0];
+                      var index = result['index'];
+                      actions = result['action'][index];
                     });
                     print('Data received from Widget B HERE: $result');
                   } else {
@@ -119,7 +125,7 @@ class _CreatePageState extends State<CreatePage> {
                   title: resultTitleAction,
                   description: resultDescriptionAction,
                   actionLabel: 'Action: ',
-                  actionValue: resultAction,
+                  actionValue: actions['value'] ?? resultAction,
                 ),
               ),
 
@@ -127,21 +133,20 @@ class _CreatePageState extends State<CreatePage> {
               const Icon(Icons.add, size: 30.0),
               const SizedBox(height: 10.0),
 
-              // Carte de Réaction
               GestureDetector(
                 onTap: () async {
                   final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ReactionPage()),
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ReactionPage(actions)),
                   );
-                  if (result != null && result['reaction'] != null) {
-                    setState(() {
-                      reactions = result['reaction'][0];
-                    });
-                    print('Data received from Widget B: $result');
+                  if (result != null && result['index'] != null && result['reaction'] != null) {
+                  setState(() {
+                    reactions = result['reaction'][result['index']];
+                  });
+                  print('Data received from Widget B: $result');
                   } else {
-                    print('No data received');
+                  print('No data received');
                   }
                 },
                 child: _buildOptionCard(
@@ -149,54 +154,68 @@ class _CreatePageState extends State<CreatePage> {
                   title: resultTitleReaction,
                   description: resultDescriptionReaction,
                   actionLabel: 'Reaction: ',
-                  actionValue: resultReaction,
+                  actionValue: reactions['value'] ?? resultReaction,
                 ),
               ),
 
               const SizedBox(height: 20.0),
 
-              // Cards réactives pour Action et Reaction
               isMobile
                   ? Column(
                       children: [
-                        _buildActionReactionCard(
-                          title: 'Action',
-                          data: actions,
-                          controllers: controllers,
-                        ),
+                        isActionSelected
+                            ? _buildActionReactionCard(
+                                title: 'Action',
+                                data: actionCleaned,
+                                controllers: controllers,
+                              )
+                            : const SizedBox.shrink(),
                         const SizedBox(height: 20.0),
-                        _buildActionReactionCard(
-                          title: 'Reaction',
-                          data: reactions,
-                          controllers: reactionControllers,
-                        ),
+                        isReactionSelected
+                            ? _buildActionReactionCard(
+                                title: 'Reaction',
+                                data: reactionCleaned,
+                                controllers: reactionControllers,
+                              )
+                            : const SizedBox.shrink(),
                       ],
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        isActionSelected
+                            ?
                         Flexible(
                           child: _buildActionReactionCard(
                             title: 'Action',
-                            data: actions,
+                            data: actionCleaned,
                             controllers: controllers,
                           ),
-                        ),
+                        ) : const SizedBox.shrink(),
                         const SizedBox(width: 16.0),
+                        isReactionSelected
+                            ?
                         Flexible(
                           child: _buildActionReactionCard(
                             title: 'Reaction',
-                            data: reactions,
+                            data: reactionCleaned,
                             controllers: reactionControllers,
                           ),
-                        ),
+                        ) : const SizedBox.shrink(),
                       ],
                     ),
 
               const SizedBox(height: 10.0),
               TextButton(
                 onPressed: () {
-                  // Fonctionnalités pour le bouton Continue
+                  final actionData = controllers.map((key, controller) {
+                    return MapEntry(key, controller.text);
+                  });
+                  final reactionData = reactionControllers.map((key, controller) {
+                    return MapEntry(key, controller.text);
+                  });
+                  print('Action Data: $actionData');
+                  print('Reaction Data: $reactionData');
                 },
                 child: const Text(
                   'Create Workflow',
@@ -210,7 +229,16 @@ class _CreatePageState extends State<CreatePage> {
     );
   }
 
-  // Widget générique pour les options (Action et Reaction)
+  void _syncControllers(Map<String, String> data, Map<String, TextEditingController> controllers) {
+    data.forEach((key, value) {
+      if (controllers.containsKey(key)) {
+        controllers[key]!.text = value;
+      } else {
+        controllers[key] = TextEditingController(text: value);
+      }
+    });
+  }
+
   Widget _buildOptionCard({
     required IconData icon,
     required String title,
@@ -277,7 +305,6 @@ class _CreatePageState extends State<CreatePage> {
     );
   }
 
-  // Widget générique pour les cartes Action et Reaction
   Widget _buildActionReactionCard({
     required String title,
     required Map<String, dynamic> data,
@@ -300,8 +327,20 @@ class _CreatePageState extends State<CreatePage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            data.isEmpty
+                ? Center(
+                    child: Text(
+                        'No data required for this ${title.toLowerCase()}.',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                      ),
+                    ),
+                  )
+                :
             const SizedBox(height: 20.0),
-            ...data.entries.map((entry) {
+            ...data.entries
+                .where((entry) => entry.key != 'value')
+                .map((entry) {
               final key = entry.key;
               final value = entry.value;
               return Padding(

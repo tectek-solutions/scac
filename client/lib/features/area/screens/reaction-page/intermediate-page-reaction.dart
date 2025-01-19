@@ -10,8 +10,9 @@ class IntermediatePageReaction extends StatefulWidget {
   static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
   int itemIndex;
   int id;
+  final dynamic action;
 
-  IntermediatePageReaction({required this.itemIndex, required this.id, super.key});
+  IntermediatePageReaction({required this.itemIndex, required this.id, required this.action, super.key});
 
   @override
   State<IntermediatePageReaction> createState() => _IntermediatePageReactionState();
@@ -42,7 +43,7 @@ class _IntermediatePageReactionState extends State<IntermediatePageReaction> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DetailPage(itemIndex: index, id: widget.id, card: cards[index]),
+        builder: (context) => DetailPage(itemIndex: index, id: widget.id, card: cards[index], action: widget.action),
       ),
     );
   }
