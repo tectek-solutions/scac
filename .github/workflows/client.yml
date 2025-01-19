@@ -20,3 +20,4 @@ jobs:
       image_name: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:client-latest
       context: .
       push_on_main: true
+      api_url: http://scac-api.duckdns.org

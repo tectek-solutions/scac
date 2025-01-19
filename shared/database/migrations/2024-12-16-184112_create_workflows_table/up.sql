@@ -4,7 +4,7 @@ CREATE TABLE workflows (
     -- Unique ID
     users_id INT NOT NULL,
     -- References the user
-    name VARCHAR(64) NOT NULL,
+    name VARCHAR(128) NOT NULL,
     -- Workflow name
     description TEXT,
     -- Workflow description

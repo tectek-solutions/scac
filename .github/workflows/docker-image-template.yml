@@ -20,6 +20,10 @@ on:
         required: false
         default: true
         type: boolean
+      api_url:
+        description: "API URL"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -56,11 +60,17 @@ jobs:
         run: echo "mode=$([[ '${{ github.event_name }}' == 'pull_request' ]] && echo '--load' || echo '--push')" >> $GITHUB_ENV
 
       - name: Build and Push Multi-Architecture Docker Image
+        env:
+          DOCKERFILE: ${{ inputs.dockerfile }}
+          IMAGE_NAME: ${{ inputs.image_name }}
+          CONTEXT: ${{ inputs.context }}
+          API_URL: ${{ inputs.api_url }}
         run: |
           docker buildx build \
-            --file ${{ inputs.dockerfile }} \
-            --tag ${{ inputs.image_name }} \
+            --file $DOCKERFILE \
+            --tag $IMAGE_NAME \
+            $([[ -n "$API_URL" ]] && echo "--build-arg API_URL=$API_URL" || echo "") \
             --cache-from=type=local,src=/tmp/.buildx-cache \
             --cache-to=type=local,dest=/tmp/.buildx-cache,mode=max \
             ${{ env.mode }} \
-            ${{ inputs.context }}
+            $CONTEXT

@@ -23,7 +23,6 @@ services:
       - "5432"
     networks:
       - internal
-
     volumes:
       - database-data:/var/lib/postgresql/data
 
@@ -40,7 +39,9 @@ services:
       - internal
 
   migration:
-    image: ghcr.io/tectek-solutions/scac:migration-latest
+    build:
+      context: .
+      dockerfile: ./shared/database/Dockerfile
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
     networks:
@@ -50,11 +51,13 @@ services:
         condition: service_healthy
 
   actions-service:
-    image: ghcr.io/tectek-solutions/scac:actions-service-latest
+    build:
+      context: .
+      dockerfile: ./services/actions-service/Dockerfile
     expose:
       - "8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -69,11 +72,13 @@ services:
       - cache
 
   apis-service:
-    image: ghcr.io/tectek-solutions/scac:apis-service-latest
+    build:
+      context: .
+      dockerfile: ./services/apis-service/Dockerfile
     expose:
       - "8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -88,11 +93,13 @@ services:
       - cache
 
   authentications-service:
-    image: ghcr.io/tectek-solutions/scac:authentications-service-latest
+    build:
+      context: .
+      dockerfile: ./services/authentications-service/Dockerfile
     expose:
       - "8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -107,11 +114,13 @@ services:
       - cache
 
   reactions-service:
-    image: ghcr.io/tectek-solutions/scac:reactions-service-latest
+    build:
+      context: .
+      dockerfile: ./services/reactions-service/Dockerfile
     expose:
       - "8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -126,11 +135,13 @@ services:
       - cache
 
   trigger-service:
-    image: ghcr.io/tectek-solutions/scac:trigger-service-latest
+    build:
+      context: .
+      dockerfile: ./services/trigger-service/Dockerfile
     expose:
       - "8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -145,11 +156,13 @@ services:
       - cache
 
   user-tokens-service:
-    image: ghcr.io/tectek-solutions/scac:user-tokens-service-latest
+    build:
+      context: .
+      dockerfile: ./services/user-tokens-service/Dockerfile
     expose:
       - "8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -164,11 +177,13 @@ services:
       - cache
 
   users-service:
-    image: ghcr.io/tectek-solutions/scac:users-service-latest
+    build:
+      context: .
+      dockerfile: ./services/users-service/Dockerfile
     expose:
       - "8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -181,14 +196,15 @@ services:
     depends_on:
       - migration
       - cache
-
 
   workflows-service:
-    image: ghcr.io/tectek-solutions/scac:workflows-service-latest
+    build:
+      context: .
+      dockerfile: ./services/workflows-service/Dockerfile
     expose:
       - "8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
@@ -201,13 +217,15 @@ services:
     depends_on:
       - migration
       - cache
-
+     
   api-gateway:
-    image: ghcr.io/tectek-solutions/scac:api-gateway-latest
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
     ports:
       - "8000:8000"
     environment:
-      RUST_LOG: debug
+      RUST_LOG: info
       BINDING_ADDRESS: 0.0.0.0
       BINDING_PORT: 8000
       ACTIONS_SERVICE_ADDRESS: actions-service
@@ -238,19 +256,19 @@ services:
       - users-service
       - workflows-service
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/authentications/ || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 3
-
+      retries: 3  
 
   client:
-    image: ghcr.io/tectek-solutions/scac:client-latest
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+      args:
+        - API_URL=http://localhost:8000
     ports:
       - "3000:3000"
-    environment:
-      API_URL: http://localhost:8000
-      CLIENT_URL: http://localhost:8000
     networks:
       - internal
     depends_on:
