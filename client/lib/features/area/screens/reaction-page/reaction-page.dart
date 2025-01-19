@@ -15,7 +15,8 @@ const baseUrlString =
 final storage = FlutterSecureStorage();
 
 class ReactionPage extends StatefulWidget {
-  const ReactionPage({super.key});
+  final dynamic action;
+  const ReactionPage(this.action, {super.key});
 
   @override
   _ReactionPageState createState() => _ReactionPageState();
@@ -51,7 +52,7 @@ class _ReactionPageState extends State<ReactionPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => IntermediatePageReaction(itemIndex: index, id: service['id']),
+        builder: (context) => IntermediatePageReaction(itemIndex: index, id: service['id'], action: widget.action),
       ),
     );
   }

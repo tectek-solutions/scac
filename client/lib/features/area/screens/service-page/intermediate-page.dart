@@ -21,7 +21,7 @@ class _IntermediatePageState extends State<IntermediatePage> {
   @override
   void initState() {
     super.initState();
-    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/${widget.id}');
+    apiService = ApiService(baseUrl: IntermediatePage.baseUrlString, route: '/apis/authentications/${widget.id}');
     apiService.fetchCards().then((value) {
       if (value is Map<String, dynamic>) {
         value = [value];
