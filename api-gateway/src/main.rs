@@ -47,6 +47,7 @@ impl Context {
             "user-tokens",
             "users",
             "workflows",
+            "about"
         ];
 
         let services = service_names
