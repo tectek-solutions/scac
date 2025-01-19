@@ -26,8 +26,6 @@ class _DetailPageState extends State<DetailPage> {
     route: '/actions/apis/${widget.id}'
     );
     apiService.fetchCards().then((value) {
-      print("OK");
-      print("Passed value: $value");
       setState(() {
         for (var i = 0; i < value.length; i++) {
           actions.add({
@@ -35,7 +33,6 @@ class _DetailPageState extends State<DetailPage> {
             ...value[i]['data_keys'],
           });
         }
-        print("Actions: $actions");
       });
     });
   }
@@ -53,10 +50,6 @@ class _DetailPageState extends State<DetailPage> {
           : ListView(
               children: actions.map<Widget>((action) {
                 var actionIndex = actions.indexOf(action);
-                print("Action: $action");
-                print("Widget Index: ${widget.itemIndex}");
-                print("Widget Card: ${widget.card}");
-                print("Widget ID: ${widget.id}");
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Card(

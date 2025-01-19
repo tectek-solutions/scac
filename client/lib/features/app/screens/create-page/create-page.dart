@@ -27,7 +27,7 @@ class _CreatePageState extends State<CreatePage> {
   bool isActionSelected = false;
   bool isReactionSelected = false;
 
-  Map<String, String> reactionData = {};
+  // Map<String, String> reactionData = {};
   Map<String, TextEditingController> controllers = {};
   Map<String, TextEditingController> reactionControllers = {};
 
@@ -54,8 +54,8 @@ class _CreatePageState extends State<CreatePage> {
   }
 
   Widget build(BuildContext context) {
+  
     final screenWidth = MediaQuery.of(context).size.width;
-
     final isMobile = screenWidth < 600;
 
     for (var entry in actions.entries) {
@@ -72,11 +72,6 @@ class _CreatePageState extends State<CreatePage> {
 
     actionCleaned.removeWhere((key, value) => key == 'value');
     reactionCleaned.removeWhere((key, value) => key == 'value');
-
-    print('Action Cleaned: $actionCleaned');
-    print('Actions: $actions');
-    print('Reaction Cleaned: $reactionCleaned');
-    print('Reactions: $reactions');
 
     isActionSelected = actionCleaned.isNotEmpty;
     isReactionSelected = reactionCleaned.isNotEmpty;
@@ -141,12 +136,12 @@ class _CreatePageState extends State<CreatePage> {
                     builder: (context) => ReactionPage(actions)),
                   );
                   if (result != null && result['index'] != null && result['reaction'] != null) {
-                  setState(() {
-                    reactions = result['reaction'][result['index']];
-                  });
-                  print('Data received from Widget B: $result');
+                    setState(() {
+                      reactions = result['reaction'][result['index']];
+                    });
+                    print('Data received from Widget B: $result');
                   } else {
-                  print('No data received');
+                    print('No data received');
                   }
                 },
                 child: _buildOptionCard(
@@ -208,9 +203,14 @@ class _CreatePageState extends State<CreatePage> {
               const SizedBox(height: 10.0),
               TextButton(
                 onPressed: () {
-                  final actionData = controllers.map((key, controller) {
-                    return MapEntry(key, controller.text);
+                  var actionData = {};
+                  if (controllers.isEmpty) {
+                    actionData = actions;
+                  } else {
+                    actionData = controllers.map((key, controller) {
+                    return MapEntry(key, controller.text.isNotEmpty ? controller.text : actions['value']);
                   });
+                  }
                   final reactionData = reactionControllers.map((key, controller) {
                     return MapEntry(key, controller.text);
                   });

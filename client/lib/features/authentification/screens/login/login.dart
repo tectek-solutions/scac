@@ -25,8 +25,6 @@ class _LoginScreen extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final ApiAccountService _apiService = ApiAccountService(baseUrl: baseUrlString);
 
-  final String _url_google = "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=936038757007-d2vvj4kjm98vcod9e9ek9ilvoeij1fcr.apps.googleusercontent.com&redirect_uri=$baseUrlString/oauth2/authorize/google&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar https://mail.google.com/&state=test_state";
-
   @override
   Widget build(BuildContext context) {
     final dark = THelperFunctions.isDarkMode(context);
@@ -118,78 +116,6 @@ class _LoginScreen extends State<LoginScreen> {
                       child: const Text("Create an account"),
                     ),
                   ),
-                  const SizedBox(height: TSizes.spaceBtwItems),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Divider(
-                        color: dark
-                            ? Colors.grey.shade700
-                            : Colors.grey.shade300,
-                        thickness: 1.5,
-                        indent: 60,
-                        endIndent: 5,
-                      )),
-                      const Text(
-                        "Or Sign In With",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      Flexible(
-                          child: Divider(
-                        color: dark
-                            ? Colors.grey.shade700
-                            : Colors.grey.shade300,
-                        thickness: 1.5,
-                        indent: 5,
-                        endIndent: 60,
-                      )),
-                    ],
-                  ),
-
-                  const SizedBox(height: TSizes.sapceBtwSections),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: IconButton(
-                          onPressed: () async {
-                            try {
-                              await launchUrl(Uri.parse(_url_google));
-                            } catch (e) {
-                              print('Erreur lors de l\'ouverture du lien: $e');
-                            }
-                          },
-                          icon: const Image(
-                            width: TSizes.iconMd,
-                            height: TSizes.iconMd,
-                            image: AssetImage(TImages.google),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: TSizes.spaceBtwItems),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: IconButton(
-                          onPressed: () {},
-                          icon: const Image(
-                            width: TSizes.iconMd,
-                            height: TSizes.iconMd,
-                            image: AssetImage(TImages.facebook),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
                 ],
               ),
             ),

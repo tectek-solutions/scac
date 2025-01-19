@@ -29,7 +29,6 @@ class _DetailPageState extends State<DetailPage> {
       if (value is Map<String, dynamic>) {
         value = [value];
       }
-      print("Passed value: $value");
       setState(() {
         for (var i = 0; i < value.length; i++) {
           reactions.add({
@@ -37,7 +36,6 @@ class _DetailPageState extends State<DetailPage> {
             ...value[i]['data_keys'],
           });
         }
-        print("Reactions: $reactions");
       });
     });
   }
