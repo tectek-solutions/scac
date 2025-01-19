@@ -285,20 +285,20 @@ services:
       timeout: 5s
       retries: 3  
 
-  # client:
-  #   build:
-  #     context: .
-  #     dockerfile: ./client/Dockerfile
-  #     args:
-  #       - API_URL=http://localhost:8000
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - internal
-  #   depends_on:
-  #     - api-gateway
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+  client:
+    build:
+      context: .
+      dockerfile: ./client/Dockerfile
+      args:
+        - API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    networks:
+      - internal
+    depends_on:
+      - api-gateway
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
