@@ -66,11 +66,10 @@ class _CreatePageState extends State<CreatePage> {
   }
 
   void createWorkflow(Map<String, String> actionData, Map<String, String> reactionData) async {
-  apiService.addCard(name, description, int.parse(actionIndex), int.parse(reactionIndex), actionData, reactionData);
-}
+    apiService.addCard(name, description, int.parse(actionIndex), int.parse(reactionIndex), actionData, reactionData);
+  }
 
   Widget build(BuildContext context) {
-  
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
 
@@ -97,24 +96,27 @@ class _CreatePageState extends State<CreatePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create a workflow'),
+        title: const Text('Create a Workflow'),
         centerTitle: true,
+        backgroundColor: Colors.teal,
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               _buildNameDescriptionFields(
                 name: name,
                 description: description,
               ),
+              const SizedBox(height: 20.0),
               const Text(
                 'Select an option below to proceed:',
                 style: TextStyle(
                   fontSize: 24.0,
                   fontWeight: FontWeight.bold,
+                  color: Colors.teal,
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -146,15 +148,16 @@ class _CreatePageState extends State<CreatePage> {
               ),
 
               const SizedBox(height: 10.0),
-              const Icon(Icons.add, size: 30.0),
+              const Icon(Icons.add, size: 30.0, color: Colors.teal),
               const SizedBox(height: 10.0),
 
               GestureDetector(
                 onTap: () async {
                   final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ReactionPage(actions)),
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReactionPage(actions),
+                    ),
                   );
                   if (result != null && result['index'] != null && result['id'] != null && result['reaction'] != null) {
                     setState(() {
@@ -202,37 +205,37 @@ class _CreatePageState extends State<CreatePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         isActionSelected
-                            ?
-                        Flexible(
-                          child: _buildActionReactionCard(
-                            title: 'Action',
-                            data: actionCleaned,
-                            controllers: controllers,
-                          ),
-                        ) : const SizedBox.shrink(),
+                            ? Flexible(
+                                child: _buildActionReactionCard(
+                                  title: 'Action',
+                                  data: actionCleaned,
+                                  controllers: controllers,
+                                ),
+                              )
+                            : const SizedBox.shrink(),
                         const SizedBox(width: 16.0),
                         isReactionSelected
-                            ?
-                        Flexible(
-                          child: _buildActionReactionCard(
-                            title: 'Reaction',
-                            data: reactionCleaned,
-                            controllers: reactionControllers,
-                          ),
-                        ) : const SizedBox.shrink(),
+                            ? Flexible(
+                                child: _buildActionReactionCard(
+                                  title: 'Reaction',
+                                  data: reactionCleaned,
+                                  controllers: reactionControllers,
+                                ),
+                              )
+                            : const SizedBox.shrink(),
                       ],
                     ),
 
               const SizedBox(height: 10.0),
-              TextButton(
+              ElevatedButton(
                 onPressed: () {
                   Map<String, String> actionData = {};
                   if (controllers.isEmpty) {
                     actionData = actions;
                   } else {
                     actionData = controllers.map((key, controller) {
-                    return MapEntry(key, controller.text.isNotEmpty ? controller.text : (actions['value'] ?? ''));
-                  });
+                      return MapEntry(key, controller.text.isNotEmpty ? controller.text : (actions['value'] ?? ''));
+                    });
                   }
                   Map<String, String> reactionData = reactionControllers.map((key, controller) {
                     return MapEntry(key, controller.text);
@@ -255,10 +258,13 @@ class _CreatePageState extends State<CreatePage> {
                     reactionIndex = "";
                   });
                 },
-                child: const Text(
-                  'Create Workflow',
-                  style: TextStyle(fontSize: 16.0),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,  // Remplacer 'primary' par 'backgroundColor'
+                  padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                  textStyle: const TextStyle(fontSize: 16.0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
                 ),
+                child: const Text('Create Workflow'),
               ),
             ],
           ),
@@ -285,16 +291,16 @@ class _CreatePageState extends State<CreatePage> {
     required String actionValue,
   }) {
     return Card(
-      elevation: 4.0,
+      elevation: 8.0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(16.0),
       ),
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, size: 30.0),
+            Icon(icon, size: 40.0, color: Colors.teal),
             const SizedBox(width: 16.0),
             Expanded(
               child: Column(
@@ -303,8 +309,9 @@ class _CreatePageState extends State<CreatePage> {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 20.0,
                       fontWeight: FontWeight.bold,
+                      color: Colors.teal,
                     ),
                   ),
                   const SizedBox(height: 8.0),
@@ -312,7 +319,7 @@ class _CreatePageState extends State<CreatePage> {
                     description,
                     style: TextStyle(
                       fontSize: 14.0,
-                      color: boxColor,
+                      color: Colors.grey[600],
                     ),
                   ),
                   const SizedBox(height: 8.0),
@@ -322,7 +329,7 @@ class _CreatePageState extends State<CreatePage> {
                         actionLabel,
                         style: TextStyle(
                           fontSize: 14.0,
-                          color: boxColor,
+                          color: Colors.grey[600],
                         ),
                       ),
                       Text(
@@ -386,9 +393,9 @@ class _CreatePageState extends State<CreatePage> {
     required Map<String, TextEditingController> controllers,
   }) {
     return Card(
-      elevation: 4.0,
+      elevation: 8.0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(16.0),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -398,55 +405,60 @@ class _CreatePageState extends State<CreatePage> {
             Text(
               title,
               style: const TextStyle(
-                fontSize: 18.0,
+                fontSize: 20.0,
                 fontWeight: FontWeight.bold,
+                color: Colors.teal,
               ),
             ),
+            const SizedBox(height: 12.0),
             data.isEmpty
                 ? Center(
                     child: Text(
-                        'No data required for this ${title.toLowerCase()}.',
+                      'No data required for this ${title.toLowerCase()}.',
                       style: TextStyle(
                         fontSize: 16.0,
+                        color: Colors.grey[600],
                       ),
                     ),
                   )
-                :
-            const SizedBox(height: 20.0),
-            ...data.entries
-                .where((entry) => entry.key != 'value')
-                .map((entry) {
-              final key = entry.key;
-              final value = entry.value;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        key,
-                        style: const TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16.0),
-                    Expanded(
-                      flex: 3,
-                      child: TextField(
-                        controller: controllers[key],
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: value,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+                : ListView(
+                    shrinkWrap: true,
+                    children: data.entries
+                        .where((entry) => entry.key != 'value')
+                        .map((entry) {
+                          final key = entry.key;
+                          final value = entry.value;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    key,
+                                    style: const TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.teal,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16.0),
+                                Expanded(
+                                  flex: 3,
+                                  child: TextField(
+                                    controller: controllers[key],
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      hintText: value,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                  ),
           ],
         ),
       ),

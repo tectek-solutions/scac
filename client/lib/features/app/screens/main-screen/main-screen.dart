@@ -22,7 +22,6 @@ class _MainScreenState extends State<MainScreen> {
   int currentPage = 0;
   final List<Widget> pages = [
     ClickableCardScreen(),
-    // const ExplorePage(),
     const CreatePage(),
     const Profile(),
   ];
@@ -44,11 +43,6 @@ class _MainScreenState extends State<MainScreen> {
             label: 'My Workflows',
             backgroundColor: TColors.lightColor,
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.search),
-          //   label: 'Search',
-          //   backgroundColor: TColors.lightColor,
-          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),
             label: 'Create Workflow',
