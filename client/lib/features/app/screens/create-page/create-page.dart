@@ -54,23 +54,27 @@ class _CreatePageState extends State<CreatePage> {
     super.dispose();
   }
 
-  void createWorkflow() async {
-  final url = Uri.parse('https://your-api-endpoint.com/create-workflow');
-  final response = await http.post(
-    url,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      // Mettre les bonnes valeurs ici
-    }),
-  );
+  void createWorkflow(Map<String, dynamic> actionData, Map<String, dynamic> reactionData) async {
+  final actionId = actions['id'];
+  final reactionId = reactions['id'];
+  print('Action Data Here: $actionData');
+  print('Reaction Data: $reactionData');
+  // final url = Uri.parse('https://your-api-endpoint.com/create-workflow');
+  // final response = await http.post(
+  //   url,
+  //   headers: <String, String>{
+  //     'Content-Type': 'application/json; charset=UTF-8',
+  //   },
+  //   body: jsonEncode(<String, String>{
+  //     // Mettre les bonnes valeurs ici
+  //   }),
+  // );
 
-  if (response.statusCode == 200) {
-    print('Workflow created successfully');
-  } else {
-    print('Failed to create workflow');
-  }
+  // if (response.statusCode == 200) {
+  //   print('Workflow created successfully');
+  // } else {
+  //   print('Failed to create workflow');
+  // }
 }
 
   Widget build(BuildContext context) {
@@ -231,13 +235,13 @@ class _CreatePageState extends State<CreatePage> {
                     return MapEntry(key, controller.text.isNotEmpty ? controller.text : actions['value']);
                   });
                   }
-                  final reactionData = reactionControllers.map((key, controller) {
+                  var reactionData = reactionControllers.map((key, controller) {
                     return MapEntry(key, controller.text);
                   });
                   print('Action Data: $actionData');
                   print('Reaction Data: $reactionData');
                   // Fonction pour créer le workflow (POST request)
-                  //createWorkflow();
+                  createWorkflow(actionData.cast<String, dynamic>(), reactionData.cast<String, dynamic>());
                 },
                 child: const Text(
                   'Create Workflow',

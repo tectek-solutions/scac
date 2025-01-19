@@ -70,8 +70,7 @@ class _DetailPageState extends State<DetailPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.itemIndex < reactions.length &&
-                                        reactions[widget.itemIndex]['type'] == 'name'
+                                widget.itemIndex < reactions.length
                                     ? reactions[widget.itemIndex]['value'] as String
                                     : 'Invalid Item',
                                 style: const TextStyle(
