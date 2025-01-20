@@ -35,16 +35,7 @@ VALUES (
         ),
         'Reddit',
         'https://oauth.reddit.com'
-    ),
-    (
-        (
-            SELECT id
-            FROM authentications
-            WHERE name = 'Twitter'
-        ),
-        'Twitter',
-        'https://api.twitter.com/2'
-    ),
+    ),  
     (
         (
             SELECT id
