@@ -67,8 +67,7 @@ struct ApiDoc;
 async fn run_background_job(db: web::Data<database::Database>) {
     let mut interval = interval(Duration::from_secs(10));
     loop {
-        interval.tick().await;
-
+        
         let workflows = match query::list_workflows(&db) {
             Ok(Some(workflows)) => workflows,
             Ok(None) => {
@@ -80,7 +79,7 @@ async fn run_background_job(db: web::Data<database::Database>) {
                 continue;
             }
         };
-
+        
 
         for workflow in workflows {
             let worker = worker::Worker::new(&db, workflow);
@@ -91,6 +90,7 @@ async fn run_background_job(db: web::Data<database::Database>) {
                 Ok(_) => info!("Trigger created"),
                 Err(err) => error!("Error creating trigger: {:?}", err),
             }
+            interval.tick().await;
         }
     }
 }
