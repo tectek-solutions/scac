@@ -12,9 +12,11 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
   bool _showDetail = false;
   static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
   ApiService apiService = ApiService(baseUrl: baseUrlString, route: '/workflows/');
+  static const clientUrl = String.fromEnvironment('CLIENT_URL', defaultValue: 'http://localhost:3000');
   List<dynamic> services = [];
   bool _isLoading = true;
   bool _hasError = false;
+  bool _isDownloadButtonHovered = false; // Booléen pour l'effet de survol du bouton de téléchargement
 
   @override
   void initState() {
@@ -66,12 +68,41 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
         backgroundColor: Colors.teal,
         automaticallyImplyLeading: false,
         actions: [
+          // Utilisation de MouseRegion pour détecter le survol du bouton de téléchargement
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: IconButton(
-              onPressed: () {
+            child: MouseRegion(
+              onEnter: (_) {
+                setState(() {
+                  _isDownloadButtonHovered = true; // Survol actif
+                });
               },
-              icon: Icon(Icons.download),
+              onExit: (_) {
+                setState(() {
+                  _isDownloadButtonHovered = false; // Survol terminé
+                });
+              },
+              child: IconButton(
+                onPressed: () {
+                  void downloadFile() async {
+                    try {
+                      final response = await apiService.downloadFile('${clientUrl}/client.apk');
+                      if (response.statusCode == 200) {
+                        print('File downloaded successfully');
+                      } else {
+                        print('Failed to download file');
+                      }
+                    } catch (e) {
+                      print('Error downloading file: $e');
+                    }
+                  }
+
+                  downloadFile();
+                },
+                icon: Icon(Icons.download),
+                color: _isDownloadButtonHovered ? Colors.blue : Colors.white, // Changer la couleur du bouton au survol
+                iconSize: _isDownloadButtonHovered ? 30.0 : 24.0, // Modifier la taille du bouton au survol
+              ),
             ),
           ),
         ],
@@ -122,6 +153,15 @@ class _ClickableCardScreenState extends State<ClickableCardScreen> {
                             ),
                           )
                         : const Center(child: Text('No services available')),
+            // Affichage d'une description sous le bouton de téléchargement lors du survol
+            if (_isDownloadButtonHovered)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  'Click to download the client APK.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
           ],
         ),
       ),
