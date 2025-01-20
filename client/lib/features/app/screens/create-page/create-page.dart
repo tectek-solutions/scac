@@ -66,7 +66,26 @@ class _CreatePageState extends State<CreatePage> {
   }
 
   void createWorkflow(Map<String, String> actionData, Map<String, String> reactionData) async {
-  apiService.addCard(name, description, int.parse(actionIndex), int.parse(reactionIndex), actionData, reactionData);
+  if (await apiService.addCard(name, description, int.parse(actionIndex), int.parse(reactionIndex), actionData, reactionData)) {
+    setState(() {
+      name = '';
+      description = '';
+      actions.clear();
+      actionCleaned.clear();
+      reactions.clear();
+      reactionCleaned.clear();
+      controllers.clear();
+      reactionControllers.clear();
+      nameController.clear();
+      descriptionController.clear();
+      isActionSelected = false;
+      isReactionSelected = false;
+      actionIndex = "";
+      reactionIndex = "";
+    });
+  } else {
+    print('Failed to create workflow');
+  }
 }
 
   Widget build(BuildContext context) {
@@ -238,22 +257,6 @@ class _CreatePageState extends State<CreatePage> {
                     return MapEntry(key, controller.text);
                   });
                   createWorkflow(actionData, reactionData);
-                  setState(() {
-                    name = '';
-                    description = '';
-                    actions.clear();
-                    actionCleaned.clear();
-                    reactions.clear();
-                    reactionCleaned.clear();
-                    controllers.clear();
-                    reactionControllers.clear();
-                    nameController.clear();
-                    descriptionController.clear();
-                    isActionSelected = false;
-                    isReactionSelected = false;
-                    actionIndex = "";
-                    reactionIndex = "";
-                  });
                 },
                 child: const Text(
                   'Create Workflow',

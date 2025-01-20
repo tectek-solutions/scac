@@ -46,9 +46,12 @@ class ApiService {
     }
   }
 
-  Future<void> addCard(String name, String description, int actionId, int reactionId, Map<String, String> actionData, Map<String, String> reactionData) async {
+  Future<bool> addCard(String name, String description, int actionId, int reactionId, Map<String, String> actionData, Map<String, String> reactionData) async {
     final url = Uri.parse('$baseUrl$route');
     final token = await storage.read(key: 'jwt');
+    if (name == "" || description == "" || actionId == 0 || reactionId == 0) {
+      throw Exception('Failed to add');
+    }
     final response = await http.post(
       url,
       headers: {
@@ -66,9 +69,15 @@ class ApiService {
       }),
     );
     if (response.statusCode == 200) {
-      return;
+      return true;
     } else {
       throw Exception('Failed to add');
     }
+  }
+
+  Future<http.Response> downloadFile(String url) async {
+    final response = await http.get(Uri.parse(url));
+    return response;
+
   }
 }
