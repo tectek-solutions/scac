@@ -217,7 +217,28 @@ services:
     depends_on:
       - migration
       - cache
-     
+  
+  about-service:
+    build:
+      context: .
+      dockerfile: ./services/about-service/Dockerfile
+    expose:
+      - "8000"
+    environment:
+      RUST_LOG: info
+      BINDING_ADDRESS: 0.0.0.0
+      BINDING_PORT: 8000
+      POSTGRES_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://cache:6379
+      JWT_SECRET: ${JWT_SECRET}
+      API_URL: http://localhost:8000
+      CLIENT_URL: http://localhost:3000
+    networks:
+      - internal
+    depends_on:
+      - migration
+      - cache
+
   api-gateway:
     build:
       context: .
@@ -244,6 +265,8 @@ services:
       USERS_SERVICE_PORT: 8000
       WORKFLOWS_SERVICE_ADDRESS: workflows-service
       WORKFLOWS_SERVICE_PORT: 8000
+      ABOUT_SERVICE_ADDRESS: about-service
+      ABOUT_SERVICE_PORT: 8000
     networks:
       - internal
     depends_on:
@@ -255,6 +278,7 @@ services:
       - user-tokens-service
       - users-service
       - workflows-service
+      - about-service
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
       interval: 10s
