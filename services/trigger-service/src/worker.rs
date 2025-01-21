@@ -177,8 +177,6 @@ impl Worker {
 
         let action_url = format!("{}{}", action_api.base_url, action_http_endpoint);
 
-        info!("URL: {}", action_url);
-
         let method = match reqwest::Method::from_bytes(action.http_method.as_bytes()) {
             Ok(method) => method,
             Err(err) => {
@@ -374,6 +372,13 @@ impl Worker {
             }   
         };
 
+        info!("Action Method: {:?}", method);
+        info!("Action URL: {}", action_url);
+        info!("Action Host: {}", action_host);
+        info!("Action Params: {:?}", action_params_map);
+        info!("Action Headers: {:?}", action_headers_map);
+        info!("Action Body: {}", action_http_body);
+
         let request = client
             .request(method, &action_url)
             .form(&action_params_map)
@@ -407,9 +412,12 @@ impl Worker {
             }
         };
 
-        info!("Response status: {:?}", response.status());
+        info!("Action Response status: {:?}", response.status());
+        info!("Action Response headers: {:?}", response.headers());
 
         let response_raw = response.text().await;
+
+        info!("Actions Response body: {:?}", response_raw);
 
         let data: serde_json::Value = match response_raw {
             Ok(text) => serde_json::from_str(&text).unwrap_or_default(),
@@ -422,7 +430,11 @@ impl Worker {
             }
         };
 
+        info!("Action JSON response: {:?}", data);
+
         let last_id_json_path = action.last_id_json_path.clone();
+
+        info!("Last id json path: {:?}", last_id_json_path);
 
         let id_retrieved = match data.pointer(&last_id_json_path) {
             Some(id) => id,
@@ -614,8 +626,6 @@ impl Worker {
         };
 
         let reaction_url = format!("{}{}", reaction_api.base_url, reaction_http_endpoint);
-
-        info!("Reaction URL: {}", reaction_url);
 
         let method = match reqwest::Method::from_bytes(reaction.http_method.as_bytes()) {
             Ok(method) => method,
@@ -813,7 +823,13 @@ impl Worker {
             }   
         };
 
+        info!("Reaction Method: {:?}", method);
+        info!("Reaction URL: {}", reaction_url);
         info!("Reaction Host: {}", reaction_host);
+        info!("Reaction Params: {:?}", reaction_params_map);
+        info!("Reaction Headers: {:?}", reaction_headers_map);
+        info!("Reaction Body: {}", reaction_http_body);
+
 
         let request = client
             .request(method, &reaction_url)
@@ -837,6 +853,8 @@ impl Worker {
 
         let response = client.execute(request).await;
 
+        info!("Reaction Response: {:?}", response);
+
         let response = match response {
             Ok(response) => response,
             Err(err) => {
@@ -849,6 +867,7 @@ impl Worker {
         };
 
         info!("Reaction Response status: {:?}", response.status());
+        info!("Reaction Response headers: {:?}", response.headers());
         info!("Reaction Response body: {:?}", response.text().await);
 
         CreateTrigger {

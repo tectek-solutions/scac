@@ -24,6 +24,16 @@ services:
       - internal
     volumes:
       - database-data:/var/lib/postgresql/data
+    
+  pgadmin:
+    image: dpage/pgadmin4:8.14.0
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5000:80"
+    networks:
+      - internal
 
   cache:
     image: redis:7.4.1-bookworm
