@@ -14,7 +14,8 @@ class CreatePage extends StatefulWidget {
 }
 
 class _CreatePageState extends State<CreatePage> {
-  ApiService apiService = ApiService(baseUrl: 'http://localhost:8000', route: '/workflows/');
+  static const baseUrlString = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:8000');
+  ApiService apiService = ApiService(baseUrl: baseUrlString, route: '/workflows/');
 
   String resultTitleAction = 'Actions';
   String resultDescriptionAction = 'Go to Action Page';
